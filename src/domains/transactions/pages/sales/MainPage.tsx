@@ -58,10 +58,16 @@ export const MainPage: React.FC = () => {
 
   // Secondary filters
   const [entity, setEntity] = useState('');
+  const [client, setClient] = useState('');
   const [documentType, setDocumentType] = useState('');
 
   // Modal state for upload sales
   const [isUploadOpen, setUploadOpen] = useState(false);
+
+  // Auto-apply filters when secondary filter values change
+  useEffect(() => {
+    applyAllFilters();
+  }, [entity, client, documentType, sales, filterType, month, year, startDate, endDate]);
 
   const handleRegisterSale = () => {
     navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`);
@@ -98,12 +104,34 @@ export const MainPage: React.FC = () => {
       }
     }
 
-    // Aplicar filtro de entidad (búsqueda en correlativo como aproximación)
+    // Aplicar filtro de serie y número (buscar en la concatenación serie + " - " + numero)
     if (entity) {
-      filtered = filtered.filter((sale) =>
-        sale.correlativo?.toLowerCase().includes(entity.toLowerCase()) ||
-        sale.serie?.toLowerCase().includes(entity.toLowerCase())
-      );
+      filtered = filtered.filter((sale) => {
+        const serieNumero = `${sale.serie}-${sale.numero}`;
+        return serieNumero.toLowerCase().includes(entity.toLowerCase()) ||
+               sale.correlativo?.toLowerCase().includes(entity.toLowerCase());
+      });
+    }
+
+    // Aplicar filtro de cliente (buscar en razonSocial, nombreCompleto, numeroDocumento)
+    if (client) {
+      filtered = filtered.filter((sale) => {
+        const searchTerm = client.toLowerCase();
+        const entidad = sale.entidad;
+        
+        if (!entidad) return false;
+        
+        // Buscar en razón social
+        const razonSocial = entidad.razonSocial?.toLowerCase() || '';
+        // Buscar en nombre completo
+        const nombreCompleto = entidad.nombreCompleto?.toLowerCase() || '';
+        // Buscar en número de documento
+        const numeroDocumento = entidad.numeroDocumento?.toLowerCase() || '';
+        
+        return razonSocial.includes(searchTerm) ||
+               nombreCompleto.includes(searchTerm) ||
+               numeroDocumento.includes(searchTerm);
+      });
     }
 
     // Aplicar filtro de tipo de documento
@@ -112,10 +140,10 @@ export const MainPage: React.FC = () => {
         const docTypeMap: { [key: string]: string } = {
           'factura': 'FACTURA',
           'boleta': 'BOLETA',
-          'nota-credito': 'NOTA DE CREDITO',
-          'nota-debito': 'NOTA DE DEBITO'
+          'nota-credito': 'NOTA_CREDITO',
+          'nota-debito': 'NOTA_DEBITO'
         };
-        return sale.tipoComprobante?.toUpperCase() === docTypeMap[documentType];
+        return sale.tipoComprobante?.toUpperCase() === docTypeMap[documentType]?.toUpperCase();
       });
     }
 
@@ -163,12 +191,10 @@ export const MainPage: React.FC = () => {
             cells: [
               sale.correlativo,
               sale.tipoComprobante,
-              sale.serie,
-              sale.numero,
+              sale.entidad.tipo === 'JURIDICA' ? sale.entidad.razonSocial : sale.entidad.nombreCompleto,
+              sale.serie + "-" + sale.numero,
               sale.fechaEmision,
               sale.fechaVencimiento !== null ? sale.fechaVencimiento : "No especificado",
-              sale.moneda,
-              sale.tipoCambio,
               sale.totales?.totalGeneral.toString(),
               <Button 
                 size='tableItemSize' 
@@ -187,17 +213,15 @@ export const MainPage: React.FC = () => {
   const headers = [
     'Correlativo',
     'Tipo Comprobante',
-    'Serie',
-    'Número',
+    'Cliente',
+    "Serie y Número",
     'Fecha Emisión',
     'Fecha Vencimiento',
-    'Moneda',
-    'Tipo Cambio',
     'Total General',
     'Acciones'
   ];
 
-  const gridTemplate = '0.8fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr 1fr';
+  const gridTemplate = '0.6fr 0.8fr 1fr 0.8fr 1fr 1fr 1fr 1fr';
 
   return (
     <PageLayout
@@ -310,6 +334,21 @@ export const MainPage: React.FC = () => {
       <section className={styles.filtersSecondary}>
         <div className={styles.filter}>
           <Text size="xs" color="neutral-primary">
+            Cliente
+          </Text>
+          <Input
+            type="text"
+            size="xs"
+            variant="createSale"
+            value={client}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setClient(e.target.value)
+            }
+            placeholder="Buscar por cliente"
+          />
+        </div>
+        <div className={styles.filter}>
+          <Text size="xs" color="neutral-primary">
             Serie y número
           </Text>
           <Input
@@ -320,7 +359,7 @@ export const MainPage: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setEntity(e.target.value)
             }
-            placeholder="Buscar por correlativo o serie"
+            placeholder="Buscar por serie y número"
           />
         </div>
         <div className={styles.filter}>
@@ -352,7 +391,7 @@ export const MainPage: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         title={`Detalle de Venta - ${selectedSale?.numero || ''}`}
-        description={`${selectedSale?.persona?.razonSocial || selectedSale?.persona?.nombreCompleto || ''} - ${selectedSale?.fechaEmision || ''}`}
+        description={`${selectedSale?.persona?.razonSocial || ''} - ${selectedSale?.fechaEmision || ''}`}
       >
         {selectedSale && (
           <div>
@@ -364,11 +403,11 @@ export const MainPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '16px' }}>
                 <div>
                   <Text size="sm" weight={500}>Número de Documento:</Text>
-                  <Text size="sm">{selectedSale.persona.numeroDocumento}</Text>
+                  <Text size="sm">{selectedSale.persona.razonSocial}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Razón Social:</Text>
-                  <Text size="sm">{selectedSale.persona.razonSocial || selectedSale.persona.nombreCompleto}</Text>
+                  <Text size="sm">{selectedSale.persona.razonSocial || selectedSale.persona.direccion}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Tipo de Comprobante:</Text>

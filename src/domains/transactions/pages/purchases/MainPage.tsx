@@ -59,10 +59,16 @@ export const MainPage: React.FC = () => {
 
   // Secondary filters
   const [entity, setEntity] = useState("");
+  const [provider, setProvider] = useState("");
   const [documentType, setDocumentType] = useState("");
 
   // Modal state for upload purchases
   const [isUploadOpen, setUploadOpen] = useState(false);
+
+  // Auto-apply filters when secondary filter values change
+  useEffect(() => {
+    applyAllFilters();
+  }, [entity, provider, documentType, purchases, filterType, month, year, startDate, endDate]);
 
   const handleRegisterPurchase = () => {
     navigate(
@@ -103,12 +109,34 @@ export const MainPage: React.FC = () => {
       }
     }
 
-    // Aplicar filtro de entidad (búsqueda en correlativo como aproximación)
+    // Aplicar filtro de serie y número (buscar en la concatenación serie + " - " + numero)
     if (entity) {
-      filtered = filtered.filter((purchase) =>
-        purchase.correlativo?.toLowerCase().includes(entity.toLowerCase()) ||
-        purchase.serie?.toLowerCase().includes(entity.toLowerCase())
-      );
+      filtered = filtered.filter((purchase) => {
+        const serieNumero = `${purchase.serie}-${purchase.numero}`;
+        return serieNumero.toLowerCase().includes(entity.toLowerCase()) ||
+               purchase.correlativo?.toLowerCase().includes(entity.toLowerCase());
+      });
+    }
+
+    // Aplicar filtro de proveedor (buscar en razonSocial, nombreCompleto, numeroDocumento)
+    if (provider) {
+      filtered = filtered.filter((purchase) => {
+        const searchTerm = provider.toLowerCase();
+        const entidad = purchase.entidad;
+        
+        if (!entidad) return false;
+        
+        // Buscar en razón social
+        const razonSocial = entidad.razonSocial?.toLowerCase() || '';
+        // Buscar en nombre completo
+        const nombreCompleto = entidad.nombreCompleto?.toLowerCase() || '';
+        // Buscar en número de documento
+        const numeroDocumento = entidad.numeroDocumento?.toLowerCase() || '';
+        
+        return razonSocial.includes(searchTerm) ||
+               nombreCompleto.includes(searchTerm) ||
+               numeroDocumento.includes(searchTerm);
+      });
     }
 
     // Aplicar filtro de tipo de documento
@@ -120,12 +148,16 @@ export const MainPage: React.FC = () => {
           'nota-credito': 'NOTA DE CREDITO',
           'nota-debito': 'NOTA DE DEBITO'
         };
-        return purchase.tipoComprobante?.toUpperCase() === docTypeMap[documentType];
+        
+        const expectedType = docTypeMap[documentType];
+        const actualType = purchase.tipoComprobante?.toUpperCase();
+        const matches = actualType === expectedType;
+        
+        return matches;
       });
     }
 
     setFilteredPurchases(filtered);
-    console.log("Filtered purchases:", filtered);
   };
 
   /**
@@ -171,7 +203,7 @@ export const MainPage: React.FC = () => {
               purchase.correlativo,
               purchase.tipoComprobante,
               purchase.entidad.tipo === 'JURIDICA' ? purchase.entidad.razonSocial : purchase.entidad.nombreCompleto,
-              purchase.serie + " - " + purchase.numero,
+              purchase.serie + "-" + purchase.numero,
               purchase.fechaEmision,
               purchase.fechaVencimiento !== null ? purchase.fechaVencimiento : "No especificado",
               purchase.totales.totalGeneral.toString(),
@@ -313,6 +345,21 @@ export const MainPage: React.FC = () => {
       <section className={styles.filtersSecondary}>
         <div className={styles.filter}>
           <Text size="xs" color="neutral-primary">
+            Proveedor
+          </Text>
+          <Input
+            type="text"
+            size="xs"
+            variant="createSale"
+            value={provider}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setProvider(e.target.value)
+            }
+            placeholder="Buscar por proveedor"
+          />
+        </div>
+        <div className={styles.filter}>
+          <Text size="xs" color="neutral-primary">
             Serie y número
           </Text>
           <Input
@@ -323,7 +370,7 @@ export const MainPage: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setEntity(e.target.value)
             }
-            placeholder="Buscar por correlativo o serie"
+            placeholder="Buscar por serie y número"
           />
         </div>
         <div className={styles.filter}>

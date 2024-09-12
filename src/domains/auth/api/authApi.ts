@@ -3,12 +3,6 @@ import { AUTH_ENDPOINTS } from "./endpoints";
 
 export const authApi = {
     login: async (payload: {email: string, contrasena: string}) => {
-        console.log('authApi: Iniciando solicitud de login', {
-            endpoint: AUTH_ENDPOINTS.LOGIN,
-            baseURL: apiClient.defaults.baseURL,
-            hasEmail: !!payload.email
-        });
-        
         try {
             const response = await apiClient.post(AUTH_ENDPOINTS.LOGIN, payload);
             console.log('authApi: Login exitoso', {
