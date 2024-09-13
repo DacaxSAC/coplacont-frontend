@@ -21,7 +21,10 @@ import {
 } from "@/domains/maintainers/services";
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
-import type { Entidad, EntidadParcial } from "@/domains/maintainers/services/entitiesService";
+import type {
+  Entidad,
+  EntidadParcial,
+} from "@/domains/maintainers/services/entitiesService";
 import { FormEntidad } from "@/domains/maintainers/organisms/FormEntidad/FormEntidad";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import { TipoComprobanteEnum, MonedaEnum } from "./enums";
@@ -61,21 +64,23 @@ export const CreateSaleForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Obtener el correlativo al montar el componente
-  useEffect(() => {
-    const fetchCorrelativo = async () => {
-      try {
-        const response = await TransactionsService.getCorrelative("venta");
-        setFormState((prev) => ({
-          ...prev,
-          correlativo: response.correlativo,
-        }));
-      } catch (error) {
-        console.error("Error al obtener el correlativo:", error);
-      }
-    };
 
+  const fetchCorrelativo = async () => {
+    try {
+      const response = await TransactionsService.getCorrelative("venta");
+      setFormState((prev) => ({
+        ...prev,
+        correlativo: response.correlativo,
+      }));
+    } catch (error) {
+      console.error("Error al obtener el correlativo:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchCorrelativo();
   }, []);
+
   const [productoSeleccionado, setProductoSeleccionado] = useState<
     ProductoType | ""
   >("");
@@ -113,7 +118,7 @@ export const CreateSaleForm = () => {
       ...prev,
       cliente: String(value),
     }));
-    
+
     // Si se selecciona un cliente, limpiar el texto de búsqueda
     if (value) {
       setClientSearchText("");
@@ -395,16 +400,21 @@ export const CreateSaleForm = () => {
         idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== '';
-      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== '';
+      const fechaEmisionValida =
+        formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida =
+        formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
       const ventaData: any = {
         idPersona: getSelectedClientId() || 1,
         tipoOperacion: "venta",
         tipoComprobante: formState.tipoComprobante || "FACTURA",
-        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
+        fechaEmision: fechaEmisionValida
+          ? new Date(formState.fechaEmision).toISOString()
+          : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD",
-        tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio),
+        tipoCambio:
+          formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio),
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         detalles: detallesAPI,
@@ -412,7 +422,9 @@ export const CreateSaleForm = () => {
 
       // Solo agregar fechaVencimiento si es válida
       if (fechaVencimientoValida) {
-        ventaData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+        ventaData.fechaVencimiento = new Date(
+          formState.fechaVencimiento
+        ).toISOString();
       }
 
       await TransactionsService.registerSale(ventaData);
@@ -440,17 +452,22 @@ export const CreateSaleForm = () => {
         idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== '';
-      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== '';
+      const fechaEmisionValida =
+        formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida =
+        formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
       const ventaData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
         tipoOperacion: "venta", // Valor fijo
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
+        fechaEmision: fechaEmisionValida
+          ? new Date(formState.fechaEmision).toISOString()
+          : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
-        tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio), // Tipo de cambio fake para dólares
+        tipoCambio:
+          formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio), // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         detalles: detallesAPI,
@@ -458,7 +475,9 @@ export const CreateSaleForm = () => {
 
       // Solo agregar fechaVencimiento si es válida
       if (fechaVencimientoValida) {
-        ventaData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+        ventaData.fechaVencimiento = new Date(
+          formState.fechaVencimiento
+        ).toISOString();
       }
 
       await TransactionsService.registerSale(ventaData);
@@ -484,6 +503,8 @@ export const CreateSaleForm = () => {
       navigate(
         `${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`
       );
+
+      fetchCorrelativo();
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     } finally {
@@ -507,9 +528,12 @@ export const CreateSaleForm = () => {
   const handleEliminarProducto = (index: number) => {
     const productoEliminado = detalleVenta[index];
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
-    
+
     // Si el producto eliminado es el que está actualmente seleccionado, limpiar la selección
-    if (productoEliminado && productoSeleccionado === productoEliminado.producto) {
+    if (
+      productoEliminado &&
+      productoSeleccionado === productoEliminado.producto
+    ) {
       setProductoSeleccionado("");
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
@@ -555,7 +579,7 @@ export const CreateSaleForm = () => {
   console.log(warehouses);
   const [inventarioProductos, setInventarioProductos] = useState<any[]>([]);
   const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
-  
+
   // Estados para el modal de nuevo cliente
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
   const [newClientData, setNewClientData] = useState<EntidadParcial>({
@@ -572,7 +596,7 @@ export const CreateSaleForm = () => {
   });
   const [newClientError, setNewClientError] = useState("");
   const [newClientLoading, setNewClientLoading] = useState(false);
-  
+
   // Estado para rastrear el texto ingresado en el ComboBox de cliente
   const [clientSearchText, setClientSearchText] = useState("");
 
@@ -633,9 +657,11 @@ export const CreateSaleForm = () => {
   };
 
   const getProductosInventarioOptions = () => {
-    const productosEnDetalle = detalleVenta.map(item => item.producto);
+    const productosEnDetalle = detalleVenta.map((item) => item.producto);
     return inventarioProductos
-      .filter(item => !productosEnDetalle.includes(item.producto.id.toString()))
+      .filter(
+        (item) => !productosEnDetalle.includes(item.producto.id.toString())
+      )
       .map((item) => ({
         value: item.producto.id.toString(),
         label: `${item.producto.nombre} (Stock: ${item.stockActual})`,
@@ -695,7 +721,7 @@ export const CreateSaleForm = () => {
   const getClientSearchText = (): string => {
     // Si hay un valor seleccionado, no hay texto libre
     if (formState.cliente) return "";
-    
+
     // Retornar el texto de búsqueda capturado
     return clientSearchText;
   };
@@ -706,9 +732,12 @@ export const CreateSaleForm = () => {
    * Precarga el número de documento si se ingresó texto en el ComboBox
    */
   const handleOpenNewClientModal = () => {
-    const tipoEntidad = formState.tipoComprobante === TipoComprobanteEnum.FACTURA ? "JURIDICA" : "NATURAL";
+    const tipoEntidad =
+      formState.tipoComprobante === TipoComprobanteEnum.FACTURA
+        ? "JURIDICA"
+        : "NATURAL";
     const numeroDocumentoIngresado = getClientSearchText();
-    
+
     setNewClientData({
       esProveedor: false,
       esCliente: true,
@@ -736,10 +765,13 @@ export const CreateSaleForm = () => {
   /**
    * Maneja los cambios en el formulario de nuevo cliente
    */
-  const handleNewClientChange = (field: keyof Entidad, value: string | number | boolean) => {
-    setNewClientData(prev => ({
+  const handleNewClientChange = (
+    field: keyof Entidad,
+    value: string | number | boolean
+  ) => {
+    setNewClientData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -750,18 +782,18 @@ export const CreateSaleForm = () => {
     try {
       setNewClientLoading(true);
       const response = await EntitiesService.postEntidad(newClientData);
-      
+
       if (response.success && response.data) {
         // Actualizar la lista de clientes
         const updatedClients = await EntitiesService.getClients();
         setClients(updatedClients);
-        
+
         // Seleccionar automáticamente el nuevo cliente
-        setFormState(prev => ({
+        setFormState((prev) => ({
           ...prev,
-          cliente: response.data!.id.toString()
+          cliente: response.data!.id.toString(),
         }));
-        
+
         // Cerrar el modal
         handleCloseNewClientModal();
       } else {
@@ -833,8 +865,8 @@ export const CreateSaleForm = () => {
             />
           </div>
           {shouldShowAddClientButton() && (
-            <Button 
-              size="tableItemSize" 
+            <Button
+              size="tableItemSize"
               variant="tableItemStyle"
               onClick={handleOpenNewClientModal}
             >
@@ -940,6 +972,7 @@ export const CreateSaleForm = () => {
               variant="createSale"
               value={formState.serie}
               onChange={handleInputChange("serie")}
+              maxLength={5}
             />
           </div>
 
@@ -954,6 +987,7 @@ export const CreateSaleForm = () => {
               variant="createSale"
               value={formState.numero}
               onChange={handleInputChange("numero")}
+              maxLength={20}
             />
           </div>
 
@@ -1175,11 +1209,11 @@ export const CreateSaleForm = () => {
       </div>
 
       {/* Modal para agregar nuevo cliente */}
-       <Modal
-         isOpen={isNewClientModalOpen}
-         onClose={handleCloseNewClientModal}
-         title="Agregar Nuevo Cliente"
-       >
+      <Modal
+        isOpen={isNewClientModalOpen}
+        onClose={handleCloseNewClientModal}
+        title="Agregar Nuevo Cliente"
+      >
         <FormEntidad
           entidad={newClientData}
           error={newClientError}

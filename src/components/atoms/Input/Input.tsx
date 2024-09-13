@@ -1,5 +1,6 @@
-import React from 'react';
 import styles from './Input.module.scss';
+import { useContext } from 'react';
+import { ThemeContext } from '@/shared';
 
 export interface InputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'date';
@@ -24,6 +25,11 @@ export interface InputProps {
    * Por ejemplo, en CreateSaleForm
    */
   variant?: 'default' | 'createSale';
+  /**
+   * Longitud máxima permitida para el input
+   */
+  maxLength?: number;
+
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -42,7 +48,14 @@ export const Input: React.FC<InputProps> = ({
   size = 'medium',
   endAdornment,
   variant = 'default',
+  maxLength,
 }) => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  if (!theme || !toggleTheme) {
+    return null;
+  }
+  
   const inputClassName = `${styles.input} ${styles[`input--${size}`]} ${error ? styles['input--error'] : ''} ${disabled ? styles['input--disabled'] : ''} ${endAdornment ? styles['input--with-adornment'] : ''} ${variant !== 'default' ? styles[`input--${variant}`] : ''}`.trim();
 
   // Si no hay endAdornment, renderizar solo el input
@@ -61,6 +74,7 @@ export const Input: React.FC<InputProps> = ({
         id={id}
         name={name}
         autoComplete={autoComplete}
+        maxLength={maxLength}
       />
     );
   }
@@ -101,6 +115,7 @@ export const Input: React.FC<InputProps> = ({
         id={id}
         name={name}
         autoComplete={autoComplete}
+        maxLength={maxLength}
       />
       <div className={styles.endAdornment}>
         {endAdornment}

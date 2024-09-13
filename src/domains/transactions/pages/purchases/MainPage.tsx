@@ -53,7 +53,7 @@ export const MainPage: React.FC = () => {
   // Top filters
   const [filterType, setFilterType] = useState("mes-anio");
   const [month, setMonth] = useState("");
-  const [year, setYear] = useState("2025");
+  const [year, setYear] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 

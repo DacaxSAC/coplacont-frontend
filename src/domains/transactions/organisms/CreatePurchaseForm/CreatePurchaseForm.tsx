@@ -2,14 +2,29 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreatePurchaseForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader, Modal } from "@/components";
+import {
+  Text,
+  Input,
+  ComboBox,
+  Divider,
+  Button,
+  CloseIcon,
+  Loader,
+  Modal,
+} from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
-import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import {
+  ProductService,
+  WarehouseService,
+} from "@/domains/maintainers/services";
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
-import type { Entidad, EntidadParcial } from "@/domains/maintainers/services/entitiesService";
+import type {
+  Entidad,
+  EntidadParcial,
+} from "@/domains/maintainers/services/entitiesService";
 import type { Transaction } from "../../services/types";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import { FormEntidad } from "@/domains/maintainers/organisms/FormEntidad/FormEntidad";
@@ -59,7 +74,8 @@ type TipoComprobanteType =
 type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
 type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum] | string;
 type UnidadMedidaType =
-  (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum] | string;
+  | (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum]
+  | string;
 
 interface DetalleCompraItem {
   id: string;
@@ -145,7 +161,8 @@ export const CreatePurchaseForm = () => {
     UnidadMedidaType | ""
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
-  const [precioUnitarioIngresado, setPrecioUnitarioIngresado] = useState<string>("");
+  const [precioUnitarioIngresado, setPrecioUnitarioIngresado] =
+    useState<string>("");
   const [precioTotalIngresado, setPrecioTotalIngresado] = useState<string>("");
   const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
 
@@ -162,12 +179,16 @@ export const CreatePurchaseForm = () => {
   console.log(tipoCambioAutomatico);
 
   // Estado para compras registradas (para comprobante afecto)
-  const [comprasRegistradas, setComprasRegistradas] = useState<Transaction[]>([]);
+  const [comprasRegistradas, setComprasRegistradas] = useState<Transaction[]>(
+    []
+  );
 
   // Estados para modal de nuevo proveedor
   const [showNewProviderModal, setShowNewProviderModal] = useState(false);
   const [providerSearchText, setProviderSearchText] = useState<string>("");
-  const [newProviderEntity, setNewProviderEntity] = useState<Partial<Entidad>>({});
+  const [newProviderEntity, setNewProviderEntity] = useState<Partial<Entidad>>(
+    {}
+  );
   const [newProviderError, setNewProviderError] = useState<string>("");
   const [newProviderLoading, setNewProviderLoading] = useState(false);
 
@@ -181,14 +202,20 @@ export const CreatePurchaseForm = () => {
    * @param costoAdicional - Monto total a distribuir
    * @returns Array de items con precios unitarios actualizados
    */
-  const distribuirCostosAdicionales = (items: DetalleCompraItem[], costoAdicional: number): DetalleCompraItem[] => {
+  const distribuirCostosAdicionales = (
+    items: DetalleCompraItem[],
+    costoAdicional: number
+  ): DetalleCompraItem[] => {
     if (costoAdicional <= 0 || items.length === 0) {
       return items;
     }
 
     // Calcular la cantidad total de todos los items
-    const cantidadTotal = items.reduce((total, item) => total + item.cantidad, 0);
-    
+    const cantidadTotal = items.reduce(
+      (total, item) => total + item.cantidad,
+      0
+    );
+
     if (cantidadTotal === 0) {
       return items;
     }
@@ -197,40 +224,38 @@ export const CreatePurchaseForm = () => {
     const costoAdicionalPorUnidad = costoAdicional / cantidadTotal;
 
     // Aplicar el mismo costo adicional por unidad a todos los items
-    return items.map(item => {
+    return items.map((item) => {
       const nuevoPrecioUnitario = item.precioUnitario + costoAdicionalPorUnidad;
-      
+
       // Recalcular todos los valores basados en el nuevo precio unitario
       const subtotal = item.cantidad * nuevoPrecioUnitario;
       const baseGravado = subtotal / 1.18; // Asumiendo IGV del 18%
       const igv = subtotal - baseGravado;
       const total = subtotal;
-      
+
       return {
         ...item,
         precioUnitario: nuevoPrecioUnitario,
         subtotal,
         baseGravado,
         igv,
-        total
+        total,
       };
     });
   };
-
+  const fetchCorrelativo = async () => {
+    try {
+      const response = await TransactionsService.getCorrelative("compra");
+      setFormState((prev) => ({
+        ...prev,
+        correlativo: response.correlativo,
+      }));
+    } catch (error) {
+      console.error("Error al obtener el correlativo:", error);
+    }
+  };
   // Obtener el correlativo al montar el componente
   useEffect(() => {
-    const fetchCorrelativo = async () => {
-      try {
-        const response = await TransactionsService.getCorrelative("compra");
-        setFormState((prev) => ({
-          ...prev,
-          correlativo: response.correlativo,
-        }));
-      } catch (error) {
-        console.error("Error al obtener el correlativo:", error);
-      }
-    };
-
     fetchCorrelativo();
   }, []);
 
@@ -257,7 +282,9 @@ export const CreatePurchaseForm = () => {
     const loadInventarioProductos = async () => {
       if (almacenSeleccionado) {
         try {
-          const data = await InventoryService.getInventoryByWarehouse(Number(almacenSeleccionado));
+          const data = await InventoryService.getInventoryByWarehouse(
+            Number(almacenSeleccionado)
+          );
           setInventarioProductos(data);
         } catch (error) {
           console.error("Error al cargar productos del inventario:", error);
@@ -368,8 +395,11 @@ export const CreatePurchaseForm = () => {
   // Función para abrir el modal de nuevo proveedor
   const handleOpenNewProviderModal = () => {
     // Determinar el tipo de entidad basado en el tipo de comprobante
-    const tipoEntidad = formState.tipoComprobante === TipoComprobanteEnum.FACTURA ? "JURIDICA" : "NATURAL";
-    
+    const tipoEntidad =
+      formState.tipoComprobante === TipoComprobanteEnum.FACTURA
+        ? "JURIDICA"
+        : "NATURAL";
+
     // Pre-cargar los datos de la nueva entidad
     const newEntity: Partial<Entidad> = {
       tipo: tipoEntidad as "JURIDICA" | "NATURAL",
@@ -381,9 +411,9 @@ export const CreatePurchaseForm = () => {
       apellidoMaterno: "",
       razonSocial: "",
       direccion: "",
-      telefono: ""
+      telefono: "",
     };
-    
+
     setNewProviderEntity(newEntity);
     setNewProviderError("");
     setShowNewProviderModal(true);
@@ -399,26 +429,28 @@ export const CreatePurchaseForm = () => {
     try {
       setNewProviderLoading(true);
       setNewProviderError("");
-      
-      const response = await EntitiesService.postEntidad(newProviderEntity as EntidadParcial);
-      
+
+      const response = await EntitiesService.postEntidad(
+        newProviderEntity as EntidadParcial
+      );
+
       if (response.success) {
         // Recargar la lista de proveedores
         const proveedoresData = await EntitiesService.getSuppliers();
         setProveedores(proveedoresData);
-        
+
         // Cerrar el modal primero
         setShowNewProviderModal(false);
-        
+
         // Limpiar el texto de búsqueda
         setProviderSearchText("");
-        
+
         // Usar setTimeout para asegurar que el ComboBox se actualice con las nuevas opciones
         // antes de seleccionar el nuevo proveedor
         setTimeout(() => {
-          setFormState(prev => ({
+          setFormState((prev) => ({
             ...prev,
-            proveedor: response.data!.id.toString()
+            proveedor: response.data!.id.toString(),
           }));
         }, 100);
       } else {
@@ -462,7 +494,9 @@ export const CreatePurchaseForm = () => {
       (item) => item.producto.id.toString() === productoId
     );
     if (productoInventario) {
-      setUnidadMedidaSeleccionada(productoInventario.producto.unidadMedida as UnidadMedidaType);
+      setUnidadMedidaSeleccionada(
+        productoInventario.producto.unidadMedida as UnidadMedidaType
+      );
     }
   };
 
@@ -475,7 +509,7 @@ export const CreatePurchaseForm = () => {
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nuevaCantidad = e.target.value;
     setCantidadIngresada(nuevaCantidad);
-    
+
     // Recalcular precio total si hay precio unitario
     if (precioUnitarioIngresado && nuevaCantidad) {
       const cantidad = parseFloat(nuevaCantidad);
@@ -484,7 +518,7 @@ export const CreatePurchaseForm = () => {
         setPrecioTotalIngresado((cantidad * precioUnitario).toString());
       }
     }
-    
+
     // Recalcular precio unitario si hay precio total
     if (precioTotalIngresado && nuevaCantidad) {
       const cantidad = parseFloat(nuevaCantidad);
@@ -496,10 +530,12 @@ export const CreatePurchaseForm = () => {
   };
 
   // Maneja el cambio de precio unitario ingresado
-  const handlePrecioUnitarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePrecioUnitarioChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const nuevoPrecioUnitario = e.target.value;
     setPrecioUnitarioIngresado(nuevoPrecioUnitario);
-    
+
     // Calcular precio total automáticamente si hay cantidad
     if (cantidadIngresada && nuevoPrecioUnitario) {
       const cantidad = parseFloat(cantidadIngresada);
@@ -516,7 +552,7 @@ export const CreatePurchaseForm = () => {
   const handlePrecioTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nuevoPrecioTotal = e.target.value;
     setPrecioTotalIngresado(nuevoPrecioTotal);
-    
+
     // Calcular precio unitario automáticamente si hay cantidad
     if (cantidadIngresada && nuevoPrecioTotal) {
       const cantidad = parseFloat(cantidadIngresada);
@@ -545,7 +581,7 @@ export const CreatePurchaseForm = () => {
       formState.fechaEmision &&
       formState.moneda &&
       formState.serie &&
-      formState.numero 
+      formState.numero
     );
 
     // Validar que haya al menos un item en el detalle
@@ -607,8 +643,10 @@ export const CreatePurchaseForm = () => {
 
   // Función para determinar si debe mostrarse el combo de comprobante afecto
   const shouldShowComprobanteAfecto = (): boolean => {
-    return formState.tipoComprobante === TipoComprobanteEnum.NOTA_CREDITO || 
-           formState.tipoComprobante === TipoComprobanteEnum.NOTA_DEBITO;
+    return (
+      formState.tipoComprobante === TipoComprobanteEnum.NOTA_CREDITO ||
+      formState.tipoComprobante === TipoComprobanteEnum.NOTA_DEBITO
+    );
   };
 
   // Función para obtener las opciones de comprobantes afectos
@@ -623,17 +661,24 @@ export const CreatePurchaseForm = () => {
   // Filtra los productos que ya están en el detalle de compra para el almacén seleccionado
   const getProductosInventarioOptions = () => {
     const productosEnDetalle = detalleCompra
-      .filter(item => item.almacen === (almacenes.find(a => a.id.toString() === almacenSeleccionado)?.nombre || almacenSeleccionado))
-      .map(item => item.producto);
-    
+      .filter(
+        (item) =>
+          item.almacen ===
+          (almacenes.find((a) => a.id.toString() === almacenSeleccionado)
+            ?.nombre || almacenSeleccionado)
+      )
+      .map((item) => item.producto);
+
     return inventarioProductos
-      .filter(item => !productosEnDetalle.includes(item.producto.id.toString()))
+      .filter(
+        (item) => !productosEnDetalle.includes(item.producto.id.toString())
+      )
       .map((item) => ({
         value: item.producto.id.toString(),
         label: `${item.producto.codigo} - ${item.producto.nombre}`,
         unidadMedida: item.producto.unidadMedida,
         stockActual: item.stockActual,
-        precio: item.producto.precio
+        precio: item.producto.precio,
       }));
   };
 
@@ -679,7 +724,9 @@ export const CreatePurchaseForm = () => {
       igv,
       isv,
       total,
-      almacen: almacenes.find(a => a.id.toString() === almacenSeleccionado)?.nombre || almacenSeleccionado,
+      almacen:
+        almacenes.find((a) => a.id.toString() === almacenSeleccionado)
+          ?.nombre || almacenSeleccionado,
       idInventario: productoInventario.id,
     };
 
@@ -698,7 +745,7 @@ export const CreatePurchaseForm = () => {
   // Al eliminar, el producto vuelve a estar disponible en el combo box
   const handleEliminarProducto = (record: DetalleCompraItem, index: number) => {
     setDetalleCompra((prev) => prev.filter((_, i) => i !== index));
-    
+
     // Si el producto eliminado era el que estaba seleccionado, limpiar la selección
     if (productoSeleccionado === record.producto) {
       setProductoSeleccionado("");
@@ -707,7 +754,7 @@ export const CreatePurchaseForm = () => {
       setPrecioUnitarioIngresado("");
       setPrecioTotalIngresado("");
     }
-    
+
     console.log("Producto eliminado:", record);
   };
 
@@ -722,13 +769,16 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      
+
       // Aplicar costos adicionales si existen
       let detalleConCostosAdicionales = [...detalleCompra];
       if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
-        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+        detalleConCostosAdicionales = distribuirCostosAdicionales(
+          detalleCompra,
+          parseFloat(costosAdicionales)
+        );
       }
-      
+
       const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -742,14 +792,18 @@ export const CreatePurchaseForm = () => {
       }));
 
       // Validar y formatear fechas
-      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== "";
-      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
-      
+      const fechaEmisionValida =
+        formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida =
+        formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
+
       const compraData: any = {
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
         tipoOperacion: "compra", // Valor fijo
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
+        fechaEmision: fechaEmisionValida
+          ? new Date(formState.fechaEmision).toISOString()
+          : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
         tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
@@ -759,12 +813,16 @@ export const CreatePurchaseForm = () => {
 
       // Solo agregar fechaVencimiento si es válida
       if (fechaVencimientoValida) {
-        compraData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+        compraData.fechaVencimiento = new Date(
+          formState.fechaVencimiento
+        ).toISOString();
       }
 
       // Solo agregar idComprobanteAfecto si existe
       if (formState.idComprobanteAfecto) {
-        compraData.idComprobanteAfecto = parseInt(formState.idComprobanteAfecto);
+        compraData.idComprobanteAfecto = parseInt(
+          formState.idComprobanteAfecto
+        );
       }
 
       await TransactionsService.registerPurchase(compraData);
@@ -788,13 +846,16 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      
+
       // Aplicar costos adicionales si existen
       let detalleConCostosAdicionales = [...detalleCompra];
       if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
-        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+        detalleConCostosAdicionales = distribuirCostosAdicionales(
+          detalleCompra,
+          parseFloat(costosAdicionales)
+        );
       }
-      
+
       const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -808,30 +869,38 @@ export const CreatePurchaseForm = () => {
       }));
 
       // Validar y formatear fechas
-      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== "";
-      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
-      
+      const fechaEmisionValida =
+        formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida =
+        formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
+
       const compraData: any = {
-        correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
+        correlativo: formState.correlativo, // Usar valor del form o fake
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
         tipoOperacion: "compra", // Valor fijo
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
+        fechaEmision: fechaEmisionValida
+          ? new Date(formState.fechaEmision).toISOString()
+          : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
         tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
-        serie: formState.serie || "F001", // Usar valor del form o fake
-        numero: formState.numero || "1234567890", // Usar valor del form o fake
+        serie: formState.serie, // Usar valor del form o fake
+        numero: formState.numero, // Usar valor del form o fake
         detalles: detallesAPI,
       };
 
       // Solo agregar fechaVencimiento si es válida
       if (fechaVencimientoValida) {
-        compraData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+        compraData.fechaVencimiento = new Date(
+          formState.fechaVencimiento
+        ).toISOString();
       }
 
       // Solo agregar idComprobanteAfecto si existe
       if (formState.idComprobanteAfecto) {
-        compraData.idComprobanteAfecto = parseInt(formState.idComprobanteAfecto);
+        compraData.idComprobanteAfecto = parseInt(
+          formState.idComprobanteAfecto
+        );
       }
 
       await TransactionsService.registerPurchase(compraData);
@@ -860,6 +929,8 @@ export const CreatePurchaseForm = () => {
       navigate(
         `${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.REGISTER}`
       );
+
+      fetchCorrelativo();
     } catch (error) {
       console.error("Error al registrar la compra:", error);
     } finally {
@@ -981,15 +1052,16 @@ export const CreatePurchaseForm = () => {
               disabled={!formState.tipoComprobante}
             />
           </div>
-          {providerSearchText || !formState.proveedor && (
-            <Button 
-              size="tableItemSize" 
-              variant="tableItemStyle"
-              onClick={handleOpenNewProviderModal}
-            >
-              Agregar nuevo proveedor
-            </Button>
-          )}
+          {providerSearchText ||
+            (!formState.proveedor && (
+              <Button
+                size="tableItemSize"
+                variant="tableItemStyle"
+                onClick={handleOpenNewProviderModal}
+              >
+                Agregar nuevo proveedor
+              </Button>
+            ))}
         </div>
 
         {/** Fila 4: Fecha de emisión, Moneda y Tipo de cambio */}
@@ -1076,7 +1148,6 @@ export const CreatePurchaseForm = () => {
 
         {/** Fila 5: Serie, Número y Fecha de vencimiento */}
         <div className={styles.CreatePurchaseForm__FormRow}>
-          
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
@@ -1088,6 +1159,7 @@ export const CreatePurchaseForm = () => {
               variant="createSale"
               value={formState.serie}
               onChange={handleInputChange("serie")}
+              maxLength={5}
             />
           </div>
 
@@ -1102,6 +1174,7 @@ export const CreatePurchaseForm = () => {
               variant="createSale"
               value={formState.numero}
               onChange={handleInputChange("numero")}
+              maxLength={20}
             />
           </div>
 
@@ -1119,21 +1192,21 @@ export const CreatePurchaseForm = () => {
               onChange={handleInputChange("fechaVencimiento")}
             />
           </div>
-           <div
-              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
-            >
-              <Text size="xs" color="neutral-primary">
-                Costos adicionales S/. (opcional)
-              </Text>
-              <Input
-                type="number"
-                size="xs"
-                variant="createSale"
-                value={costosAdicionales}
-                onChange={(e) => setCostosAdicionales(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
+          <div
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Costos adicionales S/. (opcional)
+            </Text>
+            <Input
+              type="number"
+              size="xs"
+              variant="createSale"
+              value={costosAdicionales}
+              onChange={(e) => setCostosAdicionales(e.target.value)}
+              placeholder="0.00"
+            />
+          </div>
         </div>
       </div>
 
@@ -1224,7 +1297,7 @@ export const CreatePurchaseForm = () => {
                 onChange={handlePrecioUnitarioChange}
               />
             </div>
-             <div
+            <div
               className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
             >
               <Text size="xs" color="neutral-primary">
@@ -1256,40 +1329,79 @@ export const CreatePurchaseForm = () => {
                 rows={tableRows}
                 gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
               />
-              
+
               {/* Mensaje informativo sobre costos adicionales */}
               {costosAdicionales && parseFloat(costosAdicionales) > 0 && (
-                <div style={{ marginTop: '8px', marginBottom: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef' }}>
+                <div
+                  style={{
+                    marginTop: "8px",
+                    marginBottom: "8px",
+                    padding: "8px",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "4px",
+                    border: "1px solid #e9ecef",
+                  }}
+                >
                   <Text size="xs" color="neutral-secondary">
-                    A cada producto se le añadirá S/ {(parseFloat(costosAdicionales) / detalleCompra.reduce((sum, item) => sum + item.cantidad, 0)).toFixed(2)} por concepto de costos adicionales
+                    A cada producto se le añadirá S/{" "}
+                    {(
+                      parseFloat(costosAdicionales) /
+                      detalleCompra.reduce(
+                        (sum, item) => sum + item.cantidad,
+                        0
+                      )
+                    ).toFixed(2)}{" "}
+                    por concepto de costos adicionales
                   </Text>
                 </div>
               )}
-              
+
               {/* Totales */}
               <div className={styles.CreatePurchaseForm__Totals}>
                 <div className={styles.CreatePurchaseForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">Subtotal:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleCompra.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)}
+                    Subtotal:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleCompra
+                      .reduce((sum, item) => sum + item.subtotal, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
                 <div className={styles.CreatePurchaseForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">IGV:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleCompra.reduce((sum, item) => sum + item.igv, 0).toFixed(2)}
+                    IGV:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleCompra
+                      .reduce((sum, item) => sum + item.igv, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
                 <div className={styles.CreatePurchaseForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">ISV:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleCompra.reduce((sum, item) => sum + item.isv, 0).toFixed(2)}
+                    ISV:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleCompra
+                      .reduce((sum, item) => sum + item.isv, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
-                <div className={`${styles.CreatePurchaseForm__TotalsRow} ${styles['CreatePurchaseForm__TotalsRow--total']}`}>
-                  <Text size="sm" color="neutral-primary">Total:</Text>
+                <div
+                  className={`${styles.CreatePurchaseForm__TotalsRow} ${styles["CreatePurchaseForm__TotalsRow--total"]}`}
+                >
                   <Text size="sm" color="neutral-primary">
-                    S/ {detalleCompra.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+                    Total:
+                  </Text>
+                  <Text size="sm" color="neutral-primary">
+                    S/{" "}
+                    {detalleCompra
+                      .reduce((sum, item) => sum + item.total, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
               </div>
@@ -1330,9 +1442,9 @@ export const CreatePurchaseForm = () => {
           loading={newProviderLoading}
           setLoading={setNewProviderLoading}
           onChange={(field, value) => {
-            setNewProviderEntity(prev => ({
+            setNewProviderEntity((prev) => ({
               ...prev,
-              [field]: value
+              [field]: value,
             }));
           }}
           onSubmit={handleCreateNewProvider}
