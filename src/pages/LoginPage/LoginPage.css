@@ -1,0 +1,66 @@
+.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.login-page__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.login-page__content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.login-page__title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.login-page__subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.login-page__demo {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
+  backdrop-filter: blur(10px);
+}
+
+.login-page__demo p {
+  margin: 0.25rem 0;
+}
+
+.login-page__demo strong {
+  color: #ffd700;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-page__container {
+    padding: 1rem;
+  }
+  
+  .login-page__title {
+    font-size: 2rem;
+  }
+  
+  .login-page__subtitle {
+    font-size: 1rem;
+  }
+}

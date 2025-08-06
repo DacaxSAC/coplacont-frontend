@@ -1,0 +1,51 @@
+.input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Sizes */
+.input--small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.input--medium {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+}
+
+.input--large {
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+}
+
+/* States */
+.input--error {
+  border-color: #dc3545;
+}
+
+.input--error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.input--disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
