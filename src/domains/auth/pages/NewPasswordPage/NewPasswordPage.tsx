@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { NewPasswordForm, type NewPasswordFormData } from '../../organisms/NewPasswordForm';
+// import styles from './NewPasswordPage.module.scss';
 
-//import styles from './NewPasswordPage.module.scss';
+import { AuthHeader } from '@/components/molecules';
+import { AuthLayout } from '@/components/templates';
+
+import { NewPasswordForm, type NewPasswordFormData } from '@/domains/auth/organisms';
 
 export const NewPasswordPage: React.FC = () => {
   // Estado para manejar el loading y errores del formulario

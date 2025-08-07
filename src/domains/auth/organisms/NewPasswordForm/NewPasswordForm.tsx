@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { FormField } from '../../../../components/molecules/FormField';
-import { Button } from '../../../../components/atoms/Button';
-import { Text } from '../../../../components';
 import styles from './NewPasswordForm.module.scss';
+
+import { Text, Button } from '@/components/atoms';
+import { FormField } from '@/components/molecules';
 
 /**
  * Interfaz para los datos del formulario de nueva contraseña
@@ -16,13 +16,9 @@ export interface NewPasswordFormData {
  * Props para el componente NewPasswordForm
  */
 export interface NewPasswordFormProps {
-  /** Función que se ejecuta al enviar el formulario */
   onSubmit: (data: NewPasswordFormData) => void;
-  /** Indica si el formulario está en proceso de envío */
   isLoading?: boolean;
-  /** Mensaje de error general del formulario */
   error?: string;
-  /** Mensaje de éxito cuando se guarda la contraseña */
   success?: string;
 }
 

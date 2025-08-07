@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { RecoveryPasswordForm, type RecoveryPasswordFormData } from '../../organisms/RecoveryPasswordForm';
+// import styles from './RecoveryPasswordPage.module.scss';
 
-//import styles from './RecoveryPasswordPage.module.scss';
+import { AuthHeader } from '@/components/molecules';
+import { AuthLayout } from '@/components/templates';
+
+import { RecoveryPasswordForm, type RecoveryPasswordFormData } from '@/domains/auth/organisms';
 
 export const RecoveryPasswordPage: React.FC = () => {
   // Estado para manejar el loading y errores del formulario

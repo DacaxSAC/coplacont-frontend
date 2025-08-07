@@ -1,10 +1,10 @@
 import React from 'react';
+// import styles from './HomePage.module.scss';
+
 import { Link } from 'react-router-dom';
-import { PageLayout } from '../../components/templates/PageLayout';
-import { Card } from '../../components/molecules/Card';
-import { Button } from '../../components/atoms/Button';
-import { Text } from '../../components/atoms/Text';
-import styles from './HomePage.module.scss';
+
+import { Text, Button } from '@/components/atoms';
+import { MainLayout } from '@/components/templates';
 
 /**
  * Página de inicio de la aplicación
@@ -12,7 +12,7 @@ import styles from './HomePage.module.scss';
  */
 export const HomePage: React.FC = () => {
   return (
-    <PageLayout >
+    <MainLayout >
       <div >
         <div >
           <Text as="h1" size="4xl" weight={600} color="primary" align="center">
@@ -24,36 +24,26 @@ export const HomePage: React.FC = () => {
         </div>
         
         <div >
-          <Card 
-            title="Iniciar Sesión" 
-            subtitle="Accede a tu cuenta existente"
-            variant="elevated"
-          >
-            <div >
-              <p>¿Ya tienes una cuenta? Inicia sesión para acceder a todas las funcionalidades del sistema.</p>
-              <Link to="/auth/login">
-                <Button variant="primary" size="large">
-                  Iniciar Sesión
-                </Button>
-              </Link>
-            </div>
-          </Card>
+          {/* Temporalmente comentado hasta crear el componente Card */}
+          <div>
+            <h3>Iniciar Sesión</h3>
+            <p>¿Ya tienes una cuenta? Inicia sesión para acceder a todas las funcionalidades del sistema.</p>
+            <Link to="/auth/login">
+              <Button variant="primary" size="large">
+                Iniciar Sesión
+              </Button>
+            </Link>
+          </div>
           
-          <Card 
-            title="Crear Cuenta" 
-            subtitle="Regístrate para comenzar"
-            variant="elevated"
-            className="home-page__card"
-          >
-            <div className="home-page__card-content">
-              <p>¿Nuevo usuario? Crea tu cuenta para comenzar a utilizar nuestro sistema de gestión.</p>
-              <Link to="/auth/register">
-                <Button variant="secondary" size="large">
-                  Crear Cuenta
-                </Button>
-              </Link>
-            </div>
-          </Card>
+          <div>
+            <h3>Crear Cuenta</h3>
+            <p>¿Nuevo usuario? Crea tu cuenta para comenzar a utilizar nuestro sistema de gestión.</p>
+            <Link to="/auth/register">
+              <Button variant="secondary" size="large">
+                Crear Cuenta
+              </Button>
+            </Link>
+          </div>
         </div>
         
         <div className="home-page__features">
@@ -78,7 +68,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-    </PageLayout>
+    </MainLayout>
   );
 };
 

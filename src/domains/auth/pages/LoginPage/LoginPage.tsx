@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { LoginForm, type LoginFormData } from '../../organisms/LoginForm';
+// import styles from './LoginPage.module.scss';
 
-//import styles from './LoginPage.module.scss';
+import { AuthHeader } from '@/components/molecules';
+import { AuthLayout } from '@/components/templates';
+
+import { LoginForm, type LoginFormData } from '@/domains/auth/organisms';
 
 export const LoginPage: React.FC = () => {
   // Estado para manejar el loading y errores del login

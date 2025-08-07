@@ -1,6 +1,10 @@
 import styles from './AuthLayout.module.scss';
 
-export const AuthLayout= ({children}: {children: React.ReactNode}) => {
+export type AuthLayoutProps = {
+  children: React.ReactNode;
+}
+
+export const AuthLayout: React.FC<AuthLayoutProps> = ({children}) => {
   return (
     <div className={styles.AuthLayout}>
       <p className={styles.AuthLayout__title}>Coplacont</p>
