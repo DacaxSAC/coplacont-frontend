@@ -38,8 +38,8 @@ export const FormField: React.FC<FormFieldProps> = ({
       <Text as="label" size="md" weight={500} color="neutral-secondary" align="left" >
         {label}
       </Text>
-      
-      {isPasswordField ? (
+      <div className={styles.inputContainer}>
+        {isPasswordField ? (
         <PasswordInput
           id={id}
           error={error}
@@ -53,11 +53,10 @@ export const FormField: React.FC<FormFieldProps> = ({
           {...inputProps}
         />
       )}
-      
       {error && errorMessage && (
         <Text 
           as="span" 
-          size="sm" 
+          size="xs" 
           color="danger" 
           className={styles.errorMessage}
         >
@@ -68,13 +67,20 @@ export const FormField: React.FC<FormFieldProps> = ({
       {!error && helperText && (
         <Text 
           as="span" 
-          size="sm" 
+          size="xs" 
           color="neutral-secondary" 
           className={styles.helperText}
         >
           {helperText}
         </Text>
       )}
+
+
+      </div>
+      
+      
+      
+      
     </div>
   );
 };

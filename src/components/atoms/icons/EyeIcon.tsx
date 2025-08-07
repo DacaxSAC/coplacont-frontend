@@ -25,7 +25,7 @@ export interface EyeIconProps {
 export const EyeIcon: React.FC<EyeIconProps> = ({
   width = 23,
   height = 23,
-  color = '#1F1F1F',
+  color = 'var(--text-color)',
   className
 }) => {
   return (

@@ -32,4 +32,12 @@
     opacity: 0.8;
   }
 
+  .inputContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
 }
+
+
