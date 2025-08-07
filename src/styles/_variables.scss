@@ -6,8 +6,19 @@
 // COLORES PRINCIPALES
 // -----------------------------------------------------------------------------
 
-// Colores primarios
-$primary-color: #007bff;
+// Colores neutrales
+$neutral-1: #1F1F1F;
+$neutral-2: #3A3A3A;
+$neutral-3: #DBD9D9;
+$neutral-4: #F6F6F6;
+$neutral-5: #FFFFFF;
+
+// Colores principales
+$primary-blue: #003869;
+$secondary-blue: #1A98CA;
+
+
+// Colores primary
 $primary-hover: #0056b3;
 $primary-focus: rgba(0, 123, 255, 0.25);
 
@@ -19,11 +30,11 @@ $secondary-color: #6c757d;
 $secondary-hover: #545b62;
 
 // Colores de estado
-$success-color: #28a745;
+$success-color: #1ABC9C;
 $success-hover: #218838;
-$danger-color: #dc3545;
+$danger-color: #CC2525;
 $danger-hover: #c82333;
-$warning-color: #ffc107;
+$warning-color: #F3CB26;
 $warning-hover: #e0a800;
 $info-color: #17a2b8;
 $info-hover: #138496;
@@ -162,17 +173,11 @@ $border-radius-md: 8px;
 $border-radius-lg: 12px;
 $border-radius-xl: 16px;
 
-$border-width-thin: 1px;
-$border-width-medium: 2px;
-$border-width-thick: 4px;
 
 // -----------------------------------------------------------------------------
 // TRANSICIONES
 // -----------------------------------------------------------------------------
 
-$transition-fast: 0.15s ease-in-out;
-$transition-normal: 0.2s ease-in-out;
-$transition-slow: 0.3s ease-in-out;
 
 // -----------------------------------------------------------------------------
 // BREAKPOINTS RESPONSIVOS

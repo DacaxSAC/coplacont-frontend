@@ -1,0 +1,15 @@
+@import '../../../styles/variables';
+
+.AuthLayout{
+  background-color: $neutral-4;
+  height: 100vh;
+  width: 100vw;
+  padding: 20px;
+
+  &__content{
+    height: 90%;
+    width: 100%;
+    background-color: $neutral-5;
+    border-radius: $border-radius-xl;
+  }
+}

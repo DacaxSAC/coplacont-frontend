@@ -8,22 +8,12 @@
 
   color-scheme: light dark;
   color: $text-light;
-  background-color: $bg-dark;
+  background-color: $neutral-1;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: $font-weight-medium;
-  color: $primary-color;
-  text-decoration: inherit;
-  
-  &:hover {
-    color: $primary-hover;
-  }
 }
 
 body {
@@ -33,41 +23,10 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  @include heading($font-size-6xl, $font-weight-bold);
-  line-height: $line-height-tight;
-}
-
-button {
-  @include button-base;
-  border-radius: $border-radius-md;
-  border: $border-width-thin solid transparent;
-  padding: $spacing-md $spacing-xl;
-  font-size: $font-size-md;
-  background-color: #1a1a1a;
-  transition: border-color $transition-normal;
-  
-  &:hover {
-    border-color: $primary-color;
-  }
-  
-  &:focus,
-  &:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-  }
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: $text-primary;
-    background-color: $bg-primary;
+    background-color: $neutral-5;
   }
   
-  a:hover {
-    color: $primary-hover;
-  }
-  
-  button {
-    background-color: $bg-secondary;
-  }
 }
