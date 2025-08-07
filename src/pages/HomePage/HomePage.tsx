@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageLayout } from '../../components/templates/PageLayout';
 import { Card } from '../../components/molecules/Card';
 import { Button } from '../../components/atoms/Button';
+import { Text } from '../../components/atoms/Text';
 import styles from './HomePage.module.scss';
 
 /**
@@ -14,10 +15,12 @@ export const HomePage: React.FC = () => {
     <PageLayout >
       <div >
         <div >
-          <h1 >Bienvenido a CoPlaCont</h1>
-          <p >
+          <Text as="h1" size="4xl" weight={600} color="primary" align="center">
+            Bienvenido a CoPlaCont
+          </Text>
+          <Text size="lg" color="secondary" align="center" className="mt-4">
             Sistema de gestión contable y administrativa
-          </p>
+          </Text>
         </div>
         
         <div >
