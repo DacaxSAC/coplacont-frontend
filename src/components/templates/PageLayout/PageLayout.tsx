@@ -1,5 +1,5 @@
 import React from 'react';
-import './PageLayout.css';
+import './PageLayout.scss';
 
 export interface PageLayoutProps {
   children: React.ReactNode;

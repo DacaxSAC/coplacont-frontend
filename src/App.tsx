@@ -1,11 +1,15 @@
 import React from 'react';
-import { LoginPage } from './pages/LoginPage';
-import './App.css';
+import { AppRouter } from './router';
+import './App.scss';
 
-function App() {
+/**
+ * Componente principal de la aplicación
+ * Configura el enrutamiento y la estructura base
+ */
+export const App: React.FC = () => {
   return (
     <div className="App">
-      <LoginPage />
+      <AppRouter />
     </div>
   );
 }

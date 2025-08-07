@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PageLayout } from '../../components/templates/PageLayout';
 import { LoginForm } from '../../components/organisms/LoginForm';
-import './LoginPage.css';
+import './LoginPage.scss';
 
 export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +55,11 @@ export const LoginPage: React.FC = () => {
             <p><strong>Demo:</strong></p>
             <p>Email: admin@example.com</p>
             <p>Contraseña: password</p>
+          </div>
+          
+          <div className="login-page__navigation">
+            <p>¿No tienes una cuenta? <Link to="/auth/register" className="login-page__link">Regístrate aquí</Link></p>
+            <p><Link to="/" className="login-page__link">Volver al inicio</Link></p>
           </div>
         </div>
       </div>

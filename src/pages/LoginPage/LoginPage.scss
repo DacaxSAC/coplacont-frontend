@@ -50,6 +50,28 @@
   color: #ffd700;
 }
 
+.login-page__navigation {
+  margin-top: 1.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.login-page__navigation p {
+  margin: 0.5rem 0;
+}
+
+.login-page__link {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.login-page__link:hover {
+  color: #ffed4e;
+  text-decoration: underline;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .login-page__container {

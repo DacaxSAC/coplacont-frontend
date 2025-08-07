@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '../../atoms/Input';
 import type { InputProps } from '../../atoms/Input';
-import './FormField.css';
+import './FormField.scss';
 
 export interface FormFieldProps extends Omit<InputProps, 'id'> {
   label: string;
