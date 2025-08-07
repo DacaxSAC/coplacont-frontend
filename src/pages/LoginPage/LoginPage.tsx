@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PageLayout } from '../../components/templates/PageLayout';
 import { LoginForm } from '../../components/organisms/LoginForm';
-import './LoginPage.scss';
+import styles from './LoginPage.module.scss';
 
 export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageLayout } from '../../components/templates/PageLayout';
 import { Card } from '../../components/molecules/Card';
 import { Button } from '../../components/atoms/Button';
-import './HomePage.scss';
+import styles from './HomePage.module.scss';
 
 /**
  * Página de inicio de la aplicación
@@ -11,23 +11,22 @@ import './HomePage.scss';
  */
 export const HomePage: React.FC = () => {
   return (
-    <PageLayout className="home-page">
-      <div className="home-page__container">
-        <div className="home-page__hero">
-          <h1 className="home-page__title">Bienvenido a CoPlaCont</h1>
-          <p className="home-page__subtitle">
+    <PageLayout >
+      <div >
+        <div >
+          <h1 >Bienvenido a CoPlaCont</h1>
+          <p >
             Sistema de gestión contable y administrativa
           </p>
         </div>
         
-        <div className="home-page__cards">
+        <div >
           <Card 
             title="Iniciar Sesión" 
             subtitle="Accede a tu cuenta existente"
             variant="elevated"
-            className="home-page__card"
           >
-            <div className="home-page__card-content">
+            <div >
               <p>¿Ya tienes una cuenta? Inicia sesión para acceder a todas las funcionalidades del sistema.</p>
               <Link to="/auth/login">
                 <Button variant="primary" size="large">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppRouter } from './router';
-import './App.scss';
+import styles from './App.module.scss';
 
 /**
  * Componente principal de la aplicación
@@ -8,7 +8,7 @@ import './App.scss';
  */
 export const App: React.FC = () => {
   return (
-    <div className="App">
+    <div className={styles.App}>
       <AppRouter />
     </div>
   );

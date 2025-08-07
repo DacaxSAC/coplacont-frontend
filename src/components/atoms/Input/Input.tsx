@@ -1,5 +1,5 @@
 import React from 'react';
-import './Input.scss';
+import styles from './Input.module.scss';
 
 export interface InputProps {
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';

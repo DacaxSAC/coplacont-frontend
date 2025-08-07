@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../../atoms/Button';
 import { FormField } from '../../molecules/FormField';
 import { Card } from '../../molecules/Card';
-import './LoginForm.scss';
+import styles from './LoginForm.module.scss';
 
 export interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
