@@ -33,6 +33,10 @@ p {
 /**
  * Aplicar box-sizing a todos los elementos
  */
+html {
+  box-sizing: border-box;
+}
+
 *, *::before, *::after {
   box-sizing: inherit;
 }
