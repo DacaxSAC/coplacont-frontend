@@ -1,15 +1,14 @@
 @import './styles/variables';
-@import './styles/mixins';
 
-:root {
-  font-family: $font-family-secondary;
-  line-height: $line-height-normal;
-  font-weight: $font-weight-normal;
+/**
+ * Estilos globales básicos
+ */
 
+html {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
   color-scheme: light dark;
-  color: $text-light;
-  background-color: $neutral-1;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,15 +17,22 @@
 
 body {
   margin: 0;
-  @include flex-center;
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: $text-primary;
-    background-color: $neutral-5;
-  }
-  
+/**
+ * Reset de elementos
+ */
+p {
+  margin: 0;
+}
+
+/**
+ * Aplicar box-sizing a todos los elementos
+ */
+*, *::before, *::after {
+  box-sizing: inherit;
 }

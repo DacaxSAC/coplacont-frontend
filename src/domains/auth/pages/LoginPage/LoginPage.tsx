@@ -38,8 +38,11 @@ export const LoginPage: React.FC = () => {
 
   return (
     <AuthLayout>
-      <div>contalab</div>
       <Logo size={120}/>
+
+      
+
+
     </AuthLayout>
   );
 };
