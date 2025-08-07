@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
 import { AuthHeader } from '../../../../components/molecules/AuthHeader';
 import { LoginForm, type LoginFormData } from '../../organisms/LoginForm';
+import { AuthService } from '../../services/authService';
+import type { LoginRequest } from '../../types/auth.types';
 
 //import styles from './LoginPage.module.scss';
 
@@ -12,34 +14,37 @@ export const LoginPage: React.FC = () => {
 
   /**
    * Maneja el proceso de login
-   * Aquí se implementará la lógica de autenticación con el servicio
+   * Utiliza el servicio de autenticación para realizar el login
    */
   const handleLogin = async (formData: LoginFormData) => {
     try {
       setIsLoading(true);
       setLoginError('');
       
-      // TODO: Implementar llamada al servicio de autenticación
-      console.log('Datos de login:', formData);
+      // Preparar los datos para el servicio (mapear password a contrasena)
+      const loginRequest: LoginRequest = {
+        email: formData.email,
+        contrasena: formData.password
+      };
       
-      // Simulación de delay para mostrar el loading
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Llamada al servicio de autenticación
+      const response = await AuthService.login(loginRequest);
       
-      // TODO: Aquí iría la lógica real de autenticación:
-      // const response = await authService.login(formData.email, formData.password);
-      // if (response.success) {
-      //   // Redirigir al dashboard o página principal
-      //   navigate('/dashboard');
-      // } else {
-      //   setLoginError(response.message || 'Error al iniciar sesión');
-      // }
+      console.log('Login exitoso:', response);
       
-      // Por ahora, simulamos un login exitoso
-      alert('Login exitoso! (simulado)');
+      // TODO: Redirigir al dashboard o página principal
+      // navigate('/dashboard');
+      alert(`Login exitoso! Bienvenido ${response.email}`);
       
     } catch (error) {
       console.error('Error en el login:', error);
-      setLoginError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+      
+      // Mostrar el mensaje de error específico del servidor
+      if (error instanceof Error) {
+        setLoginError(error.message);
+      } else {
+        setLoginError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+      }
     } finally {
       setIsLoading(false);
     }
