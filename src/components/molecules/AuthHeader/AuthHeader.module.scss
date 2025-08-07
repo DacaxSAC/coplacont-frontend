@@ -1,0 +1,19 @@
+@import '../../../styles/variables';
+
+.authHeader {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+  
+  .title {
+    width: 100%;
+  }
+  
+  .subtitle {
+    margin: 0;
+    max-width: 400px; // Limit width for better readability
+  }
+}

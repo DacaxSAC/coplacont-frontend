@@ -5,9 +5,10 @@
  * Componente Input - Estilos base y variantes
  */
 .input {
+  flex:1;
   //width: 100%;
   border: 1px solid $neutral-3;
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-xl;
   background-color: #0038690D; // Color específico solicitado
   color: $text-color;
   font-family: $font-family-primary;
@@ -19,7 +20,7 @@
   outline: none;
 
   &::placeholder {
-    color: $neutral-2;
+    color: $text-color;
     opacity: 0.7;
   }
 
@@ -76,12 +77,74 @@
     }
   }
 
-  // -----------------------------------------------------------------------------
-  // RESPONSIVE
-  // -----------------------------------------------------------------------------
-
-  @include respond-to(sm) {
-    font-size: $font-size-sm;
-    padding: $spacing-sm $spacing-md;
+  // Modificador para input con adornment
+  &--with-adornment {
+    padding-right: 48px; // Espacio para el endAdornment
+    // Hacer el input transparente cuando está en contenedor
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+    
+    &:hover {
+      border: none;
+    }
   }
+}
+
+// -----------------------------------------------------------------------------
+// CONTENEDOR PARA INPUT CON ENDADORNMENT
+// -----------------------------------------------------------------------------
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  // Aplicar todos los estilos visuales del input al contenedor
+  border: 1px solid $neutral-3;
+  border-radius: $border-radius-xl;
+  background-color: #0038690D;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: $primary-blue;
+  }
+  
+  &:focus-within {
+    border-color: $primary-blue;
+    box-shadow: $box-shadow-focus;
+  }
+  
+  // Estados para el contenedor
+  &.inputContainer--error {
+    border-color: $danger-color;
+    box-shadow: $box-shadow-error;
+    
+    &:focus-within {
+      border-color: $danger-color;
+      box-shadow: $box-shadow-error;
+    }
+  }
+  
+  &.inputContainer--disabled {
+    background-color: $neutral-4;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.endAdornment {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+
 }

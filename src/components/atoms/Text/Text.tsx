@@ -14,7 +14,7 @@ export interface TextProps {
     /** Color del texto */
     color?: 'primary' | 'secondary' | 'neutral-primary' | 'neutral-secondary' | 'disabled' | 'success' | 'danger' | 'warning' | 'info';
   /** Elemento HTML a renderizar */
-  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'|'label';
   /** Clases CSS adicionales */
   className?: string;
   /** Alineación del texto */

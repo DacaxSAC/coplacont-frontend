@@ -1,0 +1,137 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+/**
+ * Componente Button - Estilos base y variantes
+ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: $border-radius-xl;
+  font-family: $font-family-primary;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  outline: none;
+  user-select: none;
+  
+
+  &:focus {
+    box-shadow: $box-shadow-focus;
+  }
+
+  // -----------------------------------------------------------------------------
+  // VARIANTES DE TAMAÑO
+  // -----------------------------------------------------------------------------
+
+  &--small {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+    min-height: 32px;
+  }
+
+  &--medium {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-md;
+    min-height: 40px;
+  }
+
+  &--large {
+    padding: $spacing-lg $spacing-xl;
+    font-size: $font-size-lg;
+    min-height: 48px;
+  }
+
+  // -----------------------------------------------------------------------------
+  // VARIANTES DE ESTILO
+  // -----------------------------------------------------------------------------
+
+  &--primary {
+    background-color: $primary-blue;
+    color: $neutral-5;
+
+    &:hover:not(:disabled) {
+      background-color: darken($primary-blue, 10%);
+      transform: translateY(-1px);
+      box-shadow: $box-shadow-md;
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: $box-shadow-sm;
+    }
+  }
+
+  &--secondary {
+    background-color: $secondary-blue;
+    color: $neutral-5;
+
+    &:hover:not(:disabled) {
+      background-color: darken($secondary-blue, 10%);
+      transform: translateY(-1px);
+      box-shadow: $box-shadow-md;
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: $box-shadow-sm;
+    }
+  }
+
+  &--danger {
+    background-color: $danger-color;
+    color: $neutral-5;
+
+    &:hover:not(:disabled) {
+      background-color: darken($danger-color, 10%);
+      transform: translateY(-1px);
+      box-shadow: $box-shadow-md;
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: $box-shadow-sm;
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // ESTADO DESHABILITADO
+  // -----------------------------------------------------------------------------
+
+  &--disabled {
+    background-color: $neutral-3 !important;
+    color: $neutral-2 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  // -----------------------------------------------------------------------------
+  // RESPONSIVE
+  // -----------------------------------------------------------------------------
+
+  @include respond-to(sm) {
+    &--small {
+      padding: $spacing-xs $spacing-sm;
+      font-size: $font-size-xs;
+      min-height: 28px;
+    }
+
+    &--medium {
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-size-sm;
+      min-height: 36px;
+    }
+
+    &--large {
+      padding: $spacing-md $spacing-lg;
+      font-size: $font-size-md;
+      min-height: 44px;
+    }
+  }
+}
