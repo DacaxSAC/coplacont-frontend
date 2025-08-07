@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HomePage } from '../pages/HomePage';
-import { LoginPage } from '../domains/auth/pages';
+import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '../domains/auth/pages';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -16,6 +16,8 @@ export const AppRouter: React.FC = () => {
         
         {/* Rutas de autenticación */}
         <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
+        <Route path="/auth/new-password" element={<NewPasswordPage />} />
         
         {/* Redirección para rutas de auth sin especificar */}
         <Route path="/auth" element={<Navigate to="/auth/login" replace />} />

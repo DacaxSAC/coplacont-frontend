@@ -2,85 +2,77 @@ import React, { useState } from 'react';
 import { FormField } from '../../../../components/molecules/FormField';
 import { Button } from '../../../../components/atoms/Button';
 import { Text } from '../../../../components';
-import styles from './LoginForm.module.scss';
+import styles from './RecoveryPasswordForm.module.scss';
 
 /**
- * Interfaz para los datos del formulario de login
+ * Interfaz para los datos del formulario de recuperación de contraseña
  */
-export interface LoginFormData {
+export interface RecoveryPasswordFormData {
   email: string;
-  password: string;
 }
 
 /**
- * Props para el componente LoginForm
+ * Props para el componente RecoveryPasswordForm
  */
-export interface LoginFormProps {
+export interface RecoveryPasswordFormProps {
   /** Función que se ejecuta al enviar el formulario */
-  onSubmit: (data: LoginFormData) => void;
+  onSubmit: (data: RecoveryPasswordFormData) => void;
   /** Indica si el formulario está en proceso de envío */
   isLoading?: boolean;
   /** Mensaje de error general del formulario */
   error?: string;
+  /** Mensaje de éxito cuando se envía el formulario */
+  success?: string;
 }
 
 /**
- * Componente LoginForm - Organismo que contiene el formulario completo de login
+ * Componente RecoveryPasswordForm - Organismo que contiene el formulario completo de recuperación de contraseña
  * Maneja el estado del formulario y la validación básica
  */
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const RecoveryPasswordForm: React.FC<RecoveryPasswordFormProps> = ({
   onSubmit,
   isLoading = false,
-  error
+  error,
+  success
 }) => {
   // Estado del formulario
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: ''
+  const [formData, setFormData] = useState<RecoveryPasswordFormData>({
+    email: ''
   });
 
   // Estado de errores de validación
-  const [validationErrors, setValidationErrors] = useState<Partial<LoginFormData>>({});
+  const [validationErrors, setValidationErrors] = useState<Partial<RecoveryPasswordFormData>>({});
 
   /**
-   * Maneja los cambios en los campos del formulario
+   * Maneja los cambios en el campo de email
    */
-  const handleInputChange = (field: keyof LoginFormData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      email: value
     }));
 
     // Limpiar error de validación cuando el usuario empiece a escribir
-    if (validationErrors[field]) {
+    if (validationErrors.email) {
       setValidationErrors(prev => ({
         ...prev,
-        [field]: undefined
+        email: undefined
       }));
     }
   };
 
   /**
-   * Valida los campos del formulario
+   * Valida el campo de email del formulario
    */
   const validateForm = (): boolean => {
-    const errors: Partial<LoginFormData> = {};
+    const errors: Partial<RecoveryPasswordFormData> = {};
 
     // Validación del email
     if (!formData.email.trim()) {
       errors.email = 'El correo electrónico es requerido';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Ingresa un correo electrónico válido';
-    }
-
-    // Validación de la contraseña
-    if (!formData.password.trim()) {
-      errors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 6) {
-      errors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
 
     setValidationErrors(errors);
@@ -99,14 +91,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <form className={styles.loginForm} onSubmit={handleSubmit}>
+    <form className={styles.recoveryPasswordForm} onSubmit={handleSubmit}>
       {/* Campo de correo electrónico */}
       <FormField
         id="email"
         label="Correo electrónico"
         type="email"
         value={formData.email}
-        onChange={handleInputChange('email')}
+        onChange={handleInputChange}
         error={!!validationErrors.email}
         errorMessage={validationErrors.email}
         required
@@ -115,25 +107,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         disabled={isLoading}
       />
 
-      {/* Campo de contraseña */}
-      <FormField
-        label="Contraseña"
-        type="password"
-        id="password"
-        value={formData.password}
-        onChange={handleInputChange('password')}
-        error={!!validationErrors.password}
-        errorMessage={validationErrors.password}
-        required
-        autoComplete="current-password"
-        placeholder="Ingresa tu contraseña"
-        disabled={isLoading}
-      />
-
       {/* Mensaje de error general */}
       {error && (
         <div className={styles.generalError}>
           {error}
+        </div>
+      )}
+
+      {/* Mensaje de éxito */}
+      {success && (
+        <div className={styles.successMessage}>
+          {success}
         </div>
       )}
 
@@ -145,15 +129,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           size="large"
           disabled={isLoading}
         >
-          {isLoading ? 'Ingresando...' : 'Ingresar'}
+          {isLoading ? 'Enviando...' : 'Enviar'}
         </Button>
         <Text size='xs' align='center' color='neutral-primary'>
-          El acceso es exclusivo para trabajadores autorizados
+          Recibirás un enlace para restablecer tu contraseña
         </Text>
       </div>
 
     </form>
   );
 };
-
-export default LoginForm;
