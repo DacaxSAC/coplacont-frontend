@@ -1,0 +1,87 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+/**
+ * Componente Input - Estilos base y variantes
+ */
+.input {
+  //width: 100%;
+  border: 1px solid $neutral-3;
+  border-radius: $border-radius-md;
+  background-color: #0038690D; // Color específico solicitado
+  color: $text-color;
+  font-family: $font-family-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-normal;
+  padding: $spacing-md $spacing-lg;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &::placeholder {
+    color: $neutral-2;
+    opacity: 0.7;
+  }
+
+  &:focus {
+    border-color: $primary-blue;
+    box-shadow: $box-shadow-focus;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $primary-blue;
+  }
+
+  // -----------------------------------------------------------------------------
+  // VARIANTES DE TAMAÑO
+  // -----------------------------------------------------------------------------
+
+  &--small {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+  }
+
+  &--medium {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-md;
+  }
+
+  &--large {
+    padding: $spacing-lg $spacing-xl;
+    font-size: $font-size-lg;
+  }
+
+  // -----------------------------------------------------------------------------
+  // ESTADOS
+  // -----------------------------------------------------------------------------
+
+  &--error {
+    border-color: $danger-color;
+    box-shadow: $box-shadow-error;
+
+    &:focus {
+      border-color: $danger-color;
+      box-shadow: $box-shadow-error;
+    }
+  }
+
+  &--disabled {
+    background-color: $neutral-4;
+    color: $neutral-2;
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &::placeholder {
+      color: $neutral-2;
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // RESPONSIVE
+  // -----------------------------------------------------------------------------
+
+  @include respond-to(sm) {
+    font-size: $font-size-sm;
+    padding: $spacing-sm $spacing-md;
+  }
+}

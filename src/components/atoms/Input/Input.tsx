@@ -32,7 +32,7 @@ export const Input: React.FC<InputProps> = ({
   autoComplete,
   size = 'medium',
 }) => {
-  const className = `input input--${size} ${error ? 'input--error' : ''} ${disabled ? 'input--disabled' : ''}`;
+  const className = `${styles.input} ${styles[`input--${size}`]} ${error ? styles['input--error'] : ''} ${disabled ? styles['input--disabled'] : ''}`.trim();
 
   return (
     <input

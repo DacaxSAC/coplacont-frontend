@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
 import { Logo } from '../../../../components/atoms/Logo';
 import { Text } from '../../../../components/atoms/Text';
+import { Input } from '../../../../components/atoms/Input';
 
 import styles from './LoginPage.module.scss';
 
@@ -24,9 +25,13 @@ export const LoginPage: React.FC = () => {
         Correo electronico
       </Text>
 
+      <Input />
+
       <Text as="p" size="md" weight={500} color="neutral-secondary" align="center" >
         Contraseña
       </Text>
+
+      <Input />
 
 
     </AuthLayout>
