@@ -1,73 +1,38 @@
 @import './styles/variables';
-@import './styles/mixins';
 
-:root {
-  font-family: $font-family-secondary;
-  line-height: $line-height-normal;
-  font-weight: $font-weight-normal;
+/**
+ * Estilos globales básicos
+ */
 
+html {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
   color-scheme: light dark;
-  color: $text-light;
-  background-color: $bg-dark;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: $font-weight-medium;
-  color: $primary-color;
-  text-decoration: inherit;
-  
-  &:hover {
-    color: $primary-hover;
-  }
-}
-
 body {
   margin: 0;
-  @include flex-center;
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  @include heading($font-size-6xl, $font-weight-bold);
-  line-height: $line-height-tight;
+/**
+ * Reset de elementos
+ */
+p {
+  margin: 0;
 }
 
-button {
-  @include button-base;
-  border-radius: $border-radius-md;
-  border: $border-width-thin solid transparent;
-  padding: $spacing-md $spacing-xl;
-  font-size: $font-size-md;
-  background-color: #1a1a1a;
-  transition: border-color $transition-normal;
-  
-  &:hover {
-    border-color: $primary-color;
-  }
-  
-  &:focus,
-  &:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: $text-primary;
-    background-color: $bg-primary;
-  }
-  
-  a:hover {
-    color: $primary-hover;
-  }
-  
-  button {
-    background-color: $bg-secondary;
-  }
+/**
+ * Aplicar box-sizing a todos los elementos
+ */
+*, *::before, *::after {
+  box-sizing: inherit;
 }
