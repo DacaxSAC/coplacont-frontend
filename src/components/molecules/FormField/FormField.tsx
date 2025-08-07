@@ -1,48 +1,86 @@
 import React from 'react';
-import { Input } from '../../atoms/Input';
-import type { InputProps } from '../../atoms/Input';
+import { Input, type InputProps } from '../../atoms/Input';
+import { PasswordInput } from '../../atoms/PasswordInput';
+import { Text } from '../../atoms/Text';
+
 import styles from './FormField.module.scss';
 
-export interface FormFieldProps extends Omit<InputProps, 'id'> {
+/**
+ * Props para el componente FormField
+ */
+export interface FormFieldProps extends Omit<InputProps, 'error'> {
+  /** Etiqueta del campo */
   label: string;
-  id: string;
+  /** Mensaje de error a mostrar */
   errorMessage?: string;
+  /** Texto de ayuda */
   helperText?: string;
+  /** Si el campo es requerido */
   required?: boolean;
+  /** Si hay error en el campo */
+  error?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,
-  id,
   errorMessage,
   helperText,
   required = false,
-  error,
+  error = false,
+  id,
+  type,
   ...inputProps
 }) => {
-  const hasError = error || !!errorMessage;
-
+  const isPasswordField = type === 'password';
+  
   return (
-    <div className="form-field">
-      <label htmlFor={id} className="form-field__label">
+    <div className={styles.formField}>
+      <Text as="label" size="md" weight={500} color="neutral-secondary" align="left" >
         {label}
-        {required && <span className="form-field__required">*</span>}
-      </label>
-      
-      <Input
-        {...inputProps}
-        id={id}
-        error={hasError}
-        required={required}
-      />
-      
-      {errorMessage && (
-        <span className="form-field__error">{errorMessage}</span>
+      </Text>
+      <div className={styles.inputContainer}>
+        {isPasswordField ? (
+        <PasswordInput
+          id={id}
+          error={error}
+          {...inputProps}
+        />
+      ) : (
+        <Input
+          id={id}
+          type={type}
+          error={error}
+          {...inputProps}
+        />
+      )}
+      {error && errorMessage && (
+        <Text 
+          as="span" 
+          size="xs" 
+          color="danger" 
+          className={styles.errorMessage}
+        >
+          {errorMessage}
+        </Text>
       )}
       
-      {helperText && !errorMessage && (
-        <span className="form-field__helper">{helperText}</span>
+      {!error && helperText && (
+        <Text 
+          as="span" 
+          size="xs" 
+          color="neutral-secondary" 
+          className={styles.helperText}
+        >
+          {helperText}
+        </Text>
       )}
+
+
+      </div>
+      
+      
+      
+      
     </div>
   );
 };

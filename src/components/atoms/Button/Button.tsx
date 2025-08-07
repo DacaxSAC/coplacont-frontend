@@ -13,12 +13,12 @@ export interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
-  size = 'medium',
+  size = 'large',
   disabled = false,
   onClick,
   type = 'button',
 }) => {
-  const className = `button button--${variant} button--${size} ${disabled ? 'button--disabled' : ''}`;
+  const className = `${styles.button} ${styles[`button--${variant}`]} ${styles[`button--${size}`]} ${disabled ? styles['button--disabled'] : ''}`.trim();
 
   return (
     <button
