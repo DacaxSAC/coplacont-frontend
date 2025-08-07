@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthLayout } from '../../components/templates/AuthLayout/AuthLayout';
-import { LoginForm } from '../../components/organisms/LoginForm';
+import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
+import { Logo } from '../../../../components/atoms/Logo';
+
 import styles from './LoginPage.module.scss';
 
 export const LoginPage: React.FC = () => {
@@ -39,6 +39,7 @@ export const LoginPage: React.FC = () => {
   return (
     <AuthLayout>
       <div>contalab</div>
+      <Logo size={120}/>
     </AuthLayout>
   );
 };

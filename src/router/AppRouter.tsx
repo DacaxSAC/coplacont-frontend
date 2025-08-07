@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HomePage } from '../pages/HomePage';
-import { LoginPage } from '../pages/LoginPage';
+import { LoginPage } from '../domains/auth/pages';
 
 /**
  * Componente principal de enrutamiento de la aplicación
