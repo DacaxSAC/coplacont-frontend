@@ -82,21 +82,14 @@
     color: $secondary-blue;
   }
 
-  &--color-muted {
-    color: $neutral-2;
+  &--color-neutral-primary {
+    color: $text-color;
   }
 
-  &--color-light {
-    color: $neutral-3;
+  &--color-neutral-secondary {
+    color: $text-color-1;
   }
 
-  &--color-white {
-    color: $neutral-5;
-  }
-
-  &--color-dark {
-    color: $neutral-1;
-  }
 
   &--color-disabled {
     color: $neutral-3;

@@ -10,9 +10,9 @@ export interface TextProps {
   /** Tamaño del texto */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl';
   /** Peso de la fuente (400, 500, 600) */
-  weight?: 400 | 500 | 600;
-  /** Color del texto */
-  color?: 'primary' | 'secondary' | 'muted' | 'light' | 'white' | 'dark' | 'disabled' | 'success' | 'danger' | 'warning' | 'info';
+    weight?: 400 | 500 | 600;
+    /** Color del texto */
+    color?: 'primary' | 'secondary' | 'neutral-primary' | 'neutral-secondary' | 'disabled' | 'success' | 'danger' | 'warning' | 'info';
   /** Elemento HTML a renderizar */
   as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   /** Clases CSS adicionales */
