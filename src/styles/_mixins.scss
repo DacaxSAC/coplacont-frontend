@@ -1,0 +1,315 @@
+// =============================================================================
+// MIXINS DE SASS - COPLACONT FRONTEND
+// =============================================================================
+
+@import 'variables';
+
+// -----------------------------------------------------------------------------
+// MIXINS DE RESPONSIVE DESIGN
+// -----------------------------------------------------------------------------
+
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: #{$breakpoint-xs - 1px}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == sm {
+    @media (min-width: #{$breakpoint-sm}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == md {
+    @media (min-width: #{$breakpoint-md}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == lg {
+    @media (min-width: #{$breakpoint-lg}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == xl {
+    @media (min-width: #{$breakpoint-xl}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 2xl {
+    @media (min-width: #{$breakpoint-2xl}) {
+      @content;
+    }
+  }
+}
+
+@mixin mobile-only {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet-and-up {
+  @media (min-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin desktop-only {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE BOTONES
+// -----------------------------------------------------------------------------
+
+@mixin button-base {
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: $font-weight-medium;
+  transition: all $transition-normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  
+  &:focus {
+    outline: 2px solid $border-focus;
+    outline-offset: 2px;
+  }
+  
+  &:disabled,
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-variant($bg-color, $hover-color, $text-color: $text-white) {
+  background-color: $bg-color;
+  color: $text-color;
+  
+  &:hover:not(:disabled):not(.disabled) {
+    background-color: $hover-color;
+  }
+}
+
+@mixin button-size($padding-y, $padding-x, $font-size) {
+  padding: $padding-y $padding-x;
+  font-size: $font-size;
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE FORMULARIOS
+// -----------------------------------------------------------------------------
+
+@mixin input-base {
+  border: $border-width-thin solid $form-border;
+  border-radius: $border-radius-sm;
+  font-family: inherit;
+  transition: all $transition-normal;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: $form-bg;
+  
+  &:focus {
+    outline: none;
+    border-color: $form-focus;
+    box-shadow: $box-shadow-focus;
+  }
+  
+  &::placeholder {
+    color: $form-placeholder;
+    opacity: 1;
+  }
+  
+  &:disabled {
+    background-color: $form-disabled-bg;
+    color: $form-disabled-text;
+    cursor: not-allowed;
+  }
+}
+
+@mixin input-error {
+  border-color: $form-error;
+  
+  &:focus {
+    border-color: $form-error;
+    box-shadow: $box-shadow-error;
+  }
+}
+
+@mixin input-size($padding-y, $padding-x, $font-size) {
+  padding: $padding-y $padding-x;
+  font-size: $font-size;
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE CARDS
+// -----------------------------------------------------------------------------
+
+@mixin card-base {
+  background: $bg-primary;
+  border-radius: $border-radius-md;
+  transition: all $transition-normal;
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin card-variant($border-color, $shadow: null) {
+  border: $border-width-thin solid $border-color;
+  
+  @if $shadow {
+    box-shadow: $shadow;
+  }
+}
+
+@mixin card-hover-effect($shadow: $box-shadow-lg) {
+  &:hover {
+    box-shadow: $shadow;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin card-padding($padding) {
+  padding: $padding;
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE TEXTO
+// -----------------------------------------------------------------------------
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-shadow($color: $shadow-dark) {
+  text-shadow: 0 2px 4px $color;
+}
+
+@mixin heading($size, $weight: $font-weight-semibold, $color: $text-primary) {
+  font-size: $size;
+  font-weight: $weight;
+  color: $color;
+  line-height: $line-height-tight;
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE LAYOUT
+// -----------------------------------------------------------------------------
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin container($max-width: 1200px) {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  
+  @include mobile-only {
+    padding: 0 $spacing-md;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE ANIMACIONES
+// -----------------------------------------------------------------------------
+
+@mixin fade-in($duration: $transition-normal) {
+  opacity: 0;
+  animation: fadeIn $duration ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@mixin slide-up($duration: $transition-normal, $distance: 20px) {
+  transform: translateY($distance);
+  opacity: 0;
+  animation: slideUp $duration ease-out forwards;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE UTILIDADES
+// -----------------------------------------------------------------------------
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin backdrop-blur($blur: 10px) {
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS DE ESTADOS
+// -----------------------------------------------------------------------------
+
+@mixin loading-state {
+  position: relative;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
