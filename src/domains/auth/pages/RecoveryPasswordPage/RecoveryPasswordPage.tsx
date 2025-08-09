@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { RecoveryPasswordForm, type RecoveryPasswordFormData } from '../../organisms/RecoveryPasswordForm';
+import { AuthLayout, AuthHeader } from '@/components';
+import { RecoveryPasswordForm, type IRecoveryPasswordFormData } from '@/domains/auth';
 
 //import styles from './RecoveryPasswordPage.module.scss';
 
@@ -15,7 +14,7 @@ export const RecoveryPasswordPage: React.FC = () => {
    * Maneja el proceso de recuperación de contraseña
    * Aquí se implementará la lógica de envío del email de recuperación
    */
-  const handleRecoveryPassword = async (formData: RecoveryPasswordFormData) => {
+  const handleRecoveryPassword = async (formData: IRecoveryPasswordFormData) => {
     try {
       setIsLoading(true);
       setRecoveryError('');

@@ -1,54 +1,32 @@
 import React, { useState } from 'react';
-import { FormField } from '../../../../components/molecules/FormField';
-import { Button } from '../../../../components/atoms/Button';
-import { Text } from '../../../../components';
 import styles from './NewPasswordForm.module.scss';
 
-/**
- * Interfaz para los datos del formulario de nueva contraseña
- */
-export interface NewPasswordFormData {
-  password: string;
-  confirmPassword: string;
-}
-
-/**
- * Props para el componente NewPasswordForm
- */
-export interface NewPasswordFormProps {
-  /** Función que se ejecuta al enviar el formulario */
-  onSubmit: (data: NewPasswordFormData) => void;
-  /** Indica si el formulario está en proceso de envío */
-  isLoading?: boolean;
-  /** Mensaje de error general del formulario */
-  error?: string;
-  /** Mensaje de éxito cuando se guarda la contraseña */
-  success?: string;
-}
+import { FormField, Button, Text } from '@/components';
+import { type INewPasswordFormData, type INewPasswordFormProps } from '@/domains/auth';
 
 /**
  * Componente NewPasswordForm - Organismo que contiene el formulario completo de nueva contraseña
  * Maneja el estado del formulario y la validación básica
  */
-export const NewPasswordForm: React.FC<NewPasswordFormProps> = ({
+export const NewPasswordForm: React.FC<INewPasswordFormProps> = ({
   onSubmit,
   isLoading = false,
   error,
   success
 }) => {
   // Estado del formulario
-  const [formData, setFormData] = useState<NewPasswordFormData>({
+  const [formData, setFormData] = useState<INewPasswordFormData>({
     password: '',
     confirmPassword: ''
   });
 
   // Estado de errores de validación
-  const [validationErrors, setValidationErrors] = useState<Partial<NewPasswordFormData>>({});
+  const [validationErrors, setValidationErrors] = useState<Partial<INewPasswordFormData>>({});
 
   /**
    * Maneja los cambios en los campos del formulario
    */
-  const handleInputChange = (field: keyof NewPasswordFormData) => (
+  const handleInputChange = (field: keyof INewPasswordFormData) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
@@ -70,7 +48,7 @@ export const NewPasswordForm: React.FC<NewPasswordFormProps> = ({
    * Valida los campos del formulario
    */
   const validateForm = (): boolean => {
-    const errors: Partial<NewPasswordFormData> = {};
+    const errors: Partial<INewPasswordFormData> = {};
 
     // Validación de la nueva contraseña
     if (!formData.password.trim()) {

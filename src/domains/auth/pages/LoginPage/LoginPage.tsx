@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { LoginForm, type LoginFormData } from '../../organisms/LoginForm';
-import { AuthService } from '../../services/authService';
-import type { LoginRequest } from '../../types/auth.types';
+
+import { AuthLayout, AuthHeader } from '@/components';
+
+import { 
+  LoginForm, 
+  AuthService, 
+  type ILoginFormData, 
+  type ILoginRequest,
+} from '@/domains/auth';
 
 //import styles from './LoginPage.module.scss';
 
@@ -16,13 +20,13 @@ export const LoginPage: React.FC = () => {
    * Maneja el proceso de login
    * Utiliza el servicio de autenticación para realizar el login
    */
-  const handleLogin = async (formData: LoginFormData) => {
+  const handleLogin = async (formData: ILoginFormData) => {
     try {
       setIsLoading(true);
       setLoginError('');
       
       // Preparar los datos para el servicio (mapear password a contrasena)
-      const loginRequest: LoginRequest = {
+      const loginRequest: ILoginRequest = {
         email: formData.email,
         contrasena: formData.password
       };

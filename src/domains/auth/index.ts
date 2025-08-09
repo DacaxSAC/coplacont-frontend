@@ -12,4 +12,4 @@ export * from './organisms';
 export * from './services';
 
 // Exportar tipos
-export * from './types/auth.types';
+export * from './types';

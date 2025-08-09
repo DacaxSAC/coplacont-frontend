@@ -1,47 +1,27 @@
 import React, { useState } from 'react';
-import { FormField } from '../../../../components/molecules/FormField';
-import { Button } from '../../../../components/atoms/Button';
-import { Text } from '../../../../components';
 import styles from './RecoveryPasswordForm.module.scss';
 
-/**
- * Interfaz para los datos del formulario de recuperación de contraseña
- */
-export interface RecoveryPasswordFormData {
-  email: string;
-}
+import { FormField, Button, Text } from '@/components';
 
-/**
- * Props para el componente RecoveryPasswordForm
- */
-export interface RecoveryPasswordFormProps {
-  /** Función que se ejecuta al enviar el formulario */
-  onSubmit: (data: RecoveryPasswordFormData) => void;
-  /** Indica si el formulario está en proceso de envío */
-  isLoading?: boolean;
-  /** Mensaje de error general del formulario */
-  error?: string;
-  /** Mensaje de éxito cuando se envía el formulario */
-  success?: string;
-}
+import { type IRecoveryPasswordFormData, type IRecoveryPasswordFormProps } from '@/domains/auth/types/auth.types';
 
 /**
  * Componente RecoveryPasswordForm - Organismo que contiene el formulario completo de recuperación de contraseña
  * Maneja el estado del formulario y la validación básica
  */
-export const RecoveryPasswordForm: React.FC<RecoveryPasswordFormProps> = ({
+export const RecoveryPasswordForm: React.FC<IRecoveryPasswordFormProps> = ({
   onSubmit,
   isLoading = false,
   error,
   success
 }) => {
   // Estado del formulario
-  const [formData, setFormData] = useState<RecoveryPasswordFormData>({
+  const [formData, setFormData] = useState<IRecoveryPasswordFormData>({
     email: ''
   });
 
   // Estado de errores de validación
-  const [validationErrors, setValidationErrors] = useState<Partial<RecoveryPasswordFormData>>({});
+  const [validationErrors, setValidationErrors] = useState<Partial<IRecoveryPasswordFormData>>({});
 
   /**
    * Maneja los cambios en el campo de email
@@ -66,7 +46,7 @@ export const RecoveryPasswordForm: React.FC<RecoveryPasswordFormProps> = ({
    * Valida el campo de email del formulario
    */
   const validateForm = (): boolean => {
-    const errors: Partial<RecoveryPasswordFormData> = {};
+    const errors: Partial<IRecoveryPasswordFormData> = {};
 
     // Validación del email
     if (!formData.email.trim()) {

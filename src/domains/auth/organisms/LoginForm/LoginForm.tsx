@@ -1,51 +1,31 @@
 import React, { useState } from 'react';
-import { FormField } from '../../../../components/molecules/FormField';
-import { Button } from '../../../../components/atoms/Button';
-import { Text } from '../../../../components';
 import styles from './LoginForm.module.scss';
 
-/**
- * Interfaz para los datos del formulario de login
- */
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-/**
- * Props para el componente LoginForm
- */
-export interface LoginFormProps {
-  /** Función que se ejecuta al enviar el formulario */
-  onSubmit: (data: LoginFormData) => void;
-  /** Indica si el formulario está en proceso de envío */
-  isLoading?: boolean;
-  /** Mensaje de error general del formulario */
-  error?: string;
-}
+import { FormField, Button, Text } from '@/components';
+import { type ILoginFormData, type ILoginFormProps } from '@/domains/auth';
 
 /**
  * Componente LoginForm - Organismo que contiene el formulario completo de login
  * Maneja el estado del formulario y la validación básica
  */
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginForm: React.FC<ILoginFormProps> = ({
   onSubmit,
   isLoading = false,
   error
 }) => {
   // Estado del formulario
-  const [formData, setFormData] = useState<LoginFormData>({
+  const [formData, setFormData] = useState<ILoginFormData>({
     email: '',
     password: ''
   });
 
   // Estado de errores de validación
-  const [validationErrors, setValidationErrors] = useState<Partial<LoginFormData>>({});
+  const [validationErrors, setValidationErrors] = useState<Partial<ILoginFormData>>({});
 
   /**
    * Maneja los cambios en los campos del formulario
    */
-  const handleInputChange = (field: keyof LoginFormData) => (
+  const handleInputChange = (field: keyof ILoginFormData) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
@@ -67,7 +47,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
    * Valida los campos del formulario
    */
   const validateForm = (): boolean => {
-    const errors: Partial<LoginFormData> = {};
+    const errors: Partial<ILoginFormData> = {};
 
     // Validación del email
     if (!formData.email.trim()) {

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Logo } from '../../atoms/Logo';
-import { Text } from '../../atoms/Text';
-
 import styles from './AuthHeader.module.scss';
+
+import { Logo, Text } from '@/components';
+
 
 /**
  * Props para el componente AuthHeader

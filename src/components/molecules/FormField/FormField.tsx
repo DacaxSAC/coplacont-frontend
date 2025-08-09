@@ -1,9 +1,7 @@
 import React from 'react';
-import { Input, type InputProps } from '../../atoms/Input';
-import { PasswordInput } from '../../atoms/PasswordInput';
-import { Text } from '../../atoms/Text';
-
 import styles from './FormField.module.scss';
+
+import { Input, type InputProps, PasswordInput, Text } from '@/components';
 
 /**
  * Props para el componente FormField

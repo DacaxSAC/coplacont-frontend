@@ -58,7 +58,7 @@ apiClient.interceptors.response.use(
 /**
  * Tipos para las respuestas de la API
  */
-export interface ApiResponse<T = any> {
+export interface IApiResponse<T = any> {
   data: T;
   message?: string;
   success: boolean;
@@ -67,7 +67,7 @@ export interface ApiResponse<T = any> {
 /**
  * Tipos para los errores de la API
  */
-export interface ApiError {
+export interface IApiError {
   message: string;
   status: number;
   errors?: Record<string, string[]>;
@@ -76,7 +76,7 @@ export interface ApiError {
 /**
  * Función helper para manejar errores de la API
  */
-export const handleApiError = (error: any): ApiError => {
+export const handleApiError = (error: any): IApiError => {
   if (error.response) {
     // El servidor respondió con un código de error
     return {

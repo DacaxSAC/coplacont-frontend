@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Input } from '../Input';
-import type { InputProps } from '../Input';
-import { EyeIcon, EyeOffIcon } from '../icons';
 import styles from './PasswordInput.module.scss';
+
+import { 
+  EyeIcon, 
+  EyeOffIcon, 
+  Input, 
+  type InputProps 
+} from '@/components/atoms';
 
 /**
  * Props para el componente PasswordInput

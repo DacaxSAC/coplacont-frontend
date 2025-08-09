@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../../atoms/Button';
-import { FormField } from '../../molecules/FormField';
-import { Card } from '../../molecules/Card';
-import styles from './LoginForm.module.scss';
+// import styles from './LoginForm.module.scss';
+
+import { Button, FormField, Card } from '@/components';
 
 export interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;

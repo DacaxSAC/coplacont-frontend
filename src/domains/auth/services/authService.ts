@@ -1,6 +1,5 @@
-import { apiClient, handleApiError } from '../../../shared/services/api';
-import type { LoginRequest, LoginResponse, AuthUser } from '../types/auth.types';
-import type { ApiError } from '../../../shared/services/api';
+import { apiClient, handleApiError, type IApiError } from '@/shared';
+import type { ILoginRequest, ILoginResponse, IAuthUser } from '@/domains/auth';
 
 /**
  * Servicio de autenticación
@@ -12,9 +11,9 @@ export class AuthService {
    * @param credentials - Credenciales de login (email y contraseña)
    * @returns Promise con la respuesta del login
    */
-  static async login(credentials: LoginRequest): Promise<LoginResponse> {
+  static async login(credentials: ILoginRequest): Promise<ILoginResponse> {
     try {
-      const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
+      const response = await apiClient.post<ILoginResponse>('/auth/login', credentials);
       
       // Guardar el token y información del usuario en localStorage
       const { jwt, email } = response.data;
@@ -48,7 +47,7 @@ export class AuthService {
    * Obtiene la información del usuario almacenada
    * @returns Información del usuario o null si no existe
    */
-  static getUser(): AuthUser | null {
+  static getUser(): IAuthUser | null {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
     

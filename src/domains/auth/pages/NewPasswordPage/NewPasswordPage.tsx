@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { AuthLayout } from '../../../../components/templates/AuthLayout/AuthLayout';
-import { AuthHeader } from '../../../../components/molecules/AuthHeader';
-import { NewPasswordForm, type NewPasswordFormData } from '../../organisms/NewPasswordForm';
+import React, { useState } from 'react';  
+import { AuthLayout, AuthHeader } from '@/components';
+import { NewPasswordForm, type INewPasswordFormData } from '@/domains/auth'
 
 //import styles from './NewPasswordPage.module.scss';
 
@@ -15,7 +14,7 @@ export const NewPasswordPage: React.FC = () => {
    * Maneja el proceso de creación de nueva contraseña
    * Aquí se implementará la lógica de actualización de contraseña
    */
-  const handleNewPassword = async (formData: NewPasswordFormData) => {
+  const handleNewPassword = async (formData: INewPasswordFormData) => {
     try {
       setIsLoading(true);
       setPasswordError('');

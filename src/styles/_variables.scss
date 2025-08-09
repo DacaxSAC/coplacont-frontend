@@ -119,11 +119,19 @@ $border-radius-sm: 4px;
 $border-radius-md: 8px;
 $border-radius-lg: 12px;
 $border-radius-xl: 16px;
+$border-radius-full: 9999px;
+
+// Bordes
+$border-color: $neutral-3;
 
 
 // -----------------------------------------------------------------------------
 // TRANSICIONES
 // -----------------------------------------------------------------------------
+
+$transition-fast: 150ms ease;
+$transition-normal: 300ms ease;
+$transition-slow: 500ms ease;
 
 
 // -----------------------------------------------------------------------------
