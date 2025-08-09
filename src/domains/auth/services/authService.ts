@@ -1,5 +1,7 @@
-import { apiClient, handleApiError } from '../../../shared/services/api';
-import type { LoginRequest, LoginResponse, AuthUser } from '../types/auth.types';
+import { handleApiError } from '../../../shared/services/api';
+import type { LoginRequest, AuthUser } from '../types/auth.types';
+
+import { authApi } from '../api/authApi';
 
 /**
  * Servicio de autenticación
@@ -13,7 +15,7 @@ export class AuthService {
    */
   static async login(credentials: LoginRequest): Promise<{success: boolean, message: string}> {
     try {
-      const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
+      const response = await authApi.login(credentials);
       
       // Guardar el token y información del usuario en localStorage
       const data = response.data;
@@ -35,6 +37,21 @@ export class AuthService {
   static logout(): void {
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
+  }
+
+  static async recoverPassword(email: string): Promise<{success: boolean, message: string}> {
+    const response = await authApi.recoverPassword({email});
+    return response.data;
+  }
+
+  static async validateResetPassword(token: string, contrasena: string): Promise<{success: boolean, message: string, userId?: number}> {
+    const response = await authApi.validateResetPassword({token, contrasena});
+    return response.data;
+  }
+
+  static async resetPassword(token: string, password: string): Promise<{success: boolean, message: string}> {
+    const response = await authApi.resetPassword({token, password});
+    return response.data;
   }
 
   /**
