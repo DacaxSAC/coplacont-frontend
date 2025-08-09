@@ -1,6 +1,5 @@
 import { apiClient, handleApiError } from '../../../shared/services/api';
 import type { LoginRequest, LoginResponse, AuthUser } from '../types/auth.types';
-import type { ApiError } from '../../../shared/services/api';
 
 /**
  * Servicio de autenticación
@@ -12,16 +11,18 @@ export class AuthService {
    * @param credentials - Credenciales de login (email y contraseña)
    * @returns Promise con la respuesta del login
    */
-  static async login(credentials: LoginRequest): Promise<LoginResponse> {
+  static async login(credentials: LoginRequest): Promise<{success: boolean, message: string}> {
     try {
       const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
       
       // Guardar el token y información del usuario en localStorage
-      const { jwt, email } = response.data;
-      localStorage.setItem('jwt', jwt);
-      localStorage.setItem('user', JSON.stringify({ email }));
+      const data = response.data;
+      if(data.success){
+        localStorage.setItem('jwt', data.jwt!);
+        localStorage.setItem('user', JSON.stringify({ email: data.email! }));
+      }
       
-      return response.data;
+      return {success: data.success, message: data.message};
     } catch (error) {
       const apiError = handleApiError(error);
       throw new Error(apiError.message);

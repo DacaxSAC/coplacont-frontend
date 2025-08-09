@@ -14,8 +14,10 @@ export interface LoginRequest {
  * Respuesta del endpoint de login
  */
 export interface LoginResponse {
-  email: string;
-  jwt: string;
+  message:string;
+  success: boolean;
+  email?: string;
+  jwt?: string;
 }
 
 /**

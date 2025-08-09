@@ -17,7 +17,7 @@ export const LoginPage: React.FC = () => {
    * Utiliza el servicio de autenticación para realizar el login
    */
   const handleLogin = async (formData: LoginFormData) => {
-    try {
+
       setIsLoading(true);
       setLoginError('');
       
@@ -29,25 +29,13 @@ export const LoginPage: React.FC = () => {
       
       // Llamada al servicio de autenticación
       const response = await AuthService.login(loginRequest);
-      
-      console.log('Login exitoso:', response);
-      
-      // TODO: Redirigir al dashboard o página principal
-      // navigate('/dashboard');
-      alert(`Login exitoso! Bienvenido ${response.email}`);
-      
-    } catch (error) {
-      console.error('Error en el login:', error);
-      
-      // Mostrar el mensaje de error específico del servidor
-      if (error instanceof Error) {
-        setLoginError(error.message);
+
+      if(response.success){
+        alert(`Login exitoso! Bienvenido`);
       } else {
-        setLoginError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+        setLoginError(response.message);
       }
-    } finally {
-      setIsLoading(false);
-    }
+      
   };
 
   return (
