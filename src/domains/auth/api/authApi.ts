@@ -1,4 +1,4 @@
-import { apiClient } from "../../../shared/services/api";
+import { apiClient } from "../../../shared/services/apiService";
 import { AUTH_ENDPOINTS } from "./endpoints";
 
 export const authApi = {

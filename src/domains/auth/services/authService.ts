@@ -1,4 +1,4 @@
-import { apiClient, handleApiError  } from '@/shared';
+import { apiClient, handleApiError } from '@/shared';
 import { type ILoginRequest, type ILoginResponse, type IAuthUser, authApi } from '@/domains/auth';
 
 /**
@@ -14,12 +14,11 @@ export class AuthService {
   static async login(credentials: ILoginRequest): Promise<ILoginResponse> {
     try {
       const response = await apiClient.post<ILoginResponse>('/auth/login', credentials);
-      
-      // Guardar el token y información del usuario en localStorage
+
       const { jwt, email } = response.data;
       localStorage.setItem('jwt', jwt);
       localStorage.setItem('user', JSON.stringify({ email }));
-      
+
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error);
@@ -35,18 +34,18 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  static async recoverPassword(email: string): Promise<{success: boolean, message: string}> {
-    const response = await authApi.recoverPassword({email});
+  static async recoverPassword(email: string): Promise<{ success: boolean, message: string }> {
+    const response = await authApi.recoverPassword({ email });
     return response.data;
   }
 
-  static async validateResetToken(token: string): Promise<{success: boolean, message: string, userId?: number}> {
-    const response = await authApi.validateResetToken({token});
+  static async validateResetToken(token: string): Promise<{ success: boolean, message: string, userId?: number }> {
+    const response = await authApi.validateResetToken({ token });
     return response.data;
   }
 
-  static async resetPassword(token: string, password: string): Promise<{success: boolean, message: string}> {
-    const response = await authApi.resetPassword({token, password});
+  static async resetPassword(token: string, password: string): Promise<{ success: boolean, message: string }> {
+    const response = await authApi.resetPassword({ token, password });
     return response.data;
   }
 
@@ -65,7 +64,7 @@ export class AuthService {
   static getUser(): IAuthUser | null {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
-    
+
     try {
       return JSON.parse(userStr);
     } catch {
@@ -112,7 +111,7 @@ export class AuthService {
   static isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
     if (!decoded || !decoded.exp) return true;
-    
+
     const currentTime = Date.now() / 1000;
     return decoded.exp < currentTime;
   }
