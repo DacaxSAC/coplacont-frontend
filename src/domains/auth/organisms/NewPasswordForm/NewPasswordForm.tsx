@@ -12,7 +12,8 @@ export const NewPasswordForm: React.FC<INewPasswordFormProps> = ({
   onSubmit,
   isLoading = false,
   error,
-  success
+  success,
+  disabled = false
 }) => {
   // Estado del formulario
   const [formData, setFormData] = useState<INewPasswordFormData>({
@@ -133,7 +134,7 @@ export const NewPasswordForm: React.FC<INewPasswordFormProps> = ({
           type="submit"
           variant="primary"
           size="large"
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         >
           {isLoading ? 'Guardando...' : 'Guardar contraseña'}
         </Button>

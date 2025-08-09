@@ -1,5 +1,5 @@
-import { apiClient, handleApiError, type IApiError } from '@/shared';
-import type { ILoginRequest, ILoginResponse, IAuthUser } from '@/domains/auth';
+import { apiClient, handleApiError  } from '@/shared';
+import { type ILoginRequest, type ILoginResponse, type IAuthUser, authApi } from '@/domains/auth';
 
 /**
  * Servicio de autenticación
@@ -33,6 +33,21 @@ export class AuthService {
   static logout(): void {
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
+  }
+
+  static async recoverPassword(email: string): Promise<{success: boolean, message: string}> {
+    const response = await authApi.recoverPassword({email});
+    return response.data;
+  }
+
+  static async validateResetToken(token: string): Promise<{success: boolean, message: string, userId?: number}> {
+    const response = await authApi.validateResetToken({token});
+    return response.data;
+  }
+
+  static async resetPassword(token: string, password: string): Promise<{success: boolean, message: string}> {
+    const response = await authApi.resetPassword({token, password});
+    return response.data;
   }
 
   /**

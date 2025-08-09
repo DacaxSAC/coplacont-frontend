@@ -1,14 +1,20 @@
 import React, { useState } from 'react';  
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import { AuthLayout, AuthHeader } from '@/components';
-import { NewPasswordForm, type INewPasswordFormData } from '@/domains/auth'
+import { AuthService, NewPasswordForm, type INewPasswordFormData } from '@/domains/auth'
 
 //import styles from './NewPasswordPage.module.scss';
 
 export const NewPasswordPage: React.FC = () => {
-  // Estado para manejar el loading y errores del formulario
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get("token");
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState<string>('');
   const [passwordSuccess, setPasswordSuccess] = useState<string>('');
+  const [isValidToken, setIsValidToken] = useState<boolean>(false);
+  const [isPasswordUpdated, setIsPasswordUpdated] = useState<boolean>(false);
 
   /**
    * Maneja el proceso de creación de nueva contraseña
@@ -17,33 +23,34 @@ export const NewPasswordPage: React.FC = () => {
   const handleNewPassword = async (formData: INewPasswordFormData) => {
     try {
       setIsLoading(true);
-      setPasswordError('');
-      setPasswordSuccess('');
-      
-      // TODO: Implementar llamada al servicio de actualización de contraseña
-      console.log('Datos de nueva contraseña:', { password: formData.password });
-      
-      // Simulación de delay para mostrar el loading
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // TODO: Aquí iría la lógica real de actualización de contraseña:
-      // const response = await authService.updatePassword(formData.password, token);
-      // if (response.success) {
-      //   setPasswordSuccess('Tu contraseña ha sido actualizada exitosamente');
-      //   // Redirigir al login después de un tiempo
-      //   setTimeout(() => {
-      //     navigate('/auth/login');
-      //   }, 2000);
-      // } else {
-      //   setPasswordError(response.message || 'Error al actualizar la contraseña');
-      // }
-      
-      // Por ahora, simulamos una actualización exitosa
-      setPasswordSuccess('Tu contraseña ha sido actualizada exitosamente');
-      
+      setPasswordError("");
+      setPasswordSuccess("");
+
+      if (!token) {
+        setPasswordError('Token de restablecimiento no válido');
+        return;
+      }
+
+      const response = await AuthService.resetPassword(token, formData.password);
+
+      if (response.success) {
+        setPasswordSuccess('Tu contraseña ha sido actualizada exitosamente');
+        setIsPasswordUpdated(true);
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          navigate('/auth/login');
+        }, 2000);
+      } else {
+        setPasswordError(response.message || 'Error al actualizar la contraseña');
+      }
     } catch (error) {
-      console.error('Error al actualizar la contraseña:', error);
-      setPasswordError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+      if (error instanceof Error) {
+        setPasswordError(error.message);
+      } else {
+        setPasswordError(
+          "Ocurrió un error inesperado. Por favor, intenta nuevamente."
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -52,18 +59,29 @@ export const NewPasswordPage: React.FC = () => {
   return (
     <AuthLayout>
       {/** Header de autenticación - Molécula reutilizable */}
-      <AuthHeader 
+      <AuthHeader
         title="Crear nueva contraseña"
         subtitle="Crea una nueva contraseña para tu cuenta"
       />
 
       {/** Organismo NewPasswordForm - Contiene toda la lógica del formulario */}
-      <NewPasswordForm 
-        onSubmit={handleNewPassword}
-        isLoading={isLoading}
-        error={passwordError}
-        success={passwordSuccess}
-      />
+      {isValidToken ? (
+        <NewPasswordForm
+          onSubmit={handleNewPassword}
+          isLoading={isLoading}
+          error={passwordError}
+          success={passwordSuccess}
+          disabled={isPasswordUpdated}
+        />
+      ) : isLoading ? (
+        <div>
+          <p>Validando token...</p>
+        </div>
+      ) : (
+        <div>
+          <p>{passwordError}</p>
+        </div>
+      )}
     </AuthLayout>
   );
 };

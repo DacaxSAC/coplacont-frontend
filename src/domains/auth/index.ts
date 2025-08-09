@@ -8,6 +8,9 @@ export * from './pages';
 // Exportar organismos
 export * from './organisms';
 
+// Exportar contextos
+export * from './contexts';
+
 // Exportar servicios
 export * from './services';
 

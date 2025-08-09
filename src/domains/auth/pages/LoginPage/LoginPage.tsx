@@ -7,14 +7,17 @@ import {
   AuthService, 
   type ILoginFormData, 
   type ILoginRequest,
+  useAuth,
 } from '@/domains/auth';
+import { useNavigate } from 'react-router-dom';
 
 //import styles from './LoginPage.module.scss';
 
 export const LoginPage: React.FC = () => {
-  // Estado para manejar el loading y errores del login
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState<string>('');
+  const [loginError, setLoginError] = useState<string>("");
 
   /**
    * Maneja el proceso de login
@@ -33,21 +36,22 @@ export const LoginPage: React.FC = () => {
       
       // Llamada al servicio de autenticación
       const response = await AuthService.login(loginRequest);
-      
-      console.log('Login exitoso:', response);
-      
-      // TODO: Redirigir al dashboard o página principal
-      // navigate('/dashboard');
-      alert(`Login exitoso! Bienvenido ${response.email}`);
-      
+
+      if (response.success && response.email && response.jwt) {
+        // Usar el contexto para manejar el login
+        login(response.email, response.jwt);
+        // Redirigir a la página principal después del login exitoso
+        navigate('/');
+      } else {
+        setLoginError(response.message);
+      }
     } catch (error) {
-      console.error('Error en el login:', error);
-      
-      // Mostrar el mensaje de error específico del servidor
       if (error instanceof Error) {
         setLoginError(error.message);
       } else {
-        setLoginError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+        setLoginError(
+          "Ocurrió un error inesperado. Por favor, intenta nuevamente."
+        );
       }
     } finally {
       setIsLoading(false);
@@ -57,13 +61,13 @@ export const LoginPage: React.FC = () => {
   return (
     <AuthLayout>
       {/** Header de autenticación - Molécula reutilizable */}
-      <AuthHeader 
+      <AuthHeader
         title="Bienvenido al Sistema Coplacont"
         subtitle="Ingresa a tu cuenta para continuar"
       />
 
       {/** Organismo LoginForm - Contiene toda la lógica del formulario */}
-      <LoginForm 
+      <LoginForm
         onSubmit={handleLogin}
         isLoading={isLoading}
         error={loginError}
