@@ -44,8 +44,8 @@ export class AuthService {
     return response.data;
   }
 
-  static async validateResetPassword(token: string, contrasena: string): Promise<{success: boolean, message: string, userId?: number}> {
-    const response = await authApi.validateResetPassword({token, contrasena});
+  static async validateResetToken(token: string): Promise<{success: boolean, message: string, userId?: number}> {
+    const response = await authApi.validateResetToken({token});
     return response.data;
   }
 

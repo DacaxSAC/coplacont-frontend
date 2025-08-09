@@ -24,6 +24,8 @@ export interface NewPasswordFormProps {
   error?: string;
   /** Mensaje de éxito cuando se guarda la contraseña */
   success?: string;
+  /** Deshabilita el formulario completamente */
+  disabled?: boolean;
 }
 
 /**
@@ -34,7 +36,8 @@ export const NewPasswordForm: React.FC<NewPasswordFormProps> = ({
   onSubmit,
   isLoading = false,
   error,
-  success
+  success,
+  disabled = false
 }) => {
   // Estado del formulario
   const [formData, setFormData] = useState<NewPasswordFormData>({
@@ -155,7 +158,7 @@ export const NewPasswordForm: React.FC<NewPasswordFormProps> = ({
           type="submit"
           variant="primary"
           size="large"
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         >
           {isLoading ? 'Guardando...' : 'Guardar contraseña'}
         </Button>
