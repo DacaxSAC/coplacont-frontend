@@ -5,28 +5,12 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
 import { MainLayout } from '../components/templates/MainLayout';
-import PurchasePage from '../domains/transactions/pages/PurchasePage';
-import CashPage from '@/domains/transactions/pages/CashPage';
-import ManualJournalEntry from '@/domains/transactions/pages/ManualJournalEntryPage';
-import PayrollPage from '@/domains/transactions/pages/PayrollPage';
-import SalePage from '@/domains/transactions/pages/SalePage';
-import ProductPage from '@/domains/inventory/pages/ProductPage';
-import KardexPage from '@/domains/inventory/pages/KardexPage';
-import InventoryAdjustment from '@/domains/inventory/pages/InventoryAdjustmentPage';
-import GeneralJournalPage from '@/domains/accounting/pages/GeneralJournalPage';
-import GeneralLedgerPage from '@/domains/accounting/pages/GeneralLedgerPage';
-import InventoryAndBalanceStatementPage from '@/domains/accounting/pages/InventoryAndBalanceStatementPage';
-import ChartOfAccountPage from '@/domains/accounting/pages/ChartOfAccountPage';
-import TrialBalancePage from '@/domains/financial-closing/pages/TrialBalancePage';
-import AccountingWorksheetPage from '@/domains/financial-closing/pages/AccountingWorksheetPage';
-import ClosingAdjustmentPage from '@/domains/financial-closing/pages/ClosingAdjustmentPage';
-import BalanceSheetPage from '@/domains/financial-statements/pages/BalanceSheetPage';
-import IncomeStatementPage from '@/domains/financial-statements/pages/IncomeStatementPage';
-import CashFlowStatementPage from '@/domains/financial-statements/pages/CashFlowStatementPage';
-import StatementOfChangesInEquityPage from '@/domains/financial-statements/pages/StatementOfChangesInEquityPage';
-import AccountingPeriodPage from '@/domains/settings/pages/AccountingPeriodPage';
-import UserAndRolesPage from '@/domains/settings/pages/UserAndRolesPage';
-import ParamsPage from '@/domains/settings/pages/ParamsPage';
+import { PurchasePage, CashPage, ManualJournalEntry, PayrollPage, SalePage } from '@/domains/transactions';
+import { ProductPage, KardexPage, InventoryAdjustment } from '@/domains/inventory'
+import { TrialBalancePage, AccountingWorksheetPage, ClosingAdjustmentPage } from '@/domains/financial-closing';
+import { AccountingPeriodPage, ParamsPage, UserAndRolesPage } from '@/domains/settings';
+import { ChartOfAccountPage, GeneralJournalPage, GeneralLedgerPage, InventoryAndBalanceStatementPage } from '@/domains/accounting';
+import { BalanceSheetPage, IncomeStatementPage, CashFlowStatementPage, StatementOfChangesInEquityPage } from '@/domains/financial-statements';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -85,7 +69,7 @@ export const AppRouter: React.FC = () => {
         <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
         <Route path="/auth/new-password" element={<NewPasswordPage />} />
       </PublicRoute>
-      
+
       {/* Redirección para rutas de auth sin especificar */}
       <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
 

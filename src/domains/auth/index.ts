@@ -16,3 +16,6 @@ export * from './services';
 
 // Exportar tipos
 export * from './types';
+
+// Exportar API
+export * from './api';

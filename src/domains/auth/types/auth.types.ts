@@ -16,6 +16,8 @@ export interface ILoginRequest {
 export interface ILoginResponse {
   email: string;
   jwt: string;
+  success: string;
+  message: string;
 }
 
 /**
@@ -80,6 +82,8 @@ export interface INewPasswordFormProps {
   error?: string;
   /** Mensaje de éxito cuando se guarda la contraseña */
   success?: string;
+  /** Deshabilita el formulario completamente */
+  disabled?: boolean;
 }
 
 /**
