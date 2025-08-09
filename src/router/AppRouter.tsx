@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '../domains/auth/pages';
+import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '@/domains/auth';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 

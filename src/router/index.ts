@@ -1,4 +1,5 @@
-export { AppRouter } from './AppRouter';
-export { ProtectedRoute } from './ProtectedRoute';
-export { PublicRoute } from './PublicRoute';
-export { default } from './AppRouter';
+export * from './AppRouter';
+export * from './ProtectedRoute';
+export * from './PublicRoute';
+export * from './AppRouter';
+export * from './IRouteProps';
