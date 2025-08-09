@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { PageLayout } from '../../components/templates/PageLayout';
 import { Card } from '../../components/molecules/Card';
+import { UserStatus } from '../../components/molecules/UserStatus';
 import { Button } from '../../components/atoms/Button';
 import { Text } from '../../components/atoms/Text';
-import styles from './HomePage.module.scss';
 
 /**
  * Página de inicio de la aplicación
@@ -14,6 +14,9 @@ export const HomePage: React.FC = () => {
   return (
     <PageLayout >
       <div >
+        {/* Estado de autenticación del usuario */}
+        <UserStatus />
+        
         <div >
           <Text as="h1" size="4xl" weight={600} color="primary" align="center">
             Bienvenido a CoPlaCont

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppRouter } from './router';
+import { AuthProvider } from './domains/auth';
 import styles from './App.module.scss';
 
 /**
@@ -8,9 +9,11 @@ import styles from './App.module.scss';
  */
 export const App: React.FC = () => {
   return (
-    <div className={styles.App}>
-      <AppRouter />
-    </div>
+    <AuthProvider>
+      <div className={styles.App}>
+        <AppRouter />
+      </div>
+    </AuthProvider>
   );
 }
 

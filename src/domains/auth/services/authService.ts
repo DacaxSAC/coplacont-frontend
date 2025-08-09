@@ -13,18 +13,17 @@ export class AuthService {
    * @param credentials - Credenciales de login (email y contraseña)
    * @returns Promise con la respuesta del login
    */
-  static async login(credentials: LoginRequest): Promise<{success: boolean, message: string}> {
+  static async login(credentials: LoginRequest): Promise<{success: boolean, message: string, email?: string, jwt?: string}> {
     try {
       const response = await authApi.login(credentials);
-      
-      // Guardar el token y información del usuario en localStorage
       const data = response.data;
-      if(data.success){
-        localStorage.setItem('jwt', data.jwt!);
-        localStorage.setItem('user', JSON.stringify({ email: data.email! }));
-      }
       
-      return {success: data.success, message: data.message};
+      return {
+        success: data.success, 
+        message: data.message,
+        email: data.email,
+        jwt: data.jwt
+      };
     } catch (error) {
       const apiError = handleApiError(error);
       throw new Error(apiError.message);

@@ -4,10 +4,12 @@ import { AuthLayout } from "../../../../components/templates/AuthLayout/AuthLayo
 import { AuthHeader } from "../../../../components/molecules/AuthHeader";
 import { LoginForm, type LoginFormData } from "../../organisms/LoginForm";
 import { AuthService } from "../../services/authService";
+import { useAuth } from "../../contexts";
 import type { LoginRequest } from "../../types/auth.types";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string>("");
 
@@ -23,7 +25,9 @@ export const LoginPage: React.FC = () => {
     try {
       const response = await AuthService.login(loginRequest);
 
-      if (response.success) {
+      if (response.success && response.email && response.jwt) {
+        // Usar el contexto para manejar el login
+        login(response.email, response.jwt);
         // Redirigir a la página principal después del login exitoso
         navigate('/');
       } else {
