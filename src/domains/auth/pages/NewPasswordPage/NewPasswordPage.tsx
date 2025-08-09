@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../../../components/templates/AuthLayout/AuthLayout";
 import { AuthHeader } from "../../../../components/molecules/AuthHeader";
 import {
@@ -10,6 +10,7 @@ import { AuthService } from "../../services";
 
 export const NewPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const token = searchParams.get("token");
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState<string>("");
@@ -67,10 +68,10 @@ export const NewPasswordPage: React.FC = () => {
       if (response.success) {
         setPasswordSuccess('Tu contraseña ha sido actualizada exitosamente');
         setIsPasswordUpdated(true);
-        // TODO: Redirigir al login después de un tiempo
-        // setTimeout(() => {
-        //   navigate('/auth/login');
-        // }, 2000);
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          navigate('/auth/login');
+        }, 2000);
       } else {
         setPasswordError(response.message || 'Error al actualizar la contraseña');
       }
