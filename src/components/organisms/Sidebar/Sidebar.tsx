@@ -3,6 +3,7 @@ import styles from './Sidebar.module.scss';
 
 import { Link } from 'react-router-dom';
 import { Logo } from '@/components/atoms';
+import { ThemeToggle } from '@/components/atoms/ThemeToggle/ThemeToggle';
 
 interface SidebarProps {
   userName: string;
@@ -24,7 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
       </div>
 
       <div>
-        
+        <ThemeToggle />
       </div>
 
       <nav className={styles.navigation}>

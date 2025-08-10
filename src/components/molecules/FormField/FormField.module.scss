@@ -1,6 +1,4 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
-
+@use '@/styles' as *;
 /**
  * Componente FormField - Estilos para la molécula que combina label + input
  */

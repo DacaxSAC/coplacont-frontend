@@ -1,8 +1,9 @@
+// src/styles/_mixins.scss
 // =============================================================================
 // MIXINS DE SASS - COPLACONT FRONTEND
 // =============================================================================
 
-@import 'variables';
+@use './variables' as v;
 
 // -----------------------------------------------------------------------------
 // MIXINS DE RESPONSIVE DESIGN
@@ -10,51 +11,51 @@
 
 @mixin respond-to($breakpoint) {
   @if $breakpoint == xs {
-    @media (max-width: #{$breakpoint-xs - 1px}) {
+    @media (max-width: #{v.$breakpoint-xs - 1px}) {
       @content;
     }
   }
   @else if $breakpoint == sm {
-    @media (min-width: #{$breakpoint-sm}) {
+    @media (min-width: #{v.$breakpoint-sm}) {
       @content;
     }
   }
   @else if $breakpoint == md {
-    @media (min-width: #{$breakpoint-md}) {
+    @media (min-width: #{v.$breakpoint-md}) {
       @content;
     }
   }
   @else if $breakpoint == lg {
-    @media (min-width: #{$breakpoint-lg}) {
+    @media (min-width: #{v.$breakpoint-lg}) {
       @content;
     }
   }
   @else if $breakpoint == xl {
-    @media (min-width: #{$breakpoint-xl}) {
+    @media (min-width: #{v.$breakpoint-xl}) {
       @content;
     }
   }
   @else if $breakpoint == 2xl {
-    @media (min-width: #{$breakpoint-2xl}) {
+    @media (min-width: #{v.$breakpoint-2xl}) {
       @content;
     }
   }
 }
 
 @mixin mobile-only {
-  @media (max-width: #{$breakpoint-md - 1px}) {
+  @media (max-width: #{v.$breakpoint-md - 1px}) {
     @content;
   }
 }
 
 @mixin tablet-and-up {
-  @media (min-width: #{$breakpoint-md}) {
+  @media (min-width: #{v.$breakpoint-md}) {
     @content;
   }
 }
 
 @mixin desktop-only {
-  @media (min-width: #{$breakpoint-lg}) {
+  @media (min-width: #{v.$breakpoint-lg}) {
     @content;
   }
 }
@@ -65,21 +66,22 @@
 
 @mixin button-base {
   border: none;
-  border-radius: $border-radius-sm;
+  border-radius: v.$border-radius-sm;
   cursor: pointer;
   font-family: inherit;
-  font-weight: $font-weight-medium;
-  transition: all $transition-normal;
+  font-weight: v.$font-weight-medium;
+  transition: all v.$transition-normal;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  
+
   &:focus {
-    outline: 2px solid $border-focus;
+    /* Si quieres otro color, cambia v.$primary-blue por la variable que prefieras */
+    outline: 2px solid v.$primary-blue;
     outline-offset: 2px;
   }
-  
+
   &:disabled,
   &.disabled {
     opacity: 0.6;
@@ -87,10 +89,10 @@
   }
 }
 
-@mixin button-variant($bg-color, $hover-color, $text-color: $text-white) {
+@mixin button-variant($bg-color, $hover-color, $text-color: v.$neutral-5) {
   background-color: $bg-color;
   color: $text-color;
-  
+
   &:hover:not(:disabled):not(.disabled) {
     background-color: $hover-color;
   }
@@ -106,38 +108,39 @@
 // -----------------------------------------------------------------------------
 
 @mixin input-base {
-  border: $border-width-thin solid $form-border;
-  border-radius: $border-radius-sm;
+  /* Usamos 1px y la variable de borde ya existente */
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius-sm;
   font-family: inherit;
-  transition: all $transition-normal;
+  transition: all v.$transition-normal;
   width: 100%;
   box-sizing: border-box;
-  background-color: $form-bg;
-  
+  background-color: v.$bg-card-v2;
+
   &:focus {
     outline: none;
-    border-color: $form-focus;
-    box-shadow: $box-shadow-focus;
+    border-color: v.$primary-blue;
+    box-shadow: v.$box-shadow-focus;
   }
-  
+
   &::placeholder {
-    color: $form-placeholder;
+    color: v.$text-color-1;
     opacity: 1;
   }
-  
+
   &:disabled {
-    background-color: $form-disabled-bg;
-    color: $form-disabled-text;
+    background-color: v.$bg-card-v1;
+    color: v.$text-color-1;
     cursor: not-allowed;
   }
 }
 
 @mixin input-error {
-  border-color: $form-error;
-  
+  border-color: v.$danger-color;
+
   &:focus {
-    border-color: $form-error;
-    box-shadow: $box-shadow-error;
+    border-color: v.$danger-color;
+    box-shadow: v.$box-shadow-error;
   }
 }
 
@@ -151,22 +154,22 @@
 // -----------------------------------------------------------------------------
 
 @mixin card-base {
-  background: $bg-primary;
-  border-radius: $border-radius-md;
-  transition: all $transition-normal;
+  background: v.$bg-card-v1;
+  border-radius: v.$border-radius-md;
+  transition: all v.$transition-normal;
   display: flex;
   flex-direction: column;
 }
 
 @mixin card-variant($border-color, $shadow: null) {
-  border: $border-width-thin solid $border-color;
-  
+  border: 1px solid $border-color;
+
   @if $shadow {
     box-shadow: $shadow;
   }
 }
 
-@mixin card-hover-effect($shadow: $box-shadow-lg) {
+@mixin card-hover-effect($shadow: v.$box-shadow-lg) {
   &:hover {
     box-shadow: $shadow;
     transform: translateY(-2px);
@@ -177,7 +180,11 @@
   padding: $padding;
 }
 
-// -----------------------------------------------------------------------------
+@mixin card-radius($radius) {
+  border-radius: $radius;
+}
+
+// -----------------------------------------------------------------------------          
 // MIXINS DE TEXTO
 // -----------------------------------------------------------------------------
 
@@ -187,15 +194,15 @@
   white-space: nowrap;
 }
 
-@mixin text-shadow($color: $shadow-dark) {
+@mixin text-shadow($color: rgba(0, 0, 0, 0.12)) {
   text-shadow: 0 2px 4px $color;
 }
 
-@mixin heading($size, $weight: $font-weight-semibold, $color: $text-primary) {
+@mixin heading($size, $weight: v.$font-weight-semibold, $color: v.$text-color) {
   font-size: $size;
   font-weight: $weight;
   color: $color;
-  line-height: $line-height-tight;
+  line-height: v.$line-height-tight;
 }
 
 // -----------------------------------------------------------------------------
@@ -222,10 +229,10 @@
 @mixin container($max-width: 1200px) {
   max-width: $max-width;
   margin: 0 auto;
-  padding: 0 $spacing-lg;
-  
+  padding: 0 v.$spacing-lg;
+
   @include mobile-only {
-    padding: 0 $spacing-md;
+    padding: 0 v.$spacing-md;
   }
 }
 
@@ -233,7 +240,7 @@
 // MIXINS DE ANIMACIONES
 // -----------------------------------------------------------------------------
 
-@mixin fade-in($duration: $transition-normal) {
+@mixin fade-in($duration: v.$transition-normal) {
   opacity: 0;
   animation: fadeIn $duration ease-in-out forwards;
 }
@@ -244,7 +251,7 @@
   }
 }
 
-@mixin slide-up($duration: $transition-normal, $distance: 20px) {
+@mixin slide-up($duration: v.$transition-normal, $distance: 20px) {
   transform: translateY($distance);
   opacity: 0;
   animation: slideUp $duration ease-out forwards;
@@ -257,59 +264,4 @@
   }
 }
 
-// -----------------------------------------------------------------------------
-// MIXINS DE UTILIDADES
-// -----------------------------------------------------------------------------
-
-@mixin visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-
-@mixin clearfix {
-  &::after {
-    content: '';
-    display: table;
-    clear: both;
-  }
-}
-
-@mixin backdrop-blur($blur: 10px) {
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
-}
-
-// -----------------------------------------------------------------------------
-// MIXINS DE ESTADOS
-// -----------------------------------------------------------------------------
-
-@mixin loading-state {
-  position: relative;
-  pointer-events: none;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid transparent;
-    border-top: 2px solid $primary-color;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+// ------------------------

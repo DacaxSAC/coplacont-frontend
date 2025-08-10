@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppRouter } from './router';
 import { AuthProvider } from './domains/auth';
+import { ThemeProvider } from "@/shared";
 import styles from './App.module.scss';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -11,11 +12,13 @@ import { BrowserRouter } from 'react-router-dom';
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <div className={styles.App}>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-      </div>
+      <ThemeProvider>
+        <div className={styles.App}>
+          <BrowserRouter>
+            <AppRouter />
+          </BrowserRouter>
+        </div>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -1,5 +1,5 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@use "sass:color";
+@use "@/styles" as *;
 
 /**
  * Componente Button - Estilos base y variantes
@@ -55,7 +55,7 @@
     color: $neutral-5;
 
     &:hover:not(:disabled) {
-      background-color: darken($primary-blue, 10%);
+      background-color: color.scale($primary-blue, $lightness: 10%);
       transform: translateY(-1px);
       box-shadow: $box-shadow-md;
     }
@@ -71,7 +71,7 @@
     color: $neutral-5;
 
     &:hover:not(:disabled) {
-      background-color: darken($secondary-blue, 10%);
+      background-color: color.scale($secondary-blue, $lightness: 10%);
       transform: translateY(-1px);
       box-shadow: $box-shadow-md;
     }
@@ -87,7 +87,7 @@
     color: $neutral-5;
 
     &:hover:not(:disabled) {
-      background-color: darken($danger-color, 10%);
+      background-color: color.scale($danger-color, $lightness: 10%);
       transform: translateY(-1px);
       box-shadow: $box-shadow-md;
     }
