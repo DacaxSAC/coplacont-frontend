@@ -9,5 +9,3 @@ export const PurchasePage: React.FC = () => {
     />
   );
 };
-
-export default PurchasePage;

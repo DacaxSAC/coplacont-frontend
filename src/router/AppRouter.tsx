@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '@/domains/auth';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -19,9 +19,18 @@ import { BalanceSheetPage, IncomeStatementPage, CashFlowStatementPage, Statement
 export const AppRouter: React.FC = () => {
   return (
     <Routes>
-      <ProtectedRoute>
+
+      {/* Rutas públicas */}
+      <Route element={<PublicRoute />} >
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
+        <Route path="/auth/new-password" element={<NewPasswordPage />} />
+      </Route>
+
+      {/* Rutas privadas */}
+      <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<div>Home</div>} />
+          <Route path="/" element={<Fragment />} />
 
           {/* Transacciones */}
           <Route path="/compras" element={<PurchasePage />} />
@@ -62,13 +71,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
           <Route path="/auth/new-password" element={<NewPasswordPage />} />
         </Route>
-      </ProtectedRoute>
-
-      <PublicRoute>
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
-        <Route path="/auth/new-password" element={<NewPasswordPage />} />
-      </PublicRoute>
+      </Route>
 
       {/* Redirección para rutas de auth sin especificar */}
       <Route path="/auth" element={<Navigate to="/auth/login" replace />} />

@@ -1,16 +1,14 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import { Loader } from '@/components'
 import { useAuth } from '@/domains/auth';
-
-import type { IRouteProps } from '@/router';;
 
 /**
  * Componente para proteger rutas que requieren autenticación
  * Redirige al login si el usuario no está autenticado
  */
-export const ProtectedRoute: React.FC<IRouteProps> = ({ children }) => {
+export const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -21,6 +19,8 @@ export const ProtectedRoute: React.FC<IRouteProps> = ({ children }) => {
     return <Navigate to="/auth/login" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <Outlet />
+  );
 };
 

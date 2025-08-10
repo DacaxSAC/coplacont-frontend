@@ -9,5 +9,3 @@ export const ManualJournalEntry: React.FC = () => {
     />
   );
 };
-
-export default ManualJournalEntry;

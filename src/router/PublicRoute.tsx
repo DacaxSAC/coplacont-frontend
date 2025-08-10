@@ -1,16 +1,14 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { Fragment } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import { useAuth } from '../domains/auth';
 import { Loader } from '@/components';
-
-import { type IRouteProps } from '@/router';
 
 /**
  * Componente para rutas públicas que solo deben ser accesibles sin autenticación
  * Redirige a la página principal si el usuario ya está autenticado
  */
-export const PublicRoute: React.FC<IRouteProps> = ({ children }) => {
+export const PublicRoute: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -21,5 +19,7 @@ export const PublicRoute: React.FC<IRouteProps> = ({ children }) => {
     return <Navigate to="/" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <Outlet />
+  );
 };

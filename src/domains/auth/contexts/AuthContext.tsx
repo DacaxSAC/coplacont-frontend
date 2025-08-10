@@ -1,43 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import type { AuthUser } from '../types/auth.types';
+import React, { createContext, useState, useEffect } from 'react';
+import type { IAuthUser, IAuthContextState, IAuthProviderProps } from '@/domains/auth';
 
-/**
- * Interfaz para el estado del contexto de autenticación
- */
-interface AuthContextState {
-  /** Usuario autenticado actual */
-  user: AuthUser | null;
-  /** Token JWT del usuario */
-  token: string | null;
-  /** Indica si el usuario está autenticado */
-  isAuthenticated: boolean;
-  /** Indica si se está verificando la autenticación */
-  isLoading: boolean;
-  /** Función para realizar login */
-  login: (email: string, jwt: string) => void;
-  /** Función para realizar logout */
-  logout: () => void;
-}
-
-/**
- * Props para el proveedor del contexto de autenticación
- */
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-// Crear el contexto
-const AuthContext = createContext<AuthContextState | undefined>(undefined);
+export const AuthContext = createContext<IAuthContextState | undefined>(undefined);
 
 /**
  * Proveedor del contexto de autenticación
  * Maneja el estado global de autenticación y persistencia en localStorage
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<IAuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   /**
    * Verifica si hay datos de autenticación guardados al inicializar
@@ -49,13 +22,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const savedUser = localStorage.getItem('user');
 
         if (savedToken && savedUser) {
-          const parsedUser = JSON.parse(savedUser) as AuthUser;
+          const parsedUser = JSON.parse(savedUser) as IAuthUser;
           setToken(savedToken);
           setUser(parsedUser);
         }
       } catch (error) {
         console.error('Error al inicializar autenticación:', error);
-        // Limpiar datos corruptos
         localStorage.removeItem('jwt');
         localStorage.removeItem('user');
       } finally {
@@ -71,12 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * Guarda los datos en el estado y en localStorage
    */
   const login = (email: string, jwt: string) => {
-    const userData: AuthUser = { email };
+    const userData: IAuthUser = { email };
     
     setUser(userData);
     setToken(jwt);
-    
-    // Persistir en localStorage
     localStorage.setItem('jwt', jwt);
     localStorage.setItem('user', JSON.stringify(userData));
   };
@@ -88,13 +58,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    
-    // Limpiar localStorage
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
   };
 
-  const value: AuthContextState = {
+  const value: IAuthContextState = {
     user,
     token,
     isAuthenticated: !!user && !!token,
@@ -108,19 +76,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-/**
- * Hook personalizado para usar el contexto de autenticación
- * @returns El estado y funciones del contexto de autenticación
- * @throws Error si se usa fuera del AuthProvider
- */
-export const useAuth = (): AuthContextState => {
-  const context = useContext(AuthContext);
-  
-  if (context === undefined) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
-  }
-  
-  return context;
 };

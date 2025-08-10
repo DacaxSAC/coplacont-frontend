@@ -6,14 +6,10 @@ import { type ILoginRequest, type ILoginResponse, type IAuthUser, authApi } from
  * Maneja todas las operaciones relacionadas con la autenticación de usuarios
  */
 export class AuthService {
-  /**
-   * Realiza el login del usuario
-   * @param credentials - Credenciales de login (email y contraseña)
-   * @returns Promise con la respuesta del login
-   */
+
   static async login(credentials: ILoginRequest): Promise<ILoginResponse> {
     try {
-      const response = await apiClient.post<ILoginResponse>('/auth/login', credentials);
+      const response = await authApi.login(credentials);
 
       const { jwt, email } = response.data;
       localStorage.setItem('jwt', jwt);
@@ -26,9 +22,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Cierra la sesión del usuario
-   */
   static logout(): void {
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
@@ -49,18 +42,10 @@ export class AuthService {
     return response.data;
   }
 
-  /**
-   * Obtiene el token almacenado
-   * @returns Token JWT o null si no existe
-   */
   static getToken(): string | null {
     return localStorage.getItem('jwt');
   }
 
-  /**
-   * Obtiene la información del usuario almacenada
-   * @returns Información del usuario o null si no existe
-   */
   static getUser(): IAuthUser | null {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
@@ -72,21 +57,12 @@ export class AuthService {
     }
   }
 
-  /**
-   * Verifica si el usuario está autenticado
-   * @returns true si el usuario está autenticado
-   */
   static isAuthenticated(): boolean {
     const token = this.getToken();
     const user = this.getUser();
     return !!(token && user);
   }
 
-  /**
-   * Decodifica el JWT para obtener información del payload
-   * @param token - Token JWT
-   * @returns Payload decodificado o null si el token es inválido
-   */
   static decodeToken(token: string): any {
     try {
       const base64Url = token.split('.')[1];

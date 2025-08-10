@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAuth } from '../../../domains/auth';
-import { Button } from '../../atoms/Button';
-import { Text } from '../../atoms/Text';
 import styles from './UserStatus.module.scss';
+
+import { Button, Text } from '@/components';
+import { useAuth } from '@/domains/auth';
 
 /**
  * Componente UserStatus - Muestra el estado de autenticación del usuario

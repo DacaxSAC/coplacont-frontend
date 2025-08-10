@@ -9,5 +9,3 @@ export const KardexPage: React.FC = () => {
     />
   );
 };
-
-export default KardexPage;

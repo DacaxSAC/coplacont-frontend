@@ -9,5 +9,3 @@ export const IncomeStatementPage: React.FC = () => {
     />
   );
 };
-
-export default IncomeStatementPage;

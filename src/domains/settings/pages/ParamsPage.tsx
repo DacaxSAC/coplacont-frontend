@@ -9,5 +9,3 @@ export const ParamsPage: React.FC = () => {
     />
   );
 };
-
-export default ParamsPage;

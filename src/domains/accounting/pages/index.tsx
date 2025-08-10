@@ -1,4 +1,4 @@
-export { ChartOfAccountPage } from './ChartOfAccountPage';
-export { GeneralJournalPage } from './GeneralJournalPage';
-export { GeneralLedgerPage } from './GeneralLedgerPage';
-export { InventoryAndBalanceStatementPage } from './InventoryAndBalanceStatementPage';
+export * from './ChartOfAccountPage';
+export * from './GeneralJournalPage';
+export * from './GeneralLedgerPage';
+export * from './InventoryAndBalanceStatementPage';

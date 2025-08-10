@@ -9,5 +9,3 @@ export const SalePage: React.FC = () => {
     />
   );
 };
-
-export default SalePage;

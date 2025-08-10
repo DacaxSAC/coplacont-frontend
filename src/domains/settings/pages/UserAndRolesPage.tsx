@@ -9,5 +9,3 @@ export const UserAndRolesPage: React.FC = () => {
     />
   );
 };
-
-export default UserAndRolesPage;

@@ -9,5 +9,3 @@ export const CashFlowStatementPage: React.FC = () => {
     />
   );
 };
-
-export default CashFlowStatementPage;

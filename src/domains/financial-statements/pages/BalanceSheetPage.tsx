@@ -9,5 +9,3 @@ export const BalanceSheetPage: React.FC = () => {
     />
   );
 };
-
-export default BalanceSheetPage;

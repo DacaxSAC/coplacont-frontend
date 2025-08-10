@@ -9,5 +9,3 @@ export const ProductPage: React.FC = () => {
     />
   );
 };
-
-export default ProductPage;

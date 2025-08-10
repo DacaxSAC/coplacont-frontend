@@ -2,6 +2,8 @@
  * Tipos relacionados con la autenticación
  */
 
+import type { ReactNode } from "react";
+
 /**
  * Datos de entrada para el login
  */
@@ -105,4 +107,29 @@ export interface IRecoveryPasswordFormProps {
   error?: string;
   /** Mensaje de éxito cuando se envía el formulario */
   success?: string;
+}
+
+/**
+ * Interfaz para el estado del contexto de autenticación
+ */
+export interface IAuthContextState {
+  /** Usuario autenticado actual */
+  user: IAuthUser | null;
+  /** Token JWT del usuario */
+  token: string | null;
+  /** Indica si el usuario está autenticado */
+  isAuthenticated: boolean;
+  /** Indica si se está verificando la autenticación */
+  isLoading: boolean;
+  /** Función para realizar login */
+  login: (email: string, jwt: string) => void;
+  /** Función para realizar logout */
+  logout: () => void;
+}
+
+/**
+ * Props para el proveedor del contexto de autenticación
+ */
+export interface IAuthProviderProps {
+  children: ReactNode;
 }

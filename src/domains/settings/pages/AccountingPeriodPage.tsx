@@ -9,5 +9,3 @@ export const AccountingPeriodPage: React.FC = () => {
     />
   );
 };
-
-export default AccountingPeriodPage;

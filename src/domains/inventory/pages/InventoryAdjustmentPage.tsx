@@ -9,5 +9,3 @@ export const InventoryAdjustment: React.FC = () => {
     />
   );
 };
-
-export default InventoryAdjustment;

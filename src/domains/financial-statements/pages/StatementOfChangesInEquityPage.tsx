@@ -9,5 +9,3 @@ export const StatementOfChangesInEquityPage: React.FC = () => {
     />
   );
 };
-
-export default StatementOfChangesInEquityPage;

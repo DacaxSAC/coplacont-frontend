@@ -9,5 +9,3 @@ export const CashPage: React.FC = () => {
     />
   );
 };
-
-export default CashPage;

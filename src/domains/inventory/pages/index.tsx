@@ -1,3 +1,3 @@
-export { ProductPage } from './ProductPage';
-export { KardexPage } from './KardexPage';
-export { InventoryAdjustment } from './InventoryAdjustmentPage';
+export * from './ProductPage';
+export * from './KardexPage';
+export * from './InventoryAdjustmentPage';

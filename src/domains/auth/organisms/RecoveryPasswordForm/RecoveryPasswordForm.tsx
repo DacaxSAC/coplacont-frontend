@@ -3,7 +3,7 @@ import styles from './RecoveryPasswordForm.module.scss';
 
 import { FormField, Button, Text } from '@/components';
 
-import { type IRecoveryPasswordFormData, type IRecoveryPasswordFormProps } from '@/domains/auth/types/auth.types';
+import { type IRecoveryPasswordFormData, type IRecoveryPasswordFormProps } from '@/domains/auth/types/authTypes';
 
 /**
  * Componente RecoveryPasswordForm - Organismo que contiene el formulario completo de recuperación de contraseña
