@@ -12,6 +12,16 @@ export interface LogoProps {
    */
   alt?: string;
   /**
+   * Width of the logo (in pixels)
+   * @default 40
+   */
+  width?: number;
+  /**
+   * Height of the logo (in pixels)
+   * @default 40
+   */
+  height?: number;
+  /**
    * Additional CSS class name
    */
   className?: string;
@@ -36,6 +46,8 @@ export const Logo = ({
   alt = "Logo",
   className = "",
   src = "/images/logo.png",
+  width,
+  height,
   onClick
 }: LogoProps) => {
   // Determine size variant class
@@ -60,8 +72,8 @@ export const Logo = ({
       <img 
         src={src} 
         alt={alt}
-        width={size}
-        height={size}
+        width={width || size}
+        height={height || size} 
         style={{
           display: 'block',
           objectFit: 'contain'

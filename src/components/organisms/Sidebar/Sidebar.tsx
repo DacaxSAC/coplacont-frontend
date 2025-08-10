@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Sidebar.module.scss';
 
 import { Link } from 'react-router-dom';
+import { Logo } from '@/components/atoms';
 
 interface SidebarProps {
   userName: string;
@@ -10,10 +11,20 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
   return (
-    <aside className={styles.sidebar}>
+    <aside className={styles.sidebar} >
+
+      <div className={styles.header}>
+        <Logo src='../src/assets/sidebar/logo.svg' width={141} height={52} />
+        <Logo src='../src/assets/sidebar/hide.svg' size={18} />
+      </div>
+
       <div className={styles.userInfo}>
         <span className={styles.userName}>{userName}</span>
         <span className={styles.userRole}>{userRole}</span>
+      </div>
+
+      <div>
+        
       </div>
 
       <nav className={styles.navigation}>
