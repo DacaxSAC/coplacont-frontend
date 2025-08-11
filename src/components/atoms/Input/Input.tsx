@@ -14,7 +14,7 @@ export interface InputProps {
   id?: string;
   name?: string;
   autoComplete?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'xs' | 'small' | 'medium' | 'large';
   /**
    * Elemento adicional que se renderiza dentro del contenedor del input (ej: botón)
    */

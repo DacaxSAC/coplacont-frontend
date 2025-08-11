@@ -57,22 +57,24 @@ export interface ComboBoxOption {
 export interface ComboBoxProps {
   /** Lista de opciones disponibles */
   options: ComboBoxOption[];
-  /** Valor actualmente seleccionado */
+  /** Valor seleccionado actualmente */
   value?: string | number;
-  /** Función que se ejecuta cuando se selecciona una opción */
+  /** Función que se ejecuta cuando cambia la selección */
   onChange?: (value: string | number) => void;
   /** Texto placeholder cuando no hay selección */
   placeholder?: string;
-  /** Si el combobox está deshabilitado */
+  /** Si el componente está deshabilitado */
   disabled?: boolean;
-  /** Si hay un error en el campo */
+  /** Si el componente tiene un error */
   error?: boolean;
-  /** ID para el elemento */
+  /** ID del elemento para accesibilidad */
   id?: string;
-  /** Nombre del campo */
+  /** Nombre del campo para formularios */
   name?: string;
-  /** Variante visual del ComboBox */
+  /** Variante visual del componente */
   variant?: 'default' | 'createSale';
+  /** Tamaño del componente */
+  size?: 'xs' | 'small' | 'medium' | 'large';
 }
 
 /**
@@ -89,6 +91,7 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
   id,
   name,
   variant = 'createSale',
+  size = 'medium',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<ComboBoxOption | null>(
@@ -106,6 +109,8 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (comboBoxRef.current && !comboBoxRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsEditing(false);
+        setFilterText('');
       }
     };
 
@@ -166,7 +171,8 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
     setSelectedOption(null);
     setFilterText('');
     setIsEditing(false);
-    onChange?.(undefined as any);
+    setIsOpen(false);
+    onChange?.('');
   };
 
   /**
@@ -203,6 +209,7 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
 
   const containerClassName = [
     styles.comboBox,
+    styles[`comboBox--${size}`],
     variant !== 'default' && styles[`comboBox--${variant}`],
     error && styles['comboBox--error'],
     disabled && styles['comboBox--disabled'],

@@ -350,7 +350,7 @@ export const CreateSaleForm = () => {
   return (
     <div className={styles.CreateSaleForm}>
       <Text size="xl" color="neutral-primary">
-        Ingresa los siguientes campos
+        Cabecera de venta
       </Text>
 
       {/** Formulario */}
@@ -516,7 +516,7 @@ export const CreateSaleForm = () => {
       <Divider />
 
       <Text size="xl" color="neutral-primary">
-        Detalle de la venta
+        Detalle de venta
       </Text>
 
       <div className={styles.CreateSaleForm__AddItems}>
@@ -529,6 +529,7 @@ export const CreateSaleForm = () => {
           <ComboBox
             options={productosOptions}
             variant="createSale"
+            size="xs"
             name="producto"
             value={productoSeleccionado}
             onChange={handleProductoChange}
@@ -542,6 +543,7 @@ export const CreateSaleForm = () => {
             Unidad de medida
           </Text>
           <Input
+            size="xs"
             variant="createSale"
             value={unidadMedidaSeleccionada ? unidadMedidaOptions.find(option => option.value === unidadMedidaSeleccionada)?.label || '' : ''}
             onChange={handleUnidadMedidaChange}
@@ -556,6 +558,7 @@ export const CreateSaleForm = () => {
             Cantidad
           </Text>
           <Input
+            size="xs"
             type="number"
             variant="createSale"
             value={cantidadIngresada}

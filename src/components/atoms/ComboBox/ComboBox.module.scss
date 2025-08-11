@@ -135,4 +135,52 @@
     border-color: $primary-blue;
     box-shadow: none;
   }
+
+  // -----------------------------------------------------------------------------
+  // VARIANTES DE TAMAÑO
+  // -----------------------------------------------------------------------------
+
+  &--xs {
+    padding: $spacing-xs $spacing-sm;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-xs;
+    }
+  }
+
+  &--small {
+    padding: $spacing-sm $spacing-md;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-sm;
+    }
+  }
+
+  &--medium {
+    padding: $spacing-md $spacing-lg;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-md;
+    }
+  }
+
+  &--large {
+    padding: $spacing-lg $spacing-xl;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-lg;
+    }
+  }
 }
