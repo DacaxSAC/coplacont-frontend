@@ -1,23 +1,33 @@
 import React from 'react';
 import styles from './FormField.module.scss';
 
-import { Input, type InputProps, PasswordInput, Text } from '@/components';
+import {
+  ComboBox,
+  type ComboBoxProps,
+  Input,
+  type InputProps,
+  PasswordInput,
+  Text,
+} from '@/components';
 
-/**
- * Props para el componente FormField
- */
-export interface FormFieldProps extends Omit<InputProps, 'error'> {
-  /** Etiqueta del campo */
+type BaseProps = {
   label: string;
-  /** Mensaje de error a mostrar */
   errorMessage?: string;
-  /** Texto de ayuda */
   helperText?: string;
-  /** Si el campo es requerido */
-  required?: boolean;
-  /** Si hay error en el campo */
+  id?: string;
   error?: boolean;
-}
+  required?: boolean;
+};
+
+// Discriminated union based on 'type'
+type FormFieldInputProps = BaseProps & InputProps & { type: InputProps['type'] };
+type FormFieldPasswordProps = BaseProps & Omit<InputProps, 'type' | 'id' | 'error'> & { type: 'password' }
+type FormFieldComboBoxProps = BaseProps & ComboBoxProps & { type: 'combobox' };
+
+export type FormFieldProps =
+  | FormFieldInputProps
+  | FormFieldPasswordProps
+  | FormFieldComboBoxProps;
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,
@@ -26,59 +36,39 @@ export const FormField: React.FC<FormFieldProps> = ({
   required = false,
   error = false,
   id,
-  type,
-  ...inputProps
+  ...props
 }) => {
-  const isPasswordField = type === 'password';
-  
+  const renderField = () => {
+    const { type } = props;
+
+    switch (type) {
+      case 'password':
+        return <PasswordInput id={id} error={error} {...(props as Omit<InputProps, 'type'>)} />;
+      case 'combobox':
+        return <ComboBox id={id} error={error} {...(props as ComboBoxProps)} />;
+      default:
+        return <Input id={id} type={type} error={error} {...(props as InputProps)} />;
+    }
+  };
+
   return (
     <div className={styles.formField}>
-      <Text as="label" size="md" weight={500} color="neutral-secondary" align="left" >
+      <Text as="label" size="md" weight={500} color="neutral-secondary" align="left">
         {label}
       </Text>
       <div className={styles.inputContainer}>
-        {isPasswordField ? (
-        <PasswordInput
-          id={id}
-          error={error}
-          {...inputProps}
-        />
-      ) : (
-        <Input
-          id={id}
-          type={type}
-          error={error}
-          {...inputProps}
-        />
-      )}
-      {error && errorMessage && (
-        <Text 
-          as="span" 
-          size="xs" 
-          color="danger" 
-          className={styles.errorMessage}
-        >
-          {errorMessage}
-        </Text>
-      )}
-      
-      {!error && helperText && (
-        <Text 
-          as="span" 
-          size="xs" 
-          color="neutral-secondary" 
-          className={styles.helperText}
-        >
-          {helperText}
-        </Text>
-      )}
-
-
+        {renderField()}
+        {error && errorMessage && (
+          <Text as="span" size="xs" color="danger" className={styles.errorMessage}>
+            {errorMessage}
+          </Text>
+        )}
+        {!error && helperText && (
+          <Text as="span" size="xs" color="neutral-secondary" className={styles.helperText}>
+            {helperText}
+          </Text>
+        )}
       </div>
-      
-      
-      
-      
     </div>
   );
 };
