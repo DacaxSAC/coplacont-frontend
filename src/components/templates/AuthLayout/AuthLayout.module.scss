@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@use "@/styles" as *;
 
 .AuthLayout{
   background-color: $bg-color-secondary;

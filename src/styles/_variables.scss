@@ -54,6 +54,29 @@ $warning-color: #F3CB26;
   }
 }
 
+// Soporte explícito para data-theme establecido por ThemeProvider
+:root[data-theme="light"] {
+  --bg-color: #{$neutral-5};
+  --bg-color-secondary: #{$neutral-4};
+  --text-color: #{$neutral-1};
+  --text-color-1: #{$neutral-2};
+  --text-color-reverse: #{$neutral-5};
+  --bg-card-v1: #{$neutral-4};
+  --bg-card-v2: #{$neutral-5};
+  --text-color-card-skills: #{$neutral-2};
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #{$neutral-1};
+  --bg-color-secondary: #000000;
+  --text-color: #{$neutral-5};
+  --text-color-1: #{$neutral-3};
+  --text-color-reverse: #{$neutral-1};
+  --bg-card-v1: #{$neutral-2};
+  --bg-card-v2: #{$neutral-1};
+  --text-color-card-skills: #{$neutral-3};
+}
+
 // Variables Sass para compatibilidad con código existente
 $bg-color: var(--bg-color);
 $bg-color-secondary: var(--bg-color-secondary);
