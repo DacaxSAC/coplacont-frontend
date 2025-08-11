@@ -43,12 +43,10 @@ export const Table: React.FC<TableProps> = ({
   columns,
   data,
   onDelete,
-  emptyText = 'No hay datos disponibles',
-  className = '',
+  emptyText = 'No hay datos disponibles'
 }) => {
   return (
-    <div className={`${styles.tableContainer} ${className}`}>
-      <div className={styles.tableWrapper}>
+    <div className={`${styles.tableContainer}`}>
         <table className={styles.table}>
           <thead className={styles.tableHead}>
             <tr>
@@ -57,18 +55,19 @@ export const Table: React.FC<TableProps> = ({
                   key={column.key}
                   className={styles.tableHeader}
                   style={{
-                    width: column.width,
+                    width: column.width || 'auto',
                     textAlign: column.align || 'left',
+                    minWidth: '80px', // Ancho mínimo para evitar columnas muy estrechas
                   }}
                 >
-                  <Text size="sm" weight={500} color="neutral-primary">
+                  <Text size="xs" weight={500} color="neutral-primary">
                     {column.title}
                   </Text>
                 </th>
               ))}
               {onDelete && (
                 <th className={styles.tableHeader} style={{ width: '80px' }}>
-                  <Text size="sm" weight={500} color="neutral-primary">
+                  <Text size="xs" weight={500} color="neutral-primary">
                     Acciones
                   </Text>
                 </th>
@@ -82,7 +81,7 @@ export const Table: React.FC<TableProps> = ({
                   colSpan={columns.length + (onDelete ? 1 : 0)}
                   className={styles.emptyCell}
                 >
-                  <Text size="sm" color="neutral-secondary">
+                  <Text size="xs" color="neutral-secondary">
                     {emptyText}
                   </Text>
                 </td>
@@ -94,12 +93,15 @@ export const Table: React.FC<TableProps> = ({
                     <td
                       key={column.key}
                       className={styles.tableCell}
-                      style={{ textAlign: column.align || 'left' }}
+                      style={{ 
+                        textAlign: column.align || 'left', 
+                        fontSize: '12px'
+                      }}
                     >
                       {column.render
                         ? column.render(record[column.key], record, index)
                         : (
-                          <Text size="sm" color="neutral-primary">
+                          <Text size="xs" color="neutral-primary">
                             {record[column.key] || '-'}
                           </Text>
                         )}
@@ -121,7 +123,6 @@ export const Table: React.FC<TableProps> = ({
             )}
           </tbody>
         </table>
-      </div>
     </div>
   );
 };

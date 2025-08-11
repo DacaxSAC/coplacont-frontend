@@ -576,7 +576,7 @@ export const CreateSaleForm = () => {
       </div>
 
       {/** Table */}
-      {detalleVenta.length > 0 && (
+      {detalleVenta.length === 0 && (
         <Table
           columns={tableColumns}
           data={detalleVenta}
