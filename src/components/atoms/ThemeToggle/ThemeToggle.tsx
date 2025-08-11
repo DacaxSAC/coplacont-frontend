@@ -1,5 +1,7 @@
 import { useContext } from "react";
+import styles from "./ThemeToggle.module.scss";
 import { ThemeContext } from "@/shared/context/ThemeProvider";
+import { Logo } from "@/components";
 
 export const ThemeToggle = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -9,8 +11,12 @@ export const ThemeToggle = () => {
   }
 
   return (
-    <button onClick={toggleTheme}>
-      {theme === "light" ? "🌙" : "☀️"}
-    </button>
+    <div className={styles.themeToggle} onClick={toggleTheme}>
+      <span className={styles.themeToggle__label}>Tema de color</span>
+      <div className={styles.themeToggle__icons}>
+        <Logo src="../src/assets/sidebar/sun.svg" size={24} />
+        <Logo src="../src/assets/sidebar/moon.svg" size={24} />
+      </div>
+    </div>
   );
 };
