@@ -1,0 +1,12 @@
+.RegisterSalePage {
+
+  &__HeaderArea{
+    display: flex; 
+    flex-direction: column;
+  }
+  
+
+  &__FormField{
+    display: flex;
+  }
+}
