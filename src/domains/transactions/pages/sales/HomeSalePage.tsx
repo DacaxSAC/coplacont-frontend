@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import styles from './HomeSalePage.module.scss';
 
 import { Button, PageLayout, FormField } from '@/components';
+import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
   filterTypeOptions,
@@ -29,20 +30,37 @@ export const HomeSalePage: React.FC = () => {
     console.log({ filterType, month, year, startDate, endDate });
   };
 
-  const handleSearchFilter = () => {
-    console.log({ entity, documentType, sunatStatus });
-  };
+  // Nota: La lógica de búsqueda secundaria se conectará con el servicio cuando esté disponible.
 
   // Dummy data para la tabla (placeholder)
   const rows = useMemo(() => Array.from({ length: 10 }, (_, idx) => ({
     id: idx + 1,
-    entidad: 'XXXXXXXXXXXXXX',
-    correo: 'xxxxx@xxxxx.xxx',
-    documento: 'XX-XXXX',
-    estado: 'XXXXXX',
-    columnaA: 'XXXXXXXXXX',
-    columnaB: 'XXXXXX',
-  })), []);
+    cells: [
+      'XXXXXXXXXXXXXX',
+      'XXXXXXXX',
+      'xxxxx@xxxxx.xxx',
+      'XX-XXXX',
+      'XXXXXXXXXX',
+      'XXXXXX',
+      'XXXXXXXX',
+      '',
+      ''
+    ],
+  } as TableRow)), []);
+
+  const headers = [
+    'XXXXXXXXXXXXXX',
+    'XXXXXXXX',
+    'XXXXXX@XXXXX.XXX',
+    'XX-XXXX',
+    'XXXXXXXXXX',
+    'XXXXXX',
+    'XXXXXXXX',
+    '',
+    ''
+  ];
+
+  const gridTemplate = '1.2fr 1fr 1.2fr 0.8fr 1fr 0.8fr 0.8fr 0.4fr 0.6fr';
 
   return (
     <PageLayout
@@ -141,39 +159,7 @@ export const HomeSalePage: React.FC = () => {
       </section>
 
       {/* Tabla de resultados */}
-      <section className={styles.tableWrapper}>
-        <div className={styles.table} role="table" aria-label="Lista de ventas">
-          <div className={`${styles.row} ${styles.header}`} role="row">
-            <div className={styles.cell} role="columnheader">XXXXXXXXXXXXXX</div>
-            <div className={styles.cell} role="columnheader">XXXXXXXX</div>
-            <div className={styles.cell} role="columnheader">XXXXXX@XXXXX.XXX</div>
-            <div className={styles.cell} role="columnheader">XX-XXXX</div>
-            <div className={styles.cell} role="columnheader">XXXXXXXXXX</div>
-            <div className={styles.cell} role="columnheader">XXXXXX</div>
-            <div className={styles.cell} role="columnheader">XXXXXXXX</div>
-            <div className={styles.cell} role="columnheader"></div>
-            <div className={styles.cell} role="columnheader"></div>
-          </div>
-
-          {rows.map((r) => (
-            <div key={r.id} className={styles.row} role="row">
-              <div className={styles.cell} role="cell">{r.entidad}</div>
-              <div className={styles.cell} role="cell">{r.columnaA}</div>
-              <div className={styles.cell} role="cell">{r.correo}</div>
-              <div className={styles.cell} role="cell">{r.documento}</div>
-              <div className={styles.cell} role="cell">{r.columnaA}</div>
-              <div className={styles.cell} role="cell">{r.columnaB}</div>
-              <div className={styles.cell} role="cell">{r.estado}</div>
-              <div className={`${styles.cell} ${styles.actions}`} role="cell">
-                <button className={styles.iconButton} aria-label="Editar">✎</button>
-              </div>
-              <div className={`${styles.cell} ${styles.actions}`} role="cell">
-                <Button size="small" variant="secondary">Ver más</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
     </PageLayout>
   );
 };

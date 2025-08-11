@@ -1,0 +1,51 @@
+@use '@/styles' as *;
+
+.tableWrapper {
+  background: $bg-color;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: $box-shadow-sm;
+}
+
+.table {
+  width: 100%;
+  display: grid;
+  grid-auto-rows: minmax(48px, auto);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--grid-template, 1fr);
+  align-items: center;
+  border-top: 1px solid $border-color;
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.header {
+  background: $bg-color-secondary;
+}
+
+.cell {
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-sm;
+  color: $text-color;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.iconButton {
+  border: 1px solid $border-color;
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  font-size: $font-size-sm;
+}
