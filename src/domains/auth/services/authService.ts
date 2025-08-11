@@ -1,4 +1,4 @@
-import { apiClient, handleApiError } from '@/shared';
+import { handleApiError } from '@/shared';
 import { type ILoginRequest, type ILoginResponse, type IAuthUser, authApi } from '@/domains/auth';
 
 /**

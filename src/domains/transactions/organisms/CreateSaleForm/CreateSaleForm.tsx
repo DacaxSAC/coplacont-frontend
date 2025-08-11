@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
+import { TransactionsService } from "../../services/TransactionsService";
 
 const ClienteEnum = {
   JUAN_PEREZ: "cli-001",
@@ -16,8 +18,8 @@ const TipoVentaEnum = {
 } as const;
 
 const TipoComprobanteEnum = {
-  FACTURA: "fac",
-  BOLETA: "bol",
+  FACTURA: "FACTURA",
+  BOLETA: "BOLETA",
   NOTA_CREDITO: "nc",
   NOTA_DEBITO: "nd",
 } as const;
@@ -29,7 +31,7 @@ const TipoCambioEnum = {
 
 const MonedaEnum = {
   SOL: "sol",
-  DOLAR: "dolar",
+  DOLAR: "dol",
 } as const;
 
 const ProductoEnum = {
@@ -148,6 +150,7 @@ const unidadMedidaOptions = [
 ];
 
 export const CreateSaleForm = () => {
+  const navigate = useNavigate();
   const [formState, setFormState] = useState<CreateSaleFormState>({
     correlativo: "",
     cliente: "",
@@ -288,6 +291,116 @@ export const CreateSaleForm = () => {
   const handleEliminarProducto = (record: DetalleVentaItem, index: number) => {
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
     console.log("Producto eliminado:", record);
+  };
+
+  /**
+   * Maneja el envío del formulario de venta
+   */
+  const handleAceptarVenta = async () => {
+    try {
+      // Mapear los detalles de venta al formato requerido por la API
+      const detallesAPI = detalleVenta.map((item) => ({
+        cantidad: item.cantidad,
+        unidadMedida: item.unidadMedida.toUpperCase(),
+        precioUnitario: item.precioUnitario,
+        subtotal: item.subtotal,
+        igv: item.igv,
+        isc: item.isv, // Mapear isv a isc
+        total: item.total,
+        descripcion: item.descripcion
+      }));
+
+      // Construir el objeto para enviar a la API
+      const ventaData = {
+        correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
+        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
+        tipoOperacion: "venta", // Valor fijo
+        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
+        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
+        moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
+        tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
+        serie: formState.serie || "F001", // Usar valor del form o fake
+        numero: formState.numero || "1234567890", // Usar valor del form o fake
+        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
+        detalles: detallesAPI
+      };
+
+      console.log("Enviando venta:", ventaData);
+      
+      // Llamar al servicio para registrar la venta
+      const response = await TransactionsService.registerSale(ventaData);
+      console.log("Venta registrada exitosamente:", response);
+      
+      // Navegar a la lista de ventas
+      navigate("/ventas");
+    } catch (error) {
+      console.error("Error al registrar la venta:", error);
+      // Aquí podrías mostrar un mensaje de error al usuario
+    }
+  };
+
+  /**
+   * Maneja el envío del formulario y navegación para nueva venta
+   */
+  const handleAceptarYNuevaVenta = async () => {
+    try {
+      // Mapear los detalles de venta al formato requerido por la API
+      const detallesAPI = detalleVenta.map((item) => ({
+        cantidad: item.cantidad,
+        unidadMedida: item.unidadMedida.toUpperCase(),
+        precioUnitario: item.precioUnitario,
+        subtotal: item.subtotal,
+        igv: item.igv,
+        isc: item.isv, // Mapear isv a isc
+        total: item.total,
+        descripcion: item.descripcion
+      }));
+
+      // Construir el objeto para enviar a la API
+      const ventaData = {
+        correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
+        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
+        tipoOperacion: "venta", // Valor fijo
+        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
+        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
+        moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
+        tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
+        serie: formState.serie || "F001", // Usar valor del form o fake
+        numero: formState.numero || "1234567890", // Usar valor del form o fake
+        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
+        detalles: detallesAPI
+      };
+
+      console.log("Enviando venta:", ventaData);
+      
+      // Llamar al servicio para registrar la venta
+      const response = await TransactionsService.registerSale(ventaData);
+      console.log("Venta registrada exitosamente:", response);
+      
+      // Resetear el formulario
+      setFormState({
+        correlativo: "",
+        cliente: "",
+        tipoVenta: "",
+        tipoComprobante: "",
+        fechaEmision: "",
+        moneda: "",
+        tipoCambio: "",
+        serie: "",
+        numero: "",
+        fechaVencimiento: "",
+      });
+      setDetalleVenta([]);
+      setProductoSeleccionado("");
+      setUnidadMedidaSeleccionada("");
+      setCantidadIngresada("");
+      
+      // Navegar a registrar nueva venta
+      navigate("/ventas/registrar");
+    } catch (error) {
+      console.error("Error al registrar la venta:", error);
+      // Aquí podrías mostrar un mensaje de error al usuario
+    }
   };
 
   /**
@@ -594,8 +707,8 @@ export const CreateSaleForm = () => {
       <Divider />
 
       <div className={styles.CreateSaleForm__Actions}>
-        <Button>Aceptar</Button>
-        <Button>Aceptar y nueva venta</Button>
+        <Button onClick={handleAceptarVenta}>Aceptar</Button>
+        <Button onClick={handleAceptarYNuevaVenta}>Aceptar y nueva venta</Button>
       </div>
     </div>
   );
