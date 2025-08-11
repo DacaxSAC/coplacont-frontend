@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import styles from "./CreateSaleForm.module.scss";
-import { Text, Input, ComboBox, Divider, Table } from "@/components";
-import { Button } from "@/components";
-import type { TableColumn } from "@/components";
+
+import { Text, Input, ComboBox, Divider, Button } from "@/components";
+import { Table, type TableRow } from "@/components/organisms/Table";
 
 const ClienteEnum = {
   JUAN_PEREZ: "cli-001",
@@ -278,74 +278,50 @@ export const CreateSaleForm = () => {
   };
 
   /**
-   * Configuración de las columnas de la tabla
+   * Headers para la tabla
    */
-  const tableColumns: TableColumn[] = [
-    {
-      key: 'descripcion',
-      title: 'Descripción',
-      width: '25%',
-    },
-    {
-      key: 'cantidad',
-      title: 'Cantidad',
-      width: '10%',
-      align: 'center',
-      render: (value: number) => value.toFixed(2),
-    },
-    {
-      key: 'unidadMedida',
-      title: 'Unidad',
-      width: '10%',
-      align: 'center',
-      render: (value: UnidadMedidaType) => {
-        const unidad = unidadMedidaOptions.find(option => option.value === value);
-        return unidad ? unidad.label : value;
-      },
-    },
-    {
-      key: 'precioUnitario',
-      title: 'Precio Unitario',
-      width: '12%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
-    {
-      key: 'subtotal',
-      title: 'Subtotal',
-      width: '12%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
-    {
-      key: 'baseGravado',
-      title: 'Base Gravado',
-      width: '12%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
-    {
-      key: 'igv',
-      title: 'IGV',
-      width: '10%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
-    {
-      key: 'isv',
-      title: 'ISV',
-      width: '10%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
-    {
-      key: 'total',
-      title: 'Total',
-      width: '12%',
-      align: 'right',
-      render: (value: number) => `S/ ${value.toFixed(2)}`,
-    },
+  const tableHeaders = [
+    'Descripción',
+    'Cantidad', 
+    'Unidad',
+    'Precio Unitario',
+    'Subtotal',
+    'Base Gravado',
+    'IGV',
+    'ISV',
+    'Total',
+    'Acciones'
   ];
+
+  /**
+   * Transforma los datos de detalle de venta a formato TableRow
+   */
+  const tableRows: TableRow[] = detalleVenta.map((item, index) => {
+    const unidad = unidadMedidaOptions.find(option => option.value === item.unidadMedida);
+    
+    return {
+      id: item.id,
+      cells: [
+        item.descripcion,
+        item.cantidad.toFixed(2),
+        unidad ? unidad.label : item.unidadMedida,
+        `S/ ${item.precioUnitario.toFixed(2)}`,
+        `S/ ${item.subtotal.toFixed(2)}`,
+        `S/ ${item.baseGravado.toFixed(2)}`,
+        `S/ ${item.igv.toFixed(2)}`,
+        `S/ ${item.isv.toFixed(2)}`,
+        `S/ ${item.total.toFixed(2)}`,
+        <Button 
+          key={`delete-${item.id}`}
+          size="small" 
+          variant="danger" 
+          onClick={() => handleEliminarProducto(item, index)}
+        >
+          Eliminar
+        </Button>
+      ]
+    };
+  });
 
   return (
     <div className={styles.CreateSaleForm}>
@@ -576,11 +552,11 @@ export const CreateSaleForm = () => {
       </div>
 
       {/** Table */}
-      {detalleVenta.length === 0 && (
+      {detalleVenta.length > 0 && (
         <Table
-          columns={tableColumns}
-          data={detalleVenta}
-          onDelete={handleEliminarProducto}
+          headers={tableHeaders}
+          rows={tableRows}
+          gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
         />
       )}
 

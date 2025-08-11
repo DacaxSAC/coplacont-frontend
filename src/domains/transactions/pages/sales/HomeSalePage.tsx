@@ -10,8 +10,11 @@ import {
   sunatStatusOptions,
   yearOptions,
 } from './HomeSaleFilterData';
+import { useNavigate } from 'react-router-dom';
 
 export const HomeSalePage: React.FC = () => {
+  const navigate = useNavigate();
+
   // Top filters
   const [filterType, setFilterType] = useState('mes-anio');
   const [month, setMonth] = useState('08');
@@ -26,6 +29,10 @@ export const HomeSalePage: React.FC = () => {
 
   // Modal state for upload sales
   const [isUploadOpen, setUploadOpen] = useState(false);
+
+  const handleRegisterSale = () => {
+    navigate('/ventas/registrar');
+  }
 
   const handleTopFilter = () => {
     // TODO: conectar con servicio de ventas
@@ -124,7 +131,7 @@ export const HomeSalePage: React.FC = () => {
 
       {/* Botones de acciones */}
       <section className={styles.actionsRow}>
-        <Button size="large">+ Nueva venta</Button>
+        <Button size="large" onClick={handleRegisterSale}>+ Nueva venta</Button>
         <Button size="large" onClick={() => setUploadOpen(true)}>⇪ Subir ventas</Button>
       </section>
 
