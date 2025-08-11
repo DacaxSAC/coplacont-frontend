@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from './HomeSalePage.module.scss';
 
-import { Button, PageLayout, FormField } from '@/components';
+import { Button, PageLayout, FormField, Text, Modal } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
@@ -23,6 +23,9 @@ export const HomeSalePage: React.FC = () => {
   const [entity, setEntity] = useState('');
   const [documentType, setDocumentType] = useState('');
   const [sunatStatus, setSunatStatus] = useState('');
+
+  // Modal state for upload sales
+  const [isUploadOpen, setUploadOpen] = useState(false);
 
   const handleTopFilter = () => {
     // TODO: conectar con servicio de ventas
@@ -122,7 +125,7 @@ export const HomeSalePage: React.FC = () => {
       {/* Botones de acciones */}
       <section className={styles.actionsRow}>
         <Button size="large">+ Nueva venta</Button>
-        <Button size="large">⇪ Subir ventas</Button>
+        <Button size="large" onClick={() => setUploadOpen(true)}>⇪ Subir ventas</Button>
       </section>
 
       {/* Barra de búsqueda secundaria */}
@@ -160,6 +163,41 @@ export const HomeSalePage: React.FC = () => {
 
       {/* Tabla de resultados */}
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+
+      {/* Modal Subir ventas */}
+      <Modal
+        isOpen={isUploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Subir ventas"
+        description="Sube un Excel y genera los registros de forma masiva."
+      >
+        <div>
+          <div style={{ marginBottom: '16px' }}>
+            <Button variant="secondary">⬇️ Descargar plantilla de Excel</Button>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <Text as="h3" size="md" weight={600}>Información a tener en cuenta</Text>
+            <ul style={{ marginTop: '8px' }}>
+              <li>Se proporciona un Excel de ejemplo para facilitar el registro.</li>
+              <li>La cabecera (fila 1) no debe borrarse.</li>
+              <li>Los registros deben ingresarse desde la fila 2.</li>
+              <li>Las Notas de Crédito y Débito no se cargan automáticamente, se registran manualmente.</li>
+              <li>Las fechas deben tener el formato DÍA/MES/AÑO.</li>
+              <li>Los códigos con ceros a la izquierda (ej. 01, 02, 03) deben estar en formato TEXTO.</li>
+              <li>El archivo Excel debe tener un máximo de 500 registros o filas.</li>
+            </ul>
+          </div>
+
+          <div>
+            <Text as="h3" size="md" weight={600}>Seleccionar archivo</Text>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
+              <input type="file" accept=".xls,.xlsx" />
+              <Button>Subir Excel</Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </PageLayout>
   );
 };
