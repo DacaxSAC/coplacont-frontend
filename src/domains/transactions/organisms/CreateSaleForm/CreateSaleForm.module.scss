@@ -78,4 +78,25 @@
       flex-direction: column;
     }
   }
+
+  &__Actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-2xl;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+    
+    button {
+      width: 50%;
+      
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+  }
 }

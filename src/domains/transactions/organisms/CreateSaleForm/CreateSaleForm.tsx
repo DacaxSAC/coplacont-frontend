@@ -54,7 +54,8 @@ type TipoComprobanteType =
 type TipoCambioType = (typeof TipoCambioEnum)[keyof typeof TipoCambioEnum];
 type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
 type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum];
-type UnidadMedidaType = (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum];
+type UnidadMedidaType =
+  (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum];
 
 /**
  * Interfaz para los items del detalle de la venta
@@ -116,25 +117,25 @@ const monedaOptions = [
 ];
 
 const productosOptions = [
-  { 
-    value: ProductoEnum.PRODUCTO_A, 
+  {
+    value: ProductoEnum.PRODUCTO_A,
     label: "Producto A - Descripción del producto A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD
+    unidadMedida: UnidadMedidaEnum.UNIDAD,
   },
-  { 
-    value: ProductoEnum.PRODUCTO_B, 
+  {
+    value: ProductoEnum.PRODUCTO_B,
     label: "Producto B - Descripción del producto B",
-    unidadMedida: UnidadMedidaEnum.KILOGRAMO
+    unidadMedida: UnidadMedidaEnum.KILOGRAMO,
   },
-  { 
-    value: ProductoEnum.SERVICIO_A, 
+  {
+    value: ProductoEnum.SERVICIO_A,
     label: "Servicio A - Descripción del servicio A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD
+    unidadMedida: UnidadMedidaEnum.UNIDAD,
   },
-  { 
-    value: ProductoEnum.SERVICIO_B, 
+  {
+    value: ProductoEnum.SERVICIO_B,
     label: "Servicio B - Descripción del servicio B",
-    unidadMedida: UnidadMedidaEnum.METRO
+    unidadMedida: UnidadMedidaEnum.METRO,
   },
 ];
 
@@ -162,8 +163,12 @@ export const CreateSaleForm = () => {
 
   // Estados para el detalle de productos
   const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
-  const [productoSeleccionado, setProductoSeleccionado] = useState<ProductoType | "">("");
-  const [unidadMedidaSeleccionada, setUnidadMedidaSeleccionada] = useState<UnidadMedidaType | "">("");
+  const [productoSeleccionado, setProductoSeleccionado] = useState<
+    ProductoType | ""
+  >("");
+  const [unidadMedidaSeleccionada, setUnidadMedidaSeleccionada] = useState<
+    UnidadMedidaType | ""
+  >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
 
   /**
@@ -195,9 +200,11 @@ export const CreateSaleForm = () => {
   const handleProductoChange = (value: string | number) => {
     const productoValue = String(value) as ProductoType;
     setProductoSeleccionado(productoValue);
-    
+
     // Buscar la unidad de medida correspondiente al producto seleccionado
-    const productoOption = productosOptions.find(option => option.value === productoValue);
+    const productoOption = productosOptions.find(
+      (option) => option.value === productoValue
+    );
     if (productoOption) {
       setUnidadMedidaSeleccionada(productoOption.unidadMedida);
     }
@@ -221,23 +228,29 @@ export const CreateSaleForm = () => {
    * Agrega un producto al detalle de la venta
    */
   const handleAgregarProducto = () => {
-    if (!productoSeleccionado || !unidadMedidaSeleccionada || !cantidadIngresada) {
-      console.log('Todos los campos son requeridos');
+    if (
+      !productoSeleccionado ||
+      !unidadMedidaSeleccionada ||
+      !cantidadIngresada
+    ) {
+      console.log("Todos los campos son requeridos");
       return;
     }
 
     const cantidad = parseFloat(cantidadIngresada);
     if (isNaN(cantidad) || cantidad <= 0) {
-      console.log('La cantidad debe ser un número válido mayor a 0');
+      console.log("La cantidad debe ser un número válido mayor a 0");
       return;
     }
 
     // Obtener la descripción del producto seleccionado
-    const productoOption = productosOptions.find(option => option.value === productoSeleccionado);
-    const descripcion = productoOption ? productoOption.label : '';
+    const productoOption = productosOptions.find(
+      (option) => option.value === productoSeleccionado
+    );
+    const descripcion = productoOption ? productoOption.label : "";
 
     // Precio unitario temporal (en una implementación real vendría de la API)
-    const precioUnitario = 10.00;
+    const precioUnitario = 10.0;
     const subtotal = cantidad * precioUnitario;
     const baseGravado = subtotal / 1.18; // Base sin IGV
     const igv = subtotal - baseGravado; // IGV 18%
@@ -258,47 +271,49 @@ export const CreateSaleForm = () => {
       total,
     };
 
-    setDetalleVenta(prev => [...prev, nuevoItem]);
-    
+    setDetalleVenta((prev) => [...prev, nuevoItem]);
+
     // Limpiar los campos después de agregar
-    setProductoSeleccionado('');
-    setUnidadMedidaSeleccionada('');
-    setCantidadIngresada('');
-    
-    console.log('Producto agregado:', nuevoItem);
-    console.log('Detalle actual:', [...detalleVenta, nuevoItem]);
+    setProductoSeleccionado("");
+    setUnidadMedidaSeleccionada("");
+    setCantidadIngresada("");
+
+    console.log("Producto agregado:", nuevoItem);
+    console.log("Detalle actual:", [...detalleVenta, nuevoItem]);
   };
 
   /**
    * Elimina un producto del detalle de la venta
    */
   const handleEliminarProducto = (record: DetalleVentaItem, index: number) => {
-    setDetalleVenta(prev => prev.filter((_, i) => i !== index));
-    console.log('Producto eliminado:', record);
+    setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
+    console.log("Producto eliminado:", record);
   };
 
   /**
    * Headers para la tabla
    */
   const tableHeaders = [
-    'Descripción',
-    'Cantidad', 
-    'Unidad',
-    'Precio Unitario',
-    'Subtotal',
-    'Base Gravado',
-    'IGV',
-    'ISV',
-    'Total',
-    'Acciones'
+    "Descripción",
+    "Cantidad",
+    "Unidad",
+    "Precio Unitario",
+    "Subtotal",
+    "Base Gravado",
+    "IGV",
+    "ISV",
+    "Total",
+    "Acciones",
   ];
 
   /**
    * Transforma los datos de detalle de venta a formato TableRow
    */
   const tableRows: TableRow[] = detalleVenta.map((item, index) => {
-    const unidad = unidadMedidaOptions.find(option => option.value === item.unidadMedida);
-    
+    const unidad = unidadMedidaOptions.find(
+      (option) => option.value === item.unidadMedida
+    );
+
     return {
       id: item.id,
       cells: [
@@ -311,15 +326,15 @@ export const CreateSaleForm = () => {
         `S/ ${item.igv.toFixed(2)}`,
         `S/ ${item.isv.toFixed(2)}`,
         `S/ ${item.total.toFixed(2)}`,
-        <Button 
+        <Button
           key={`delete-${item.id}`}
-          size="small" 
-          variant="danger" 
+          size="small"
+          variant="danger"
           onClick={() => handleEliminarProducto(item, index)}
         >
           Eliminar
-        </Button>
-      ]
+        </Button>,
+      ],
     };
   });
 
@@ -336,10 +351,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--correlativo"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Correlativo
             </Text>
             <Input
+              size="xs"
               variant="createSale"
               value={formState.correlativo}
               onChange={handleInputChange("correlativo")}
@@ -349,10 +365,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--cliente"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Cliente
             </Text>
             <ComboBox
+              size="xs"
               options={clientesOptions}
               variant="createSale"
               name="cliente"
@@ -367,10 +384,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Tipo de venta
             </Text>
             <ComboBox
+              size="xs"
               options={tipoVentaOptions}
               variant="createSale"
               name="tipoVenta"
@@ -382,10 +400,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Tipo de comprobante
             </Text>
             <ComboBox
+              size="xs"
               options={tipoComprobanteOptions}
               variant="createSale"
               name="tipoComprobante"
@@ -400,10 +419,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Fecha de emisión
             </Text>
             <Input
+              size="xs"
               type="date"
               variant="createSale"
               value={formState.fechaEmision}
@@ -414,10 +434,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Moneda
             </Text>
             <ComboBox
+              size="xs"
               options={monedaOptions}
               variant="createSale"
               name="moneda"
@@ -431,10 +452,11 @@ export const CreateSaleForm = () => {
             <div
               className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
             >
-              <Text size="sm" color="neutral-primary">
+              <Text size="xs" color="neutral-primary">
                 Tipo de cambio de la SUNAT
               </Text>
               <ComboBox
+                size="xs"
                 options={tipoCambioOptions}
                 variant="createSale"
                 name="tipoCambio"
@@ -450,10 +472,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Serie
             </Text>
             <Input
+              size="xs"
               variant="createSale"
               value={formState.serie}
               onChange={handleInputChange("serie")}
@@ -463,10 +486,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Número
             </Text>
             <Input
+              size="xs"
               variant="createSale"
               value={formState.numero}
               onChange={handleInputChange("numero")}
@@ -476,10 +500,11 @@ export const CreateSaleForm = () => {
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
-            <Text size="sm" color="neutral-primary">
+            <Text size="xs" color="neutral-primary">
               Fecha de vencimiento
             </Text>
             <Input
+              size="xs"
               type="date"
               variant="createSale"
               value={formState.fechaVencimiento}
@@ -521,7 +546,13 @@ export const CreateSaleForm = () => {
           <Input
             size="xs"
             variant="createSale"
-            value={unidadMedidaSeleccionada ? unidadMedidaOptions.find(option => option.value === unidadMedidaSeleccionada)?.label || '' : ''}
+            value={
+              unidadMedidaSeleccionada
+                ? unidadMedidaOptions.find(
+                    (option) => option.value === unidadMedidaSeleccionada
+                  )?.label || ""
+                : ""
+            }
             onChange={handleUnidadMedidaChange}
             disabled={true}
           />
@@ -560,6 +591,12 @@ export const CreateSaleForm = () => {
         />
       )}
 
+      <Divider />
+
+      <div className={styles.CreateSaleForm__Actions}>
+        <Button>Aceptar</Button>
+        <Button>Aceptar y nueva venta</Button>
+      </div>
     </div>
   );
 };
