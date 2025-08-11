@@ -5,3 +5,4 @@ export * from './PasswordInput';
 export * from './Text';
 export * from './Logo';
 export * from './Loader';
+export * from './Divider';

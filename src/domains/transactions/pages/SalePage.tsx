@@ -1,11 +1,13 @@
 import React from 'react';
-import { UnderConstruction } from '@/components';
+import { PageLayout } from '@/components';
 
 export const SalePage: React.FC = () => {
   return (
-    <UnderConstruction
-      title="Submodulo de ventas"
-      message="El submodulo de ventas está en construcción. Por favor, regresa pronto."
-    />
+    <PageLayout
+      title="Ventas"
+      subtitle="Muestra la lista de ventas de AGOSTO 2025."
+    >
+      <p>Contenido de la página de ventas</p>
+    </PageLayout>
   );
 };

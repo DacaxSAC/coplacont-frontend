@@ -40,6 +40,7 @@ $warning-color: #F3CB26;
   --bg-card-v1: #{$neutral-4};         // #F6F6F6
   --bg-card-v2: #{$neutral-5};         // #FFFFFF
   --text-color-card-skills: #{$neutral-2}; // #3A3A3A
+  --border-color: #{$neutral-3};
 
   // Tema oscuro automático basado en preferencias del sistema
   @media (prefers-color-scheme: dark) {
@@ -51,7 +52,33 @@ $warning-color: #F3CB26;
     --bg-card-v1: #{$neutral-2};           // #3A3A3A
     --bg-card-v2: #{$neutral-1};           // #1F1F1F
     --text-color-card-skills: #{$neutral-3}; // #DBD9D9
+    --border-color: #{$neutral-2};
   }
+}
+
+// Soporte explícito para data-theme establecido por ThemeProvider
+:root[data-theme="light"] {
+  --bg-color: #{$neutral-5};
+  --bg-color-secondary: #{$neutral-4};
+  --text-color: #{$neutral-1};
+  --text-color-1: #{$neutral-2};
+  --text-color-reverse: #{$neutral-5};
+  --bg-card-v1: #{$neutral-4};
+  --bg-card-v2: #{$neutral-5};
+  --text-color-card-skills: #{$neutral-2};
+  --border-color: #{$neutral-3};
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #{$neutral-1};
+  --bg-color-secondary: #000000;
+  --text-color: #{$neutral-5};
+  --text-color-1: #{$neutral-3};
+  --text-color-reverse: #{$neutral-1};
+  --bg-card-v1: #{$neutral-2};
+  --bg-card-v2: #{$neutral-1};
+  --text-color-card-skills: #{$neutral-3};
+  --border-color: #{$neutral-2};
 }
 
 // Variables Sass para compatibilidad con código existente
@@ -63,6 +90,7 @@ $text-color-reverse: var(--text-color-reverse);
 $bg-card-v1: var(--bg-card-v1);
 $bg-card-v2: var(--bg-card-v2);
 $text-color-card-skills: var(--text-color-card-skills);
+$border-color: var(--border-color);
 
 
 // Color de botón neutro
