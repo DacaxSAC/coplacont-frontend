@@ -5,4 +5,50 @@
   flex-direction: column;
   gap: $spacing-lg;
 
+  &__Form{
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__FormRow {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  &__FormField {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+    
+    &--correlativo {
+      width: 150px;
+      
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+    
+    &--cliente {
+      flex: 1;
+    }
+    
+    &--half {
+      flex: 1;
+    }
+    
+    &--third {
+      flex: 1;
+    }
+  }
 }
