@@ -3,13 +3,13 @@
 .pageLayout {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: 0;
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: $spacing-xs;
+  gap: $spacing-lg;
 }
 
 .title {
