@@ -1,2 +1,2 @@
 export * from './pages';
-export * from './pages/sales';
+export * from './router';

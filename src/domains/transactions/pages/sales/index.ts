@@ -1,2 +1,2 @@
+export * from './HomeSalePage';
 export * from './RegisterSalePage';
-export * from './SalePage';

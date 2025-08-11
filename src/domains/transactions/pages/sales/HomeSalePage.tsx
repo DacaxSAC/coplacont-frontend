@@ -1,7 +1,7 @@
 import React from 'react';
 import { PageLayout } from '@/components';
 
-export const SalePage: React.FC = () => {
+export const HomeSalePage: React.FC = () => {
   return (
     <PageLayout
       title="Ventas"
