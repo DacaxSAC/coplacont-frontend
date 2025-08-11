@@ -14,11 +14,16 @@ export interface InputProps {
   id?: string;
   name?: string;
   autoComplete?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'xs' | 'small' | 'medium' | 'large';
   /**
    * Elemento adicional que se renderiza dentro del contenedor del input (ej: botón)
    */
   endAdornment?: React.ReactNode;
+  /**
+   * Variante visual opcional para usar el input en contextos con estilos distintos
+   * Por ejemplo, en CreateSaleForm
+   */
+  variant?: 'default' | 'createSale';
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -36,8 +41,9 @@ export const Input: React.FC<InputProps> = ({
   autoComplete,
   size = 'medium',
   endAdornment,
+  variant = 'default',
 }) => {
-  const inputClassName = `${styles.input} ${styles[`input--${size}`]} ${error ? styles['input--error'] : ''} ${disabled ? styles['input--disabled'] : ''} ${endAdornment ? styles['input--with-adornment'] : ''}`.trim();
+  const inputClassName = `${styles.input} ${styles[`input--${size}`]} ${error ? styles['input--error'] : ''} ${disabled ? styles['input--disabled'] : ''} ${endAdornment ? styles['input--with-adornment'] : ''} ${variant !== 'default' ? styles[`input--${variant}`] : ''}`.trim();
 
   // Si no hay endAdornment, renderizar solo el input
   if (!endAdornment) {
@@ -63,16 +69,22 @@ export const Input: React.FC<InputProps> = ({
   const containerClassName = [
     styles.inputContainer,
     error && styles['inputContainer--error'],
-    disabled && styles['inputContainer--disabled']
-  ].filter(Boolean).join(' ');
+    disabled && styles['inputContainer--disabled'],
+    variant !== 'default' && styles[`inputContainer--${variant}`],
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const inputWithAdornmentClassName = [
     styles.input,
     styles[`input--${size}`],
     styles['input--with-adornment'],
     error && styles['input--error'],
-    disabled && styles['input--disabled']
-  ].filter(Boolean).join(' ');
+    disabled && styles['input--disabled'],
+    variant !== 'default' && styles[`input--${variant}`],
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={containerClassName}>

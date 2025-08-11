@@ -1,15 +1,17 @@
 @use "@/styles" as *;
 
 .pageLayout {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: 0;
+  margin-bottom: 40px;
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: $spacing-xs;
+  gap: $spacing-lg;
 }
 
 .title {
@@ -25,4 +27,5 @@
 
 .content {
   flex: 1;
+  overflow-y: auto;
 }

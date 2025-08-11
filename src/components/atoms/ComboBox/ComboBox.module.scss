@@ -1,134 +1,186 @@
+@use '@/styles' as *;
+
 .comboBox {
   position: relative;
   width: 100%;
-}
+  //padding: $spacing-sm $spacing-md;
+  // Estilos por defecto (variante createSale)
+  background-color: transparent;
+  border: 0.5px solid #00000040;
+  border-radius: $border-radius-lg;
+  transition: all 0.2s ease;
 
-.inputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  background: var(--input-bg, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: var(--box-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
-  cursor: text;
-}
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: $font-size-sm;
+    color: $text-color;
+    cursor: pointer;
+    background: transparent;
+  }
 
-.comboBox--small .inputWrapper { height: 32px; }
-.comboBox--medium .inputWrapper { height: 40px; }
-.comboBox--large .inputWrapper { height: 48px; }
+  &__value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.8;
+    flex: 1;
+    min-height: 20px;
+    line-height: 20px;
+    font-size: $font-size-sm;
+    font-family: inherit;
+    font-weight: inherit;
+    display: flex;
+    align-items: center;
+  }
 
-.comboBox--error .inputWrapper {
-  border-color: var(--danger-500, #ef4444);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-}
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: $font-size-sm;
+    color: $text-color;
+    padding: 0;
+    min-height: 20px;
+    line-height: 20px;
+    font-family: inherit;
+    font-weight: inherit;
+    
+    &::placeholder {
+      color: rgba($text-color, 0.6);
+    }
+  }
 
-.comboBox--disabled .inputWrapper {
-  background: var(--neutral-100, #f4f4f5);
-  color: var(--neutral-400, #a1a1aa);
-  cursor: not-allowed;
-}
+  &__arrow {
+    display: flex;
+    margin-left: $spacing-sm;
+    font-size: 0.8em;
+    color: $text-color;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+  }
 
-.input {
-  flex: 1;
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 0 40px 0 12px;
-  font-size: 14px;
-  color: var(--text-color, #111827);
-}
+  &--open &__arrow {
+    transform: rotate(180deg);
+  }
 
-.input--small { font-size: 12px; }
-.input--medium { font-size: 14px; }
-.input--large { font-size: 16px; }
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: $bg-color;
+    border: 1px solid $neutral-3;
+    border-radius: $border-radius-md;
+    box-shadow: $box-shadow-lg;
+    z-index: $z-index-dropdown;
+    max-height: 240px;
+    overflow: auto;
+  }
 
-.input--disabled { color: var(--neutral-400, #a1a1aa); }
+  &__options {
+    list-style: none;
+    margin: 0;
+    padding: $spacing-xs 0;
+  }
 
-.indicators {
-  position: absolute;
-  right: 8px;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+  &__option {
+    padding: $spacing-sm $spacing-md;
+    cursor: pointer;
+    font-size: $font-size-sm;
+    color: $text-color;
+    transition: background-color 0.15s ease;
 
-.separator {
-  width: 1px;
-  height: 60%;
-  background: var(--border-color, #e5e7eb);
-}
+    &:hover {
+      background-color: rgba($primary-blue, 0.08);
+    }
 
-.clearButton {
-  border: none;
-  background: transparent;
-  color: var(--neutral-400, #a1a1aa);
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-  border-radius: 4px;
-}
+    &--selected {
+      background-color: rgba($primary-blue, 0.12);
+      font-weight: $font-weight-medium;
+    }
+  }
 
-.clearButton:hover {
-  background: var(--neutral-100, #f4f4f5);
-  color: var(--neutral-600, #52525b);
-}
+  &__noResults {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+    color: rgba($text-color, 0.6);
+    font-style: italic;
+    text-align: center;
+    cursor: default;
+  }
 
-.arrow {
-  color: var(--neutral-500, #71717a);
-  font-size: 10px;
-  transition: transform 0.15s ease-in-out;
-}
+  &--error {
+    border-color: $danger-color;
+    box-shadow: $box-shadow-error;
+  }
 
-.arrow--up {
-  transform: rotate(180deg);
-}
+  &--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    
+    .comboBox__trigger {
+      cursor: not-allowed;
+    }
+  }
 
-.dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-top: 4px;
-  background: var(--bg-color, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: var(--box-shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05));
-  overflow-y: auto;
-  max-height: 200px;
-  z-index: 20;
-  display: none;
-}
+  &:hover:not(&--disabled) {
+    border-color: $primary-blue;
+  }
 
-.dropdown--open {
-  display: block;
-}
+  &:focus-within {
+    border-color: $primary-blue;
+    box-shadow: none;
+  }
 
-.option {
-  padding: 10px 12px;
-  cursor: pointer;
-  color: var(--text-color, #111827);
-}
+  // -----------------------------------------------------------------------------
+  // VARIANTES DE TAMAÑO
+  // -----------------------------------------------------------------------------
 
-.option:hover, .option--highlighted {
-  background: var(--neutral-100, #f4f4f5);
-}
+  &--xs {
+    padding: $spacing-xs $spacing-sm;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-xs;
+    }
+  }
 
-.option--selected {
-  background: var(--primary-50, #eef2ff);
-  color: var(--primary-700, #4338ca);
-  font-weight: 500;
-}
+  &--small {
+    padding: $spacing-sm $spacing-md;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-sm;
+    }
+  }
 
-.option--disabled {
-  color: var(--neutral-400, #a1a1aa);
-  cursor: not-allowed;
-}
+  &--medium {
+    padding: $spacing-xs $spacing-sm;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-md;
+    }
+  }
 
-.noOptions {
-  padding: 10px 12px;
-  color: var(--neutral-500, #71717a);
+  &--large {
+    padding: $spacing-lg $spacing-xl;
+    
+    .comboBox__trigger,
+    .comboBox__value,
+    .comboBox__input,
+    .comboBox__option {
+      font-size: $font-size-lg;
+    }
+  }
 }

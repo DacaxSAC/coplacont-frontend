@@ -1,278 +1,294 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './ComboBox.module.scss';
 
+/**
+ * Componente SVG para la flecha del dropdown
+ */
+const DropdownArrowIcon: React.FC = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M3 4.5L6 7.5L9 4.5" 
+      stroke="black" 
+      strokeOpacity="0.25" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Componente SVG para el ícono de limpiar (X)
+ */
+const ClearIcon: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
+  <svg 
+    width="12" 
+    height="12" 
+    viewBox="0 0 12 12" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    onClick={onClick}
+    style={{ cursor: 'pointer' }}
+  >
+    <path 
+      d="M9 3L3 9M3 3L9 9" 
+      stroke="black" 
+      strokeOpacity="0.25" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Interfaz para las opciones del ComboBox
+ */
 export interface ComboBoxOption {
-  value: string;
+  /** Valor único de la opción */
+  value: string | number;
+  /** Texto a mostrar para la opción */
   label: string;
-  disabled?: boolean;
 }
 
+/**
+ * Props para el componente ComboBox
+ */
 export interface ComboBoxProps {
+  /** Lista de opciones disponibles */
   options: ComboBoxOption[];
-  value?: string;
+  /** Valor seleccionado actualmente */
+  value?: string | number;
+  /** Función que se ejecuta cuando cambia la selección */
+  onChange?: (value: string | number) => void;
+  /** Texto placeholder cuando no hay selección */
   placeholder?: string;
-  onChange?: (value: string) => void;
-  onBlur?: () => void;
-  onFocus?: () => void;
+  /** Si el componente está deshabilitado */
   disabled?: boolean;
+  /** Si el componente tiene un error */
   error?: boolean;
-  required?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  /** ID del elemento para accesibilidad */
   id?: string;
+  /** Nombre del campo para formularios */
   name?: string;
-  searchable?: boolean;
-  clearable?: boolean;
-  maxHeight?: number;
+  /** Variante visual del componente */
+  variant?: 'default' | 'createSale';
+  /** Tamaño del componente */
+  size?: 'xs' | 'small' | 'medium' | 'large';
 }
 
+/**
+ * Componente ComboBox - Lista desplegable de opciones
+ * Permite seleccionar una opción de una lista predefinida
+ */
 export const ComboBox: React.FC<ComboBoxProps> = ({
   options = [],
-  value = '',
-  placeholder = 'Seleccionar...',
+  value,
   onChange,
-  onBlur,
-  onFocus,
+  placeholder = '',
   disabled = false,
   error = false,
-  required = false,
-  size = 'medium',
   id,
   name,
-  searchable = true,
-  clearable = false,
-  maxHeight = 200,
+  variant = 'createSale',
+  size = 'medium',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedOption, setSelectedOption] = useState<ComboBoxOption | null>(
+    options.find(option => option.value === value) || null
+  );
+  const [filterText, setFilterText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const comboBoxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
 
-  // Filtrar opciones basado en el término de búsqueda
-  const filteredOptions = searchable
-    ? options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : options;
-
-  // Encontrar la opción seleccionada
-  const selectedOption = options.find(option => option.value === value);
-
-  // Cerrar el dropdown cuando se hace clic fuera
+  /**
+   * Maneja el clic fuera del componente para cerrar el dropdown
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (comboBoxRef.current && !comboBoxRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(-1);
+        setIsEditing(false);
+        setFilterText('');
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  // Manejar navegación con teclado
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-        } else {
-          setHighlightedIndex(prev => 
-            prev < filteredOptions.length - 1 ? prev + 1 : 0
-          );
-        }
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (isOpen) {
-          setHighlightedIndex(prev => 
-            prev > 0 ? prev - 1 : filteredOptions.length - 1
-          );
-        }
-        break;
-      case 'Enter':
-        event.preventDefault();
-        if (isOpen && highlightedIndex >= 0) {
-          const selectedOption = filteredOptions[highlightedIndex];
-          if (!selectedOption.disabled) {
-            handleSelect(selectedOption.value);
-          }
-        } else {
-          setIsOpen(!isOpen);
-        }
-        break;
-      case 'Escape':
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(-1);
-        inputRef.current?.blur();
-        break;
-      case 'Tab':
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(-1);
-        break;
-    }
-  };
+  /**
+   * Actualiza la opción seleccionada cuando cambia el valor
+   */
+  useEffect(() => {
+    const newSelectedOption = options.find(option => option.value === value) || null;
+    setSelectedOption(newSelectedOption);
+  }, [value, options]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (searchable) {
-      setSearchTerm(event.target.value);
-      setIsOpen(true);
-      setHighlightedIndex(-1);
-    }
-  };
+  /**
+   * Filtra las opciones basándose en el texto ingresado
+   */
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(filterText.toLowerCase())
+  );
 
-  const handleInputFocus = () => {
-    if (!disabled) {
-      setIsOpen(true);
-      onFocus?.();
-    }
-  };
-
-  const handleInputBlur = () => {
-    // Delay para permitir clicks en las opciones
-    setTimeout(() => {
-      if (!containerRef.current?.contains(document.activeElement)) {
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(-1);
-        onBlur?.();
-      }
-    }, 150);
-  };
-
-  const handleSelect = (optionValue: string) => {
-    onChange?.(optionValue);
+  /**
+   * Maneja la selección de una opción
+   */
+  const handleOptionSelect = (option: ComboBoxOption) => {
+    setSelectedOption(option);
+    setFilterText('');
+    setIsEditing(false);
     setIsOpen(false);
-    setSearchTerm('');
-    setHighlightedIndex(-1);
-    inputRef.current?.focus();
+    onChange?.(option.value);
   };
 
-  const handleClear = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    onChange?.('');
-    setSearchTerm('');
-    inputRef.current?.focus();
-  };
-
-  const handleToggle = () => {
+  /**
+   * Alterna la apertura/cierre del dropdown
+   */
+  const toggleDropdown = () => {
     if (!disabled) {
-      setIsOpen(!isOpen);
       if (!isOpen) {
-        inputRef.current?.focus();
+        setIsOpen(true);
+        setIsEditing(true);
+        setTimeout(() => inputRef.current?.focus(), 0);
+      } else {
+        setIsOpen(false);
+        setIsEditing(false);
+        setFilterText('');
       }
     }
   };
 
-  // Clases CSS
+  /**
+   * Limpia la selección actual
+   */
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedOption(null);
+    setFilterText('');
+    setIsEditing(false);
+    setIsOpen(false);
+    onChange?.('');
+  };
+
+  /**
+   * Maneja el cambio en el input de filtro
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setFilterText(text);
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+  };
+
+  /**
+   * Maneja el enfoque en el input
+   */
+  const handleInputFocus = () => {
+    setIsEditing(true);
+    setIsOpen(true);
+  };
+
+  /**
+   * Maneja las teclas presionadas en el input
+   */
+  const handleInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+      setIsEditing(false);
+      setFilterText('');
+    } else if (e.key === 'Enter' && filteredOptions.length > 0) {
+      handleOptionSelect(filteredOptions[0]);
+    }
+  };
+
   const containerClassName = [
     styles.comboBox,
     styles[`comboBox--${size}`],
-    isOpen && styles['comboBox--open'],
+    variant !== 'default' && styles[`comboBox--${variant}`],
     error && styles['comboBox--error'],
-    disabled && styles['comboBox--disabled']
-  ].filter(Boolean).join(' ');
-
-  const inputClassName = [
-    styles.input,
-    styles[`input--${size}`],
-    error && styles['input--error'],
-    disabled && styles['input--disabled']
-  ].filter(Boolean).join(' ');
-
-  const dropdownClassName = [
-    styles.dropdown,
-    isOpen && styles['dropdown--open']
-  ].filter(Boolean).join(' ');
-
-  // Valor a mostrar en el input
-  const displayValue = searchable && isOpen
-    ? searchTerm
-    : (selectedOption?.label || '');
+    disabled && styles['comboBox--disabled'],
+    isOpen && styles['comboBox--open'],
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div
-      ref={containerRef}
-      className={containerClassName}
-      onKeyDown={handleKeyDown}
-    >
-      <div className={styles.inputWrapper} onClick={handleToggle}>
-        <input
-          ref={inputRef}
-          type="text"
-          className={inputClassName}
-          value={displayValue}
-          placeholder={placeholder}
-          onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
-          disabled={disabled}
-          required={required}
-          readOnly={!searchable}
-          id={id}
-          name={name}
-          autoComplete="off"
-        />
-        
-        <div className={styles.indicators}>
-          {clearable && value && !disabled && (
-            <button
-              type="button"
-              className={styles.clearButton}
-              onClick={handleClear}
-              tabIndex={-1}
-              aria-label="Limpiar selección"
-            >
-              ×
-            </button>
+    <div className={containerClassName} ref={comboBoxRef}>
+      <div 
+        className={styles.comboBox__trigger}
+        onClick={!isEditing ? toggleDropdown : undefined}
+        id={id}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+      >
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={filterText}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            onKeyDown={handleInputKeyDown}
+            placeholder={placeholder}
+            className={styles.comboBox__input}
+            disabled={disabled}
+          />
+        ) : (
+          <span 
+            className={styles.comboBox__value}
+            onClick={toggleDropdown}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        )}
+        <span className={styles.comboBox__arrow}>
+          {selectedOption ? (
+            <ClearIcon onClick={handleClear} />
+          ) : (
+            <DropdownArrowIcon />
           )}
-          <div className={styles.separator} />
-          <div className={`${styles.arrow} ${isOpen ? styles['arrow--up'] : ''}`}>
-            ▼
-          </div>
-        </div>
+        </span>
       </div>
 
-      <ul
-        ref={listRef}
-        className={dropdownClassName}
-        style={{ maxHeight: `${maxHeight}px` }}
-        role="listbox"
-        aria-expanded={isOpen}
-      >
-        {filteredOptions.length > 0 ? (
-          filteredOptions.map((option, index) => (
-            <li
-              key={option.value}
-              className={`${styles.option} ${
-                index === highlightedIndex ? styles['option--highlighted'] : ''
-              } ${
-                option.value === value ? styles['option--selected'] : ''
-              } ${
-                option.disabled ? styles['option--disabled'] : ''
-              }`}
-              onClick={() => !option.disabled && handleSelect(option.value)}
-              role="option"
-              aria-selected={option.value === value}
-              aria-disabled={option.disabled}
-            >
-              {option.label}
-            </li>
-          ))
-        ) : (
-          <li className={styles.noOptions}>
-            No se encontraron opciones
-          </li>
-        )}
-      </ul>
+      {isOpen && (
+        <div className={styles.comboBox__dropdown}>
+          <ul className={styles.comboBox__options} role="listbox">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <li
+                  key={option.value}
+                  className={`${styles.comboBox__option} ${
+                    selectedOption?.value === option.value ? styles['comboBox__option--selected'] : ''
+                  }`}
+                  onClick={() => handleOptionSelect(option)}
+                  role="option"
+                  aria-selected={selectedOption?.value === option.value}
+                >
+                  {option.label}
+                </li>
+              ))
+            ) : (
+              <li className={styles.comboBox__noResults}>
+                No se encontraron resultados
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {/* Input oculto para formularios */}
+      <input
+        type="hidden"
+        name={name}
+        value={selectedOption?.value || ''}
+      />
     </div>
   );
 };
-
-export default ComboBox;

@@ -1,0 +1,14 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+
+  table{
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+}

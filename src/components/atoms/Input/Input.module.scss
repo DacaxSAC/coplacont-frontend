@@ -36,13 +36,18 @@
   // VARIANTES DE TAMAÑO
   // -----------------------------------------------------------------------------
 
+  &--xs {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-xs !important;
+  }
+
   &--small {
-    padding: $spacing-sm $spacing-md;
+    padding: $spacing-xs $spacing-sm;
     font-size: $font-size-sm;
   }
 
   &--medium {
-    padding: $spacing-md $spacing-lg;
+    padding: $spacing-xs $spacing-sm;
     font-size: $font-size-md;
   }
 
@@ -146,4 +151,48 @@
   justify-content: center;
   z-index: 1;
 
+}
+
+/* -----------------------------------------------------------------------------
+   VARIANTE VISUAL: CreateSaleForm
+   Estilos alternativos para cuando el input se use dentro del formulario de ventas
+   ----------------------------------------------------------------------------- */
+.input {
+  &--createSale {
+    background-color: transparent;
+    border:  0.5px solid  #00000040;
+    border-radius: $border-radius-lg;
+    //padding: $spacing-sm $spacing-md;
+    // Removido font-size para permitir que las variantes de tamaño funcionen
+
+    &::placeholder {
+      opacity: 0.6;
+    }
+
+    &:focus {
+      border-color: $primary-blue;
+      box-shadow: none; // Mantener un look más limpio en esta variante
+    }
+
+    &:hover:not(:disabled) {
+      border-color: $primary-blue;
+    }
+  }
+}
+
+.inputContainer {
+  &.inputContainer--createSale {
+    border: 1px solid $neutral-3;
+    border-radius: $border-radius-md;
+    background-color: transparent;
+
+    &:hover {
+      border-color: $primary-blue;
+    }
+
+    &:focus-within {
+      border-color: $primary-blue;
+      box-shadow: none; // Mantener consistencia con el input --createSale
+    }
+  }
 }
