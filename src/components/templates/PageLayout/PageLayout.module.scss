@@ -1,0 +1,28 @@
+@use "@/styles" as *;
+
+.pageLayout {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-color;
+}
+
+.subtitle {
+  font-size: $font-size-lg;
+  color: $text-color-1;
+}
+
+.content {
+  flex: 1;
+}
