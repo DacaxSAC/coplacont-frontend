@@ -12,6 +12,7 @@
   grid-template-columns: repeat(6, 1fr);
   gap: $spacing-lg;
   align-items: end;
+  padding-bottom: $spacing-2xl;
 }
 
 // cada Field (label + control)
@@ -30,6 +31,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: $spacing-xl;
+  padding-bottom: $spacing-2xl;
 
   button {
     justify-self: stretch;
