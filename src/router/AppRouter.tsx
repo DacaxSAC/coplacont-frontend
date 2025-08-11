@@ -5,7 +5,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
 import { MainLayout } from '../components/templates/MainLayout';
-import { PurchasePage, CashPage, ManualJournalEntry, PayrollPage, SalePage } from '@/domains/transactions';
+import { PurchasePage, CashPage, ManualJournalEntry, PayrollPage, SalePage, RegisterSalePage } from '@/domains/transactions';
 import { ProductPage, KardexPage, InventoryAdjustment } from '@/domains/inventory'
 import { TrialBalancePage, AccountingWorksheetPage, ClosingAdjustmentPage } from '@/domains/financial-closing';
 import { AccountingPeriodPage, ParamsPage, UserAndRolesPage } from '@/domains/settings';
@@ -35,6 +35,7 @@ export const AppRouter: React.FC = () => {
           {/* Transacciones */}
           <Route path="/compras" element={<PurchasePage />} />
           <Route path="/ventas" element={<SalePage />} />
+          <Route path="/ventas/registrar" element={<RegisterSalePage />} />
           <Route path="/caja" element={<CashPage />} />
           <Route path="/asientos-manuales" element={<ManualJournalEntry />} />
           <Route path="/planillas" element={<PayrollPage />} />
