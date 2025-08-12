@@ -6,7 +6,7 @@ import { COMMON_ROUTES } from '@/router/routes';
 export const Router = () => {
   return (
     <Routes>
-      <Route path={COMMON_ROUTES.MAIN} element={<MainPage />} />
+      <Route index element={<MainPage />} />
       <Route path={COMMON_ROUTES.REGISTER} element={<RegisterPage />} />
     </Routes>
   );

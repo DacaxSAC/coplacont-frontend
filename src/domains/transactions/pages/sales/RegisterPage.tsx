@@ -1,5 +1,5 @@
 import { PageLayout } from "@/components";
-import { CreateSaleForm } from "@/domains/transactions/organisms/CreateSaleForm";
+import { CreateSaleForm } from "@/domains/transactions/organisms";
 
 export const RegisterPage: React.FC = () => {
   return (
@@ -8,6 +8,7 @@ export const RegisterPage: React.FC = () => {
       subtitle="Permite registrar una nueva venta con sus datos."
     >
       <CreateSaleForm />
+      aaa
     </PageLayout>
   );
 };
