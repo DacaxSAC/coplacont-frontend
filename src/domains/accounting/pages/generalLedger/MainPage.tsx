@@ -1,7 +1,7 @@
 import React from 'react';
-import { UnderConstruction } from '../../../components/organisms';
+import { UnderConstruction } from '@/components';
 
-export const GeneralLedgerPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de libro mayor"
@@ -9,5 +9,3 @@ export const GeneralLedgerPage: React.FC = () => {
     />
   );
 };
-
-export default GeneralLedgerPage;

@@ -13,7 +13,7 @@ export const Router : React.FC = () => {
   return (
     <Routes>
       <Route path="/sales" element={<SalesRouter />} />
-      <Route path="/purchase" element={<PurchaseRouter />} />
+      <Route path="/purchases" element={<PurchaseRouter />} />
       <Route path="/cash" element={<CashRouter />} />
       <Route path="/manual-journal-entry" element={<ManualJournalEntryRouter />} />
       <Route path="/payroll" element={<PayrollRouter />} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const CashFlowStatementPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de flujo de efectivo"

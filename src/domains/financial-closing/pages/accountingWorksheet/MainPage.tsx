@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const AccountingWorksheetPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de la hoja de trabajo"
@@ -9,5 +9,3 @@ export const AccountingWorksheetPage: React.FC = () => {
     />
   );
 };
-
-export default AccountingWorksheetPage;

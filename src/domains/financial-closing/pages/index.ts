@@ -1,3 +1,3 @@
-export * from './AccountingWorksheetPage';
-export * from './TrialBalancePage';
-export * from './ClosingAdjustmentPage';
+export { AccountingWorksheetRouter } from './accountingWorksheet';
+export { TrialBalanceRouter } from './trialBalance';
+export { ClosingAdjustmentRouter } from './closingAdjustment';

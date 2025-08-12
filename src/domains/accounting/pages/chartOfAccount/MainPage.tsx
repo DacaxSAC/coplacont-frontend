@@ -1,7 +1,7 @@
 import React from 'react';
-import { UnderConstruction } from '../../../components/organisms';
+import { UnderConstruction } from '@/components';
 
-export const ChartOfAccountPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de plan de cuentas"
@@ -9,5 +9,3 @@ export const ChartOfAccountPage: React.FC = () => {
     />
   );
 };
-
-export default ChartOfAccountPage;

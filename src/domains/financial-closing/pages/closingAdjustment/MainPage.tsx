@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const ClosingAdjustmentPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de ajustes de cierre"
@@ -9,5 +9,3 @@ export const ClosingAdjustmentPage: React.FC = () => {
     />
   );
 };
-
-export default ClosingAdjustmentPage;

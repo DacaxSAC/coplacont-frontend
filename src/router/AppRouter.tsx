@@ -8,7 +8,10 @@ import { MainLayout } from '../components/templates/MainLayout';
 import {  
   TransactionsRouter, 
   InventoryRouter,
-  SettingsRouter 
+  AccountingRouter,
+  FinancialClosingRouter,
+  FinancialStatementsRouter,
+  SettingsRouter,
 } from '@/domains';
 
 /**
@@ -24,44 +27,20 @@ export const AppRouter: React.FC = () => {
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
         <Route path="/auth/new-password" element={<NewPasswordPage />} />
+        <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
       </Route>
 
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Fragment />} />
-
+        <Route path="/" element={<MainLayout />}>
           <Route path="/transactions/*" element={<TransactionsRouter />} />
           <Route path="/inventory/*" element={<InventoryRouter />} />
-
-          {/* Contabilidad */}
-          <Route path="/plan-cuentas" element={<ChartOfAccountPage />} />
-          <Route path="/libro-diario" element={<GeneralJournalPage />} />
-          <Route path="/libro-mayor" element={<GeneralLedgerPage />} />
-          <Route path="/libro-inventario-balance" element={<InventoryAndBalanceStatementPage />} />
-
-          {/* Cierre Contable */}
-          <Route path="/hoja-trabajo" element={<AccountingWorksheetPage />} />
-          <Route path="/hoja-comprobacion" element={<TrialBalancePage />} />
-          <Route path="/ajustes-cierre" element={<ClosingAdjustmentPage />} />
-
-          {/* Estados financieros */}
-          <Route path="/balance-general" element={<BalanceSheetPage />} />
-          <Route path="/estado-resultados" element={<IncomeStatementPage />} />
-          <Route path="/flujo-efectivo" element={<CashFlowStatementPage />} />
-          <Route path="/estado-patrimonio" element={<StatementOfChangesInEquityPage />} />
-
+          <Route path="/accounting/*" element={<AccountingRouter />} />
+          <Route path="/financial-closing/*" element={<FinancialClosingRouter />} />
+          <Route path="/financial-statements" element={<FinancialStatementsRouter />} />
           <Route path="/settings/*" element={<SettingsRouter />} />
-
-          {/* Rutas de autenticación */}
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
-          <Route path="/auth/new-password" element={<NewPasswordPage />} />
         </Route>
       </Route>
-
-      {/* Redirección para rutas de auth sin especificar */}
-      <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
 
       {/* Ruta 404 - Redirecciona a la página principal */}
       <Route path="*" element={<Navigate to="/" replace />} />

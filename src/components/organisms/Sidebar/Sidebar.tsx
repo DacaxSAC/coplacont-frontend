@@ -37,11 +37,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
           </div>
           
           <ul className={styles.menuList}>
-            <li><Link to="/compras">Compras</Link></li>
-            <li><Link to="/ventas">Ventas</Link></li>
-            <li><Link to="/caja">Caja</Link></li>
-            <li><Link to="/asientos-manuales">Asientos Manuales</Link></li>
-            <li><Link to="/planillas">Planillas</Link></li>
+            <li><Link to="/purchases">Compras</Link></li>
+            <li><Link to="/sales">Ventas</Link></li>
+            <li><Link to="/cash">Caja</Link></li>
+            <li><Link to="/manual-journal-entry">Asientos Manuales</Link></li>
+            <li><Link to="/payroll">Planillas</Link></li>
           </ul>
         </div>
 

@@ -1,4 +1,4 @@
-export * from './BalanceSheetPage'
-export * from './IncomeStatementPage'
-export * from './CashFlowStatementPage'
-export * from './StatementOfChangesInEquityPage'
+export { BalanceSheetRouter } from './balanceSheet'
+export { IncomeStatementRouter } from './incomeStatement'
+export { CashFlowStatementRouter } from './cashFlowStatement'
+export { StatementOfChangesInEquityRouter } from './statementOfChangesInEquity'

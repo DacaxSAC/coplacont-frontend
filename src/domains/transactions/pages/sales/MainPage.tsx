@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import styles from './HomeSalePage.module.scss';
+import styles from './MainPage.module.scss';
 
 import { Button, PageLayout, FormField, Text, Modal } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';

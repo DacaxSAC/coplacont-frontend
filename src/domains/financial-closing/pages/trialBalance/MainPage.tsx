@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const TrialBalancePage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de la hoja de comprobación"
@@ -9,5 +9,3 @@ export const TrialBalancePage: React.FC = () => {
     />
   );
 };
-
-export default TrialBalancePage;

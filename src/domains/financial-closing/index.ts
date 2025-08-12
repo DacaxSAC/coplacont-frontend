@@ -1,1 +1,1 @@
-export * from './pages'
+export { Router as FinancialClosingRouter } from './router'

@@ -1,1 +1,1 @@
-export { Router as SettingsRouter } from './router';
+export { Router as SettingsRouter } from '../financial-closing/router';

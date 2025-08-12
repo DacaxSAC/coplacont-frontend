@@ -1,7 +1,7 @@
 import React from 'react';
-import { UnderConstruction } from '../../../components/organisms';
+import { UnderConstruction } from '@/components';
 
-export const InventoryAndBalanceStatementPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de libro de inventario y balance"
@@ -9,5 +9,3 @@ export const InventoryAndBalanceStatementPage: React.FC = () => {
     />
   );
 };
-
-export default InventoryAndBalanceStatementPage;
