@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
+import { PersonsService } from "@/domains/persons/service/PersonsService";
+import type {Person} from "@/domains/persons/service/types";
 
-const ClienteEnum = {
-  JUAN_PEREZ: "cli-001",
-  ACME_SAC: "cli-002",
-  MARIA_LOPEZ: "cli-003",
-} as const;
 
 const TipoVentaEnum = {
   CONTADO: "contado",
@@ -49,7 +46,7 @@ const UnidadMedidaEnum = {
   CAJA: "cja",
 } as const;
 
-type ClienteType = (typeof ClienteEnum)[keyof typeof ClienteEnum];
+
 type TipoVentaType = (typeof TipoVentaEnum)[keyof typeof TipoVentaEnum];
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
@@ -78,7 +75,7 @@ interface DetalleVentaItem {
 
 interface CreateSaleFormState {
   correlativo: string;
-  cliente: ClienteType | "";
+  cliente: string | "";
   tipoVenta: TipoVentaType | "";
   tipoComprobante: TipoComprobanteType | "";
   fechaEmision: string;
@@ -89,12 +86,6 @@ interface CreateSaleFormState {
   fechaVencimiento: string;
 }
 
-// Datos para los ComboBox basados en los enums
-const clientesOptions = [
-  { value: ClienteEnum.JUAN_PEREZ, label: "Juan Pérez" },
-  { value: ClienteEnum.ACME_SAC, label: "Acme S.A.C." },
-  { value: ClienteEnum.MARIA_LOPEZ, label: "María López" },
-];
 
 const tipoVentaOptions = [
   { value: TipoVentaEnum.CONTADO, label: "Contado" },
@@ -411,6 +402,18 @@ export const CreateSaleForm = () => {
     };
   });
 
+  // get clients
+  const [clients, setClients] = useState<Person[]>([]);
+  useEffect(() => {
+    PersonsService.getClients().then((data) => {setClients(data);console.log(data)});
+  }, []);
+
+  // Crear opciones dinámicas para el ComboBox de clientes
+  const clientesOptionsFromAPI = clients.map(client => ({
+    value: client.id.toString(),
+    label: client.displayName
+  }));
+
   return (
     <div className={styles.CreateSaleForm}>
       <Text size="xl" color="neutral-primary">
@@ -443,7 +446,7 @@ export const CreateSaleForm = () => {
             </Text>
             <ComboBox
               size="xs"
-              options={clientesOptions}
+              options={clientesOptionsFromAPI}
               variant="createSale"
               name="cliente"
               value={formState.cliente}

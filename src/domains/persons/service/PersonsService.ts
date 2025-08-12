@@ -1,14 +1,14 @@
 import { personsApi } from '../api/personsApi';
-import type { PersonsApiResponse } from './types';
+import type { Person } from './types';
 
 
 export class PersonsService {
-    static async getClients(): Promise<PersonsApiResponse> {
+    static async getClients(): Promise<Person[]> {
         const response = await personsApi.getClients();
-        return response.data;
+        return response.data.data;
     }
-    static async getSuppliers(): Promise<PersonsApiResponse> {
+    static async getSuppliers(): Promise<Person[]> {
         const response = await personsApi.getSuppliers();
-        return response.data;
+        return response.data.data;
     }
 }
