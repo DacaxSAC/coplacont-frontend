@@ -1,5 +1,7 @@
 import { apiClient } from "../../../shared/services/apiService";
 import { TRANSACTIONS_ENDPOINTS } from './endpoints';
+import type { Transaction } from './types';
+
 
 export const transactionsApi = {
     registerSale: (payload: {
@@ -24,6 +26,8 @@ export const transactionsApi = {
             descripcion: string;
         }[];
     }) => apiClient.post(TRANSACTIONS_ENDPOINTS.REGISTRAR_VENTA, payload),
+    getSales: (): Promise<Transaction[]> => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_VENTAS),
+    getPurchases: (): Promise<Transaction[]> => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_COMPRAS),
 } as const;
 
 export type TransactionsApi = typeof transactionsApi;
