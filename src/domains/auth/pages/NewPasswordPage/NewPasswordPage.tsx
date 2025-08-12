@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AuthLayout, AuthHeader } from '@/components';
 import { AuthService, NewPasswordForm, type INewPasswordFormData } from '@/domains/auth'
+import { AUTH_ROUTES } from '@/router/routes';
 
 //import styles from './NewPasswordPage.module.scss';
 
@@ -38,7 +39,7 @@ export const NewPasswordPage: React.FC = () => {
         setIsPasswordUpdated(true);
         // Redirigir al login después de 2 segundos
         setTimeout(() => {
-          navigate('/auth/login');
+          navigate(AUTH_ROUTES.LOGIN);
         }, 2000);
       } else {
         setPasswordError(response.message || 'Error al actualizar la contraseña');

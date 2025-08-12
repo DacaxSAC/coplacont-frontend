@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '@/domains/auth';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
-import { MainLayout } from '../components/templates/MainLayout';
+import { MainLayout } from '../components';
 import {  
   TransactionsRouter, 
   InventoryRouter,
@@ -13,6 +13,7 @@ import {
   FinancialStatementsRouter,
   SettingsRouter,
 } from '@/domains';
+import { AUTH_ROUTES, MAIN_ROUTES } from '@/router';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -24,26 +25,26 @@ export const AppRouter: React.FC = () => {
 
       {/* Rutas públicas */}
       <Route element={<PublicRoute />} >
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/recovery-password" element={<RecoveryPasswordPage />} />
-        <Route path="/auth/new-password" element={<NewPasswordPage />} />
-        <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
+        <Route path={AUTH_ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={AUTH_ROUTES.RECOVERY_PASSWORD} element={<RecoveryPasswordPage />} />
+        <Route path={AUTH_ROUTES.NEW_PASSWORD} element={<NewPasswordPage />} />
+        <Route path={AUTH_ROUTES.AUTH} element={<Navigate to={AUTH_ROUTES.LOGIN} replace />} />
       </Route>
 
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<MainLayout />}>
-          <Route path="/transactions/*" element={<TransactionsRouter />} />
-          <Route path="/inventory/*" element={<InventoryRouter />} />
-          <Route path="/accounting/*" element={<AccountingRouter />} />
-          <Route path="/financial-closing/*" element={<FinancialClosingRouter />} />
-          <Route path="/financial-statements/*" element={<FinancialStatementsRouter />} />
-          <Route path="/settings/*" element={<SettingsRouter />} />
+        <Route path={MAIN_ROUTES.HOME} element={<MainLayout />}>
+          <Route path={`${MAIN_ROUTES.TRANSACTIONS}/*`} element={<TransactionsRouter />} />
+          <Route path={`${MAIN_ROUTES.INVENTORY}/*`} element={<InventoryRouter />} />
+          <Route path={`${MAIN_ROUTES.ACCOUNTING}/*`} element={<AccountingRouter />} />
+          <Route path={`${MAIN_ROUTES.FINANCIAL_CLOSING}/*`} element={<FinancialClosingRouter />} />
+          <Route path={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}/*`} element={<FinancialStatementsRouter />} />
+          <Route path={`${MAIN_ROUTES.SETTINGS}/*`} element={<SettingsRouter />} />
         </Route>
       </Route>
 
       {/* Ruta 404 - Redirecciona a la página principal */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to={MAIN_ROUTES.HOME} replace />} />
     </Routes>
   );
 };

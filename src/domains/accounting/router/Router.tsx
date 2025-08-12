@@ -7,13 +7,15 @@ import {
   InventoryAndBalanceStatementRouter,
 } from '../pages';
 
+import { ACCOUNTING_ROUTES } from '@/router';
+
 export const Router = () => {
   return (
     <Routes>
-      <Route path="/chart-of-account" element={<ChartOfAccountRouter />} />
-      <Route path="/general-journal" element={<GeneralJournalRouter />} />
-      <Route path="/general-ledger" element={<GeneralLedgerRouter />} />
-      <Route path="/inventory-and-balance-statement" element={<InventoryAndBalanceStatementRouter />} />
+      <Route path={ACCOUNTING_ROUTES.CHART_OF_ACCOUNT} element={<ChartOfAccountRouter />} />
+      <Route path={ACCOUNTING_ROUTES.GENERAL_JOURNAL} element={<GeneralJournalRouter />} />
+      <Route path={ACCOUNTING_ROUTES.GENERAL_LEDGER} element={<GeneralLedgerRouter />} />
+      <Route path={ACCOUNTING_ROUTES.INVENTORY_AND_BALANCE_STATEMENT} element={<InventoryAndBalanceStatementRouter />} />
     </Routes>
   );
 };

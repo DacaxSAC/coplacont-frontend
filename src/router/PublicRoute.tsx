@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { useAuth } from '../domains/auth';
 import { Loader } from '@/components';
+import { MAIN_ROUTES } from './routes';
 
 /**
  * Componente para rutas públicas que solo deben ser accesibles sin autenticación
@@ -16,7 +17,7 @@ export const PublicRoute: React.FC = () => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={MAIN_ROUTES.HOME} replace />;
   }
 
   return (

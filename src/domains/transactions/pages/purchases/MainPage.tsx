@@ -13,6 +13,7 @@ import {
   yearOptions,
 } from './HomePurchaseFilterData';
 import { useNavigate } from 'react-router-dom';
+import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export const MainPage: React.FC = () => {
   const [isUploadOpen, setUploadOpen] = useState(false);
 
   const handleRegisterPurchase = () => {
-    navigate('/transactions/purchases/register');
+    navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.REGISTER}`);
   }
 
   const handleTopFilter = () => {

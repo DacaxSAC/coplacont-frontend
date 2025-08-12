@@ -7,7 +7,7 @@ import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { PersonsService } from "@/domains/persons/service/PersonsService";
 import type {Person} from "@/domains/persons/service/types";
-
+import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoCompraEnum = {
   CONTADO: "contado",
@@ -300,7 +300,7 @@ export const CreatePurchaseForm = () => {
 
       await TransactionsService.registerSale(compraData);
 
-      navigate("/transactions/purchases");
+      navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`);
     } catch (error) {
       console.error("Error al registrar la compra:", error);
     }
@@ -353,7 +353,7 @@ export const CreatePurchaseForm = () => {
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
 
-      navigate("/transactions/purchases/register");
+      navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.REGISTER}`);
     } catch (error) {
       console.error("Error al registrar la compra:", error);
     }

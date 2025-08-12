@@ -5,13 +5,14 @@ import {
     ParamsRouter,
     AccountingPeriodRouter
 } from '../pages';
+import { SETTINGS_ROUTES } from '../../../router';
 
 export const Router = () => {
   return (
     <Routes>
-      <Route path="/users" element={<UsersRouter />} />
-      <Route path="/params" element={<ParamsRouter />} />
-      <Route path="/accounting-periods" element={<AccountingPeriodRouter />} />
+      <Route path={SETTINGS_ROUTES.USERS} element={<UsersRouter />} />
+      <Route path={SETTINGS_ROUTES.PARAMS} element={<ParamsRouter />} />
+      <Route path={SETTINGS_ROUTES.ACCOUNTING_PERIODS} element={<AccountingPeriodRouter />} />
     </Routes>
   );
 };

@@ -10,6 +10,7 @@ import {
   useAuth,
 } from '@/domains/auth';
 import { useNavigate } from 'react-router-dom';
+import { MAIN_ROUTES } from '@/router';
 
 //import styles from './LoginPage.module.scss';
 
@@ -41,7 +42,7 @@ export const LoginPage: React.FC = () => {
         // Usar el contexto para manejar el login
         login(response.email, response.jwt);
         // Redirigir a la página principal después del login exitoso
-        navigate('/');
+        navigate(MAIN_ROUTES.HOME);
       } else {
         setLoginError(response.message);
       }
