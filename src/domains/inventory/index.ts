@@ -1,1 +1,1 @@
-export * from './pages'
+export { Router as InventoryRouter } from './router'

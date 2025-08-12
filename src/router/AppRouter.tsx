@@ -7,6 +7,7 @@ import { PublicRoute } from './PublicRoute';
 import { MainLayout } from '../components/templates/MainLayout';
 import {  
   TransactionsRouter, 
+  InventoryRouter,
   SettingsRouter 
 } from '@/domains';
 
@@ -31,11 +32,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/" element={<Fragment />} />
 
           <Route path="/transactions/*" element={<TransactionsRouter />} />
-
-          {/* Inventario */}
-          <Route path="/productos" element={<ProductPage />} />
-          <Route path="/kardex" element={<KardexPage />} />
-          <Route path="/ajustes-inventario" element={<InventoryAdjustment />} />
+          <Route path="/inventory/*" element={<InventoryRouter />} />
 
           {/* Contabilidad */}
           <Route path="/plan-cuentas" element={<ChartOfAccountPage />} />
