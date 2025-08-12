@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styles from './HomePurchasePage.module.scss';
+import type { Transaction } from '../../services/types';
+import { TransactionsService } from '../../services/TransactionsService';
 
 import { Button, PageLayout, FormField, Text, Modal } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
@@ -14,6 +16,14 @@ import { useNavigate } from 'react-router-dom';
 
 export const HomePurchasePage: React.FC = () => {
   const navigate = useNavigate();
+
+  // State for purchases
+  const [purchases, setPurchases] = useState<Transaction[]>([]);
+
+  // Fetch purchases on mount
+  useEffect(() => {
+    TransactionsService.getPurchases().then((response) => {setPurchases(response);console.log(response)});
+  }, []);
 
   // Top filters
   const [filterType, setFilterType] = useState('mes-anio');
@@ -42,35 +52,36 @@ export const HomePurchasePage: React.FC = () => {
 
   // Nota: La lógica de búsqueda secundaria se conectará con el servicio cuando esté disponible.
 
-  // Dummy data para la tabla (placeholder)
-  const rows = useMemo(() => Array.from({ length: 10 }, (_, idx) => ({
+  // Transformar datos de compras reales en filas de tabla
+  const rows = useMemo(() => purchases.map((purchase, idx) => ({
     id: idx + 1,
     cells: [
-      'XXXXXXXXXXXXXX',
-      'XXXXXXXX',
-      'xxxxx@xxxxx.xxx',
-      'XX-XXXX',
-      'XXXXXXXXXX',
-      'XXXXXX',
-      'XXXXXXXX',
-      '',
-      ''
+      purchase.correlativo,
+      purchase.tipoComprobante,
+      purchase.serie,
+      purchase.numero,
+      purchase.fechaEmision,
+      purchase.fechaVencimiento,
+      purchase.moneda,
+      purchase.tipoCambio,
+      purchase.totales.totalGeneral.toString()
     ],
-  } as TableRow)), []);
+  } as TableRow)), [purchases]);
 
+  // Cabeceras de la tabla basadas en la interfaz Transaction
   const headers = [
-    'XXXXXXXXXXXXXX',
-    'XXXXXXXX',
-    'XXXXXX@XXXXX.XXX',
-    'XX-XXXX',
-    'XXXXXXXXXX',
-    'XXXXXX',
-    'XXXXXXXX',
-    '',
-    ''
+    'Correlativo',
+    'Tipo Comprobante',
+    'Serie',
+    'Número',
+    'Fecha Emisión',
+    'Fecha Vencimiento',
+    'Moneda',
+    'Tipo Cambio',
+    'Total General'
   ];
 
-  const gridTemplate = '1.2fr 1fr 1.2fr 0.8fr 1fr 0.8fr 0.8fr 0.4fr 0.6fr';
+  const gridTemplate = '1fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr';
 
   return (
     <PageLayout

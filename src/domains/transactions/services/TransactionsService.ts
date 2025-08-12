@@ -1,6 +1,7 @@
 import { handleApiError } from "@/shared";
 import { transactionsApi } from "../api/transactionsApi";
 import type { RegisterSalePayload } from "./types";
+import type{ Transaction } from "./types";
 
 /**
  * Servicio de transacciones
@@ -25,10 +26,10 @@ export class TransactionsService {
    * Obtiene todas las ventas
    * @returns Promise con la lista de ventas
    */
-  static async getSales() {
+  static async getSales(): Promise<Transaction[]> {
     try {
       const response = await transactionsApi.getSales();
-      return response;
+      return response.data;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -38,10 +39,10 @@ export class TransactionsService {
    * Obtiene todas las compras
    * @returns Promise con la lista de compras
    */
-  static async getPurchases() {
+  static async getPurchases(): Promise<Transaction[]> {
     try {
       const response = await transactionsApi.getPurchases();
-      return response;
+      return response.data;
     } catch (error) {
       throw handleApiError(error);
     }

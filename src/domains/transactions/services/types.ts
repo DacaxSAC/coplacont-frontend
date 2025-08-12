@@ -22,3 +22,39 @@ export interface RegisterSalePayload {
   fechaVencimiento: string;
   detalles: SaleDetail[];
 }
+
+export interface TransactionTotals {
+  idTotal: number;
+  totalGravada: string;
+  totalExonerada: string;
+  totalInafecta: string;
+  totalIgv: string;
+  totalIsc: string;
+  totalGeneral: string;
+}
+
+export interface Transaction {
+  idComprobante: number;
+  correlativo: string;
+  tipoOperacion: 'venta' | 'compra';
+  tipoComprobante: string;
+  fechaEmision: string;
+  moneda: string;
+  tipoCambio: string;
+  serie: string;
+  numero: string;
+  fechaVencimiento: string;
+  totales: TransactionTotals;
+}
+
+export interface SalesApiResponse {
+  success: boolean;
+  message: string;
+  data: Transaction[];
+}
+
+export interface PurchasesApiResponse {
+  success: boolean;
+  message: string;
+  data: Transaction[];
+}
