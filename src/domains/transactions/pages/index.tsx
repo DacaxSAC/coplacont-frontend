@@ -1,4 +1,4 @@
-export * from './PurchasePage';
+export * from './purchases/HomePurchasePage';
 export * from './sales';
 export * from './CashPage';
 export * from './ManualJournalEntryPage';
