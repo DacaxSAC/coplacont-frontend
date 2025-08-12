@@ -5,7 +5,10 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
 import { MainLayout } from '../components/templates/MainLayout';
-import {  TransactionsRouter } from '@/domains/transactions';
+import {  
+  TransactionsRouter, 
+  SettingsRouter 
+} from '@/domains';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -27,7 +30,6 @@ export const AppRouter: React.FC = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Fragment />} />
 
-          {/* Transacciones */}
           <Route path="/transactions/*" element={<TransactionsRouter />} />
 
           {/* Inventario */}
@@ -52,10 +54,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/flujo-efectivo" element={<CashFlowStatementPage />} />
           <Route path="/estado-patrimonio" element={<StatementOfChangesInEquityPage />} />
 
-          {/* Configuración */}
-          <Route path="/periodos-contables" element={<AccountingPeriodPage />} />
-          <Route path="/usuarios-roles" element={<UserAndRolesPage />} />
-          <Route path="/parametros" element={<ParamsPage />} />
+          <Route path="/settings/*" element={<SettingsRouter />} />
 
           {/* Rutas de autenticación */}
           <Route path="/auth/login" element={<LoginPage />} />
