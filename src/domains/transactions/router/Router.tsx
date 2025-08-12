@@ -1,3 +1,4 @@
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { 
@@ -6,9 +7,9 @@ import {
     CashRouter,
     ManualJournalEntryRouter,
     PayrollRouter,
-} from '.'
-s
-export const Router = () => {
+} from '../pages'
+
+export const Router : React.FC = () => {
   return (
     <Routes>
       <Route path="/sales" element={<SalesRouter />} />

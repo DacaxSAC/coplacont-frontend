@@ -1,2 +1,4 @@
-export { RegisterPurchasePage } from './RegisterPurchasePage';
-export { HomePurchasePage } from './HomePurchasePage';
+export { MainPage } from './MainPage';
+export { RegisterPage } from './RegisterPage';
+
+export { Router as PurchaseRouter } from './Router';

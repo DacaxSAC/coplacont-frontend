@@ -1,7 +1,7 @@
 import { PageLayout } from "@/components";
 import { CreatePurchaseForm } from "@/domains/transactions/organisms";
 
-export const RegisterPurchasePage: React.FC = () => {
+export const RegisterPage: React.FC = () => {
   return (
     <PageLayout
       title="Registrar compra"

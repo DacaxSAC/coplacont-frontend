@@ -12,7 +12,7 @@ import {
 } from './HomePurchaseFilterData';
 import { useNavigate } from 'react-router-dom';
 
-export const HomePurchasePage: React.FC = () => {
+export const MainPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Top filters

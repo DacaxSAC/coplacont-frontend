@@ -1,2 +1,1 @@
-export * from './pages';
-export * from './router';
+export { Router as TransactionsRouter } from './router';

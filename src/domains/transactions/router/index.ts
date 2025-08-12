@@ -1,2 +1,1 @@
-export * from './SalesRouter';
-export * from './PurchaseRouter';
+export { Router } from './Router';

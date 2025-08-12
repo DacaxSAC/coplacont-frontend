@@ -5,12 +5,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
 import { MainLayout } from '../components/templates/MainLayout';
-import { CashPage, ManualJournalEntry, PayrollPage, SalesRouter, PurchaseRouter } from '@/domains/transactions';
-import { ProductPage, KardexPage, InventoryAdjustment } from '@/domains/inventory'
-import { TrialBalancePage, AccountingWorksheetPage, ClosingAdjustmentPage } from '@/domains/financial-closing';
-import { AccountingPeriodPage, ParamsPage, UserAndRolesPage } from '@/domains/settings';
-import { ChartOfAccountPage, GeneralJournalPage, GeneralLedgerPage, InventoryAndBalanceStatementPage } from '@/domains/accounting';
-import { BalanceSheetPage, IncomeStatementPage, CashFlowStatementPage, StatementOfChangesInEquityPage } from '@/domains/financial-statements';
+import {  TransactionsRouter } from '@/domains/transactions';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -33,11 +28,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/" element={<Fragment />} />
 
           {/* Transacciones */}
-          <Route path="/compras/*" element={<PurchaseRouter />} />
-          <Route path="/ventas/*" element={<SalesRouter />} />
-          <Route path="/caja" element={<CashPage />} />
-          <Route path="/asientos-manuales" element={<ManualJournalEntry />} />
-          <Route path="/planillas" element={<PayrollPage />} />
+          <Route path="/transactions/*" element={<TransactionsRouter />} />
 
           {/* Inventario */}
           <Route path="/productos" element={<ProductPage />} />
