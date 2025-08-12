@@ -1,30 +1,7 @@
-import { handleApiError } from '@/shared';
-import { transactionsApi } from '../api/transactionsApi';
-
-interface SaleDetail {
-  cantidad: number;
-  unidadMedida: string;
-  precioUnitario: number;
-  subtotal: number;
-  igv: number;
-  isc: number;
-  total: number;
-  descripcion: string;
-}
-
-interface RegisterSalePayload {
-  correlativo: string;
-  idPersona: number;
-  tipoOperacion: string;
-  tipoComprobante: string;
-  fechaEmision: string;
-  moneda: string;
-  tipoCambio: number;
-  serie: string;
-  numero: string;
-  fechaVencimiento: string;
-  detalles: SaleDetail[];
-}
+import { handleApiError } from "@/shared";
+import { transactionsApi } from "../api/transactionsApi";
+import type { RegisterSalePayload } from "./types";
+import type{ Transaction } from "./types";
 
 /**
  * Servicio de transacciones
@@ -39,6 +16,32 @@ export class TransactionsService {
   static async registerSale(payload: RegisterSalePayload) {
     try {
       const response = await transactionsApi.registerSale(payload);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Obtiene todas las ventas
+   * @returns Promise con la lista de ventas
+   */
+  static async getSales(): Promise<Transaction[]> {
+    try {
+      const response = await transactionsApi.getSales();
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Obtiene todas las compras
+   * @returns Promise con la lista de compras
+   */
+  static async getPurchases(): Promise<Transaction[]> {
+    try {
+      const response = await transactionsApi.getPurchases();
       return response.data;
     } catch (error) {
       throw handleApiError(error);

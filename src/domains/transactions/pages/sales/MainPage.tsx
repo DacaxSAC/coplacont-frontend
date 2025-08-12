@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styles from './MainPage.module.scss';
+import type { Transaction } from '../../services/types';
+import { TransactionsService } from '../../services/TransactionsService';
 
 import { Button, PageLayout, FormField, Text, Modal } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
@@ -14,6 +16,14 @@ import { useNavigate } from 'react-router-dom';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
+
+  // State for sales data
+  const [sales, setSales] = useState<Transaction[]>([]);
+
+  // Effect to fetch sales data on component mount
+  useEffect(() => {
+    TransactionsService.getSales().then((response) => setSales(response));
+  }, []);
 
   // Top filters
   const [filterType, setFilterType] = useState('mes-anio');
@@ -42,35 +52,36 @@ export const MainPage: React.FC = () => {
 
   // Nota: La lógica de búsqueda secundaria se conectará con el servicio cuando esté disponible.
 
-  // Dummy data para la tabla (placeholder)
-  const rows = useMemo(() => Array.from({ length: 10 }, (_, idx) => ({
+  // Transformar datos de ventas reales en filas de tabla
+  const rows = useMemo(() => sales.map((sale, idx) => ({
     id: idx + 1,
     cells: [
-      'XXXXXXXXXXXXXX',
-      'XXXXXXXX',
-      'xxxxx@xxxxx.xxx',
-      'XX-XXXX',
-      'XXXXXXXXXX',
-      'XXXXXX',
-      'XXXXXXXX',
-      '',
-      ''
+      sale.correlativo,
+      sale.tipoComprobante,
+      sale.serie,
+      sale.numero,
+      sale.fechaEmision,
+      sale.fechaVencimiento,
+      sale.moneda,
+      sale.tipoCambio,
+      sale.totales.totalGeneral.toString()
     ],
-  } as TableRow)), []);
+  } as TableRow)), [sales]);
 
+  // Cabeceras de la tabla basadas en la interfaz Transaction
   const headers = [
-    'XXXXXXXXXXXXXX',
-    'XXXXXXXX',
-    'XXXXXX@XXXXX.XXX',
-    'XX-XXXX',
-    'XXXXXXXXXX',
-    'XXXXXX',
-    'XXXXXXXX',
-    '',
-    ''
+    'Correlativo',
+    'Tipo Comprobante',
+    'Serie',
+    'Número',
+    'Fecha Emisión',
+    'Fecha Vencimiento',
+    'Moneda',
+    'Tipo Cambio',
+    'Total General'
   ];
 
-  const gridTemplate = '1.2fr 1fr 1.2fr 0.8fr 1fr 0.8fr 0.8fr 0.4fr 0.6fr';
+  const gridTemplate = '1fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr';
 
   return (
     <PageLayout

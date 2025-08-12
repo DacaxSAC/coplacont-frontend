@@ -24,6 +24,8 @@ export const transactionsApi = {
             descripcion: string;
         }[];
     }) => apiClient.post(TRANSACTIONS_ENDPOINTS.REGISTRAR_VENTA, payload),
+    getSales: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_VENTAS),
+    getPurchases: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_COMPRAS),
 } as const;
 
 export type TransactionsApi = typeof transactionsApi;
