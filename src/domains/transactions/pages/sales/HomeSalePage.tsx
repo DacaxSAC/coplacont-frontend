@@ -22,7 +22,7 @@ export const HomeSalePage: React.FC = () => {
 
   // Effect to fetch sales data on component mount
   useEffect(() => {
-    TransactionsService.getSales().then((response) => {setSales(response);console.log(response)});
+    TransactionsService.getSales().then((response) => setSales(response));
   }, []);
 
   // Top filters
