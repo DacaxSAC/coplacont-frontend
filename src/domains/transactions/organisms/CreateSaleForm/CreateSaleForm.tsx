@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
+import { PersonsService } from "@/domains/persons/service/PersonsService";
+import type {Person} from "@/domains/persons/service/types";
 
-const ClienteEnum = {
-  JUAN_PEREZ: "cli-001",
-  ACME_SAC: "cli-002",
-  MARIA_LOPEZ: "cli-003",
-} as const;
 
 const TipoVentaEnum = {
   CONTADO: "contado",
@@ -49,7 +46,7 @@ const UnidadMedidaEnum = {
   CAJA: "cja",
 } as const;
 
-type ClienteType = (typeof ClienteEnum)[keyof typeof ClienteEnum];
+
 type TipoVentaType = (typeof TipoVentaEnum)[keyof typeof TipoVentaEnum];
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
@@ -78,7 +75,7 @@ interface DetalleVentaItem {
 
 interface CreateSaleFormState {
   correlativo: string;
-  cliente: ClienteType | "";
+  cliente: string | "";
   tipoVenta: TipoVentaType | "";
   tipoComprobante: TipoComprobanteType | "";
   fechaEmision: string;
@@ -89,12 +86,6 @@ interface CreateSaleFormState {
   fechaVencimiento: string;
 }
 
-// Datos para los ComboBox basados en los enums
-const clientesOptions = [
-  { value: ClienteEnum.JUAN_PEREZ, label: "Juan Pérez" },
-  { value: ClienteEnum.ACME_SAC, label: "Acme S.A.C." },
-  { value: ClienteEnum.MARIA_LOPEZ, label: "María López" },
-];
 
 const tipoVentaOptions = [
   { value: TipoVentaEnum.CONTADO, label: "Contado" },
@@ -174,9 +165,7 @@ export const CreateSaleForm = () => {
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
 
-  /**
-   * Maneja los cambios en los campos de texto
-   */
+  // Maneja los cambios en los campos de texto
   const handleInputChange =
     (field: keyof CreateSaleFormState) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,9 +175,7 @@ export const CreateSaleForm = () => {
       }));
     };
 
-  /**
-   * Maneja los cambios en los ComboBox
-   */
+  // Maneja los cambios en los ComboBox
   const handleComboBoxChange =
     (field: keyof CreateSaleFormState) => (value: string | number) => {
       setFormState((prev) => ({
@@ -197,9 +184,7 @@ export const CreateSaleForm = () => {
       }));
     };
 
-  /**
-   * Maneja el cambio de producto seleccionado
-   */
+  // Maneja el cambio de producto seleccionado
   const handleProductoChange = (value: string | number) => {
     const productoValue = String(value) as ProductoType;
     setProductoSeleccionado(productoValue);
@@ -213,23 +198,17 @@ export const CreateSaleForm = () => {
     }
   };
 
-  /**
-   * Maneja el cambio de unidad de medida seleccionada
-   */
+  // Maneja el cambio de unidad de medida seleccionada
   const handleUnidadMedidaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUnidadMedidaSeleccionada(e.target.value as UnidadMedidaType);
   };
 
-  /**
-   * Maneja el cambio de cantidad ingresada
-   */
+  // Maneja el cambio de cantidad ingresada
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCantidadIngresada(e.target.value);
   };
 
-  /**
-   * Agrega un producto al detalle de la venta
-   */
+    // Agrega un producto al detalle de la venta
   const handleAgregarProducto = () => {
     if (
       !productoSeleccionado ||
@@ -285,20 +264,15 @@ export const CreateSaleForm = () => {
     console.log("Detalle actual:", [...detalleVenta, nuevoItem]);
   };
 
-  /**
-   * Elimina un producto del detalle de la venta
-   */
+  // Elimina un producto del detalle de la venta
   const handleEliminarProducto = (record: DetalleVentaItem, index: number) => {
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
     console.log("Producto eliminado:", record);
   };
 
-  /**
-   * Maneja el envío del formulario de venta
-   */
+  // Maneja el envío del formulario de venta
   const handleAceptarVenta = async () => {
     try {
-      // Mapear los detalles de venta al formato requerido por la API
       const detallesAPI = detalleVenta.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -307,10 +281,9 @@ export const CreateSaleForm = () => {
         igv: item.igv,
         isc: item.isv, // Mapear isv a isc
         total: item.total,
-        descripcion: item.descripcion
+        descripcion: item.descripcion,
       }));
 
-      // Construir el objeto para enviar a la API
       const ventaData = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
@@ -322,29 +295,20 @@ export const CreateSaleForm = () => {
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
-        detalles: detallesAPI
+        detalles: detallesAPI,
       };
 
-      console.log("Enviando venta:", ventaData);
-      
-      // Llamar al servicio para registrar la venta
-      const response = await TransactionsService.registerSale(ventaData);
-      console.log("Venta registrada exitosamente:", response);
-      
-      // Navegar a la lista de ventas
+      await TransactionsService.registerSale(ventaData);
+
       navigate("/ventas");
     } catch (error) {
       console.error("Error al registrar la venta:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
     }
   };
 
-  /**
-   * Maneja el envío del formulario y navegación para nueva venta
-   */
+  // Maneja el envío del formulario de venta y navegación para nueva venta
   const handleAceptarYNuevaVenta = async () => {
     try {
-      // Mapear los detalles de venta al formato requerido por la API
       const detallesAPI = detalleVenta.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -353,10 +317,9 @@ export const CreateSaleForm = () => {
         igv: item.igv,
         isc: item.isv, // Mapear isv a isc
         total: item.total,
-        descripcion: item.descripcion
+        descripcion: item.descripcion,
       }));
 
-      // Construir el objeto para enviar a la API
       const ventaData = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
@@ -368,16 +331,11 @@ export const CreateSaleForm = () => {
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
-        detalles: detallesAPI
+        detalles: detallesAPI,
       };
 
-      console.log("Enviando venta:", ventaData);
-      
-      // Llamar al servicio para registrar la venta
-      const response = await TransactionsService.registerSale(ventaData);
-      console.log("Venta registrada exitosamente:", response);
-      
-      // Resetear el formulario
+      await TransactionsService.registerSale(ventaData);
+
       setFormState({
         correlativo: "",
         cliente: "",
@@ -394,18 +352,13 @@ export const CreateSaleForm = () => {
       setProductoSeleccionado("");
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
-      
-      // Navegar a registrar nueva venta
+
       navigate("/ventas/registrar");
     } catch (error) {
       console.error("Error al registrar la venta:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
     }
   };
 
-  /**
-   * Headers para la tabla
-   */
   const tableHeaders = [
     "Descripción",
     "Cantidad",
@@ -419,9 +372,7 @@ export const CreateSaleForm = () => {
     "Acciones",
   ];
 
-  /**
-   * Transforma los datos de detalle de venta a formato TableRow
-   */
+  // Transforma los datos de detalle de venta a formato TableRow
   const tableRows: TableRow[] = detalleVenta.map((item, index) => {
     const unidad = unidadMedidaOptions.find(
       (option) => option.value === item.unidadMedida
@@ -450,6 +401,18 @@ export const CreateSaleForm = () => {
       ],
     };
   });
+
+  // get clients
+  const [clients, setClients] = useState<Person[]>([]);
+  useEffect(() => {
+    PersonsService.getClients().then((data) => {setClients(data);console.log(data)});
+  }, []);
+
+  // Crear opciones dinámicas para el ComboBox de clientes
+  const clientesOptionsFromAPI = clients.map(client => ({
+    value: client.id.toString(),
+    label: client.displayName
+  }));
 
   return (
     <div className={styles.CreateSaleForm}>
@@ -483,7 +446,7 @@ export const CreateSaleForm = () => {
             </Text>
             <ComboBox
               size="xs"
-              options={clientesOptions}
+              options={clientesOptionsFromAPI}
               variant="createSale"
               name="cliente"
               value={formState.cliente}
@@ -708,7 +671,9 @@ export const CreateSaleForm = () => {
 
       <div className={styles.CreateSaleForm__Actions}>
         <Button onClick={handleAceptarVenta}>Aceptar</Button>
-        <Button onClick={handleAceptarYNuevaVenta}>Aceptar y nueva venta</Button>
+        <Button onClick={handleAceptarYNuevaVenta}>
+          Aceptar y nueva venta
+        </Button>
       </div>
     </div>
   );
