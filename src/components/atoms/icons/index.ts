@@ -4,3 +4,6 @@ export * from './TransaccionesIcon';
 export * from './CierreContableIcon';
 export * from './ContabilidadIcon';
 export * from './InventarioIcon';
+export * from './CerrarSesionIcon';
+export * from './EstadosFinancierosIcon';
+export * from './ConfiguracionIcon';

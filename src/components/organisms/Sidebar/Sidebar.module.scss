@@ -67,11 +67,17 @@
 }
 
 .sectionTitle {
-  font-size: $font-size-sm;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap:4px;
+  &__title{
+    font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   color: $text-color-1;
   letter-spacing: 0.5px;
   margin: 0;
+  }
 }
 
 .menuList {

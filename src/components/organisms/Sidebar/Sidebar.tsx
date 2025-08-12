@@ -4,6 +4,7 @@ import styles from './Sidebar.module.scss';
 import { Link } from 'react-router-dom';
 import { Logo } from '@/components/atoms';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle/ThemeToggle';
+import { TransaccionesIcon, InventarioIcon, ContabilidadIcon, CierreContableIcon, CerrarSesionIcon, EstadosFinancierosIcon, ConfiguracionIcon } from '@/components/atoms';
 
 interface SidebarProps {
   userName: string;
@@ -30,7 +31,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
 
       <nav className={styles.navigation}>
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Transacciones</h3>
+          <div className={styles.sectionTitle}>
+            <TransaccionesIcon />
+            <h3 className={styles.sectionTitle__title}>Transacciones</h3>  
+          </div>
+          
           <ul className={styles.menuList}>
             <li><Link to="/compras">Compras</Link></li>
             <li><Link to="/ventas">Ventas</Link></li>
@@ -41,7 +46,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
         </div>
 
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Inventario</h3>
+          <div className={styles.sectionTitle}>
+            <InventarioIcon />
+            <h3 className={styles.sectionTitle__title}>Inventario</h3>
+          </div>
           <ul className={styles.menuList}>
             <li><Link to="/productos">Productos</Link></li>
             <li><Link to="/kardex">Kardex</Link></li>
@@ -50,7 +58,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
         </div>
 
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Contabilidad</h3>
+          <div className={styles.sectionTitle}>
+            <ContabilidadIcon />
+            <h3 className={styles.sectionTitle__title}>Contabilidad</h3>
+          </div>
           <ul className={styles.menuList}>
             <li><Link to="/plan-cuentas">Plan de Cuentas</Link></li>
             <li><Link to="/libro-diario">Libro Diario</Link></li>
@@ -60,7 +71,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
         </div>
 
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Cierre Contable</h3>
+          <div className={styles.sectionTitle}>
+            <CierreContableIcon />
+            <h3 className={styles.sectionTitle__title}>Cierre Contable</h3>
+          </div>
           <ul className={styles.menuList}>
             <li><Link to="/hoja-trabajo">Hoja de Trabajo</Link></li>
             <li><Link to="/hoja-comprobacion">Hoja de Comprobación</Link></li>
@@ -69,7 +83,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
         </div>
 
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Estados Financieros</h3>
+          <div className={styles.sectionTitle}>
+            <EstadosFinancierosIcon />
+            <h3 className={styles.sectionTitle__title}>Estados Financieros</h3>
+          </div>
           <ul className={styles.menuList}>
             <li><Link to="/balance-general">Balance General</Link></li>
             <li><Link to="/estado-resultados">Estado de Resultados</Link></li>
@@ -78,12 +95,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
           </ul>
 
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Configuración</h3>
+            <div className={styles.sectionTitle}>
+              <ConfiguracionIcon />
+              <h3 className={styles.sectionTitle__title}>Configuración</h3>
+            </div>
             <ul className={styles.menuList}>
               <li><Link to="/periodos-contables">Periodos Contables</Link></li>
               <li><Link to="/usuarios-roles">Usuarios y Roles</Link></li>
               <li><Link to="/parametros">Parámetros</Link></li>
             </ul>
+          </div>
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>
+              <CerrarSesionIcon />
+              <h3 className={styles.sectionTitle__title}>Cerrar Sesión</h3>
+            </div>
+            
           </div>
         </div>
       </nav>
