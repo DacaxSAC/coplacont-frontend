@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const ParamsPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de parametros"
@@ -9,3 +9,5 @@ export const ParamsPage: React.FC = () => {
     />
   );
 };
+
+export default MainPage;

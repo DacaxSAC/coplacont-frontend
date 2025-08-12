@@ -1,4 +1,3 @@
-
-export * from './AccountingPeriodPage';
-export * from './ParamsPage';
-export * from './UserAndRolesPage';
+export { UsersRouter } from './Users'
+export { ParamsRouter } from './Params'
+export { AccountingPeriodRouter } from './AccountingPeriod'

@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const PurchasePage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de compras"

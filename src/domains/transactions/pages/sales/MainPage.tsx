@@ -9,10 +9,10 @@ import {
   monthOptions,
   sunatStatusOptions,
   yearOptions,
-} from './HomeSaleFilterData';
+} from './MainFilterData';
 import { useNavigate } from 'react-router-dom';
 
-export const HomeSalePage: React.FC = () => {
+export const MainPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Top filters

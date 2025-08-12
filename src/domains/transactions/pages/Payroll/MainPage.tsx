@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const PayrollPage: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de planillas"
@@ -10,4 +10,3 @@ export const PayrollPage: React.FC = () => {
   );
 };
 
-export default PayrollPage;

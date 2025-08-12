@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnderConstruction } from '@/components';
 
-export const ManualJournalEntry: React.FC = () => {
+export const MainPage: React.FC = () => {
   return (
     <UnderConstruction
       title="Submodulo de asiento contable manual"
