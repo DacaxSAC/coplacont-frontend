@@ -300,7 +300,7 @@ export const CreatePurchaseForm = () => {
 
       await TransactionsService.registerSale(compraData);
 
-      navigate("/compras");
+      navigate("/transactions/purchases");
     } catch (error) {
       console.error("Error al registrar la compra:", error);
     }
@@ -353,7 +353,7 @@ export const CreatePurchaseForm = () => {
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
 
-      navigate("/compras/registrar");
+      navigate("/transactions/purchases/register");
     } catch (error) {
       console.error("Error al registrar la compra:", error);
     }

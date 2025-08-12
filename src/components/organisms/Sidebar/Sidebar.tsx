@@ -35,13 +35,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <TransaccionesIcon />
             <h3 className={styles.sectionTitle__title}>Transacciones</h3>  
           </div>
-          
           <ul className={styles.menuList}>
-            <li><Link to="/purchases">Compras</Link></li>
-            <li><Link to="/sales">Ventas</Link></li>
-            <li><Link to="/cash">Caja</Link></li>
-            <li><Link to="/manual-journal-entry">Asientos Manuales</Link></li>
-            <li><Link to="/payroll">Planillas</Link></li>
+            <li><Link to="transactions/purchases">Compras</Link></li>
+            <li><Link to="transactions/sales">Ventas</Link></li>
+            <li><Link to="transactions/cash">Caja</Link></li>
+            <li><Link to="transactions/manual-journal-entry">Asientos Manuales</Link></li>
+            <li><Link to="transactions/payroll">Planillas</Link></li>
           </ul>
         </div>
 
@@ -51,9 +50,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Inventario</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to="/productos">Productos</Link></li>
-            <li><Link to="/kardex">Kardex</Link></li>
-            <li><Link to="/ajustes-inventario">Ajustes</Link></li>
+            <li><Link to="/inventory/product">Productos</Link></li>
+            <li><Link to="/inventory/kardex">Kardex</Link></li>
+            <li><Link to="/inventory/inventory-adjusment">Ajustes</Link></li>
           </ul>
         </div>
 
@@ -63,10 +62,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Contabilidad</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to="/plan-cuentas">Plan de Cuentas</Link></li>
-            <li><Link to="/libro-diario">Libro Diario</Link></li>
-            <li><Link to="/libro-mayor">Libro Mayor</Link></li>
-            <li><Link to="/libro-inventario-balance">Libro de Inventario y Balance</Link></li>
+            <li><Link to="/accounting/chart-of-account">Plan de Cuentas</Link></li>
+            <li><Link to="/accounting/general-journal">Libro Diario</Link></li>
+            <li><Link to="/accounting/general-ledger">Libro Mayor</Link></li>
+            <li><Link to="/accounting/inventory-and-balance-statement">Libro de Inventario y Balance</Link></li>
           </ul>
         </div>
 
@@ -76,9 +75,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Cierre Contable</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to="/hoja-trabajo">Hoja de Trabajo</Link></li>
-            <li><Link to="/hoja-comprobacion">Hoja de Comprobación</Link></li>
-            <li><Link to="/ajustes-cierre">Ajustes</Link></li>
+            <li><Link to="/financial-closing/accounting-worksheet">Hoja de Trabajo</Link></li>
+            <li><Link to="/financial-closing/closing-adjustment">Hoja de Comprobación</Link></li>
+            <li><Link to="/financial-closing/trial-balance">Ajustes</Link></li>
           </ul>
         </div>
 
@@ -88,10 +87,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Estados Financieros</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to="/balance-general">Balance General</Link></li>
-            <li><Link to="/estado-resultados">Estado de Resultados</Link></li>
-            <li><Link to="/flujo-efectivo">Flujo de efectivo</Link></li>
-            <li><Link to="/estado-patrimonio">Estado de patrimonio</Link></li>
+            <li><Link to="/financial-statements/balance-sheet">Balance General</Link></li>
+            <li><Link to="/financial-statements/income-statement">Estado de Resultados</Link></li>
+            <li><Link to="/financial-statements/cash-flow-statement">Flujo de efectivo</Link></li>
+            <li><Link to="/financial-statements/statement-of-changes-in-equity">Estado de patrimonio</Link></li>
           </ul>
 
           <div className={styles.section}>
@@ -100,9 +99,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
               <h3 className={styles.sectionTitle__title}>Configuración</h3>
             </div>
             <ul className={styles.menuList}>
-              <li><Link to="/periodos-contables">Periodos Contables</Link></li>
-              <li><Link to="/usuarios-roles">Usuarios y Roles</Link></li>
-              <li><Link to="/parametros">Parámetros</Link></li>
+              <li><Link to="/settings/accounting-periods">Periodos Contables</Link></li>
+              <li><Link to="/settings/users">Usuarios y Roles</Link></li>
+              <li><Link to="/settings/parameters">Parámetros</Link></li>
             </ul>
           </div>
           <div className={styles.section}>

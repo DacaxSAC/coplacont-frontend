@@ -37,7 +37,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/inventory/*" element={<InventoryRouter />} />
           <Route path="/accounting/*" element={<AccountingRouter />} />
           <Route path="/financial-closing/*" element={<FinancialClosingRouter />} />
-          <Route path="/financial-statements" element={<FinancialStatementsRouter />} />
+          <Route path="/financial-statements/*" element={<FinancialStatementsRouter />} />
           <Route path="/settings/*" element={<SettingsRouter />} />
         </Route>
       </Route>

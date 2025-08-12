@@ -31,7 +31,7 @@ export const MainPage: React.FC = () => {
   const [isUploadOpen, setUploadOpen] = useState(false);
 
   const handleRegisterPurchase = () => {
-    navigate('/compras/registrar');
+    navigate('/transactions/purchases/register');
   }
 
   const handleTopFilter = () => {

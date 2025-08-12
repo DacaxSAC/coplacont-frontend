@@ -300,7 +300,7 @@ export const CreateSaleForm = () => {
 
       await TransactionsService.registerSale(ventaData);
 
-      navigate("/ventas");
+      navigate("/transactions/sales");
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     }
@@ -353,7 +353,7 @@ export const CreateSaleForm = () => {
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
 
-      navigate("/ventas/registrar");
+      navigate("/transactions/sales/register");
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     }

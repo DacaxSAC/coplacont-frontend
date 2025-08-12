@@ -11,7 +11,7 @@ export const Router = () => {
     <Routes>
       <Route path="/product" element={<ProductRouter />} />
       <Route path="/kardex" element={<KardexRouter />} />
-      <Route path="/inventoryAdjusment" element={<InventoryAdjusmentRouter />} />
+      <Route path="/inventory-adjusment" element={<InventoryAdjusmentRouter />} />
     </Routes>
   );
 };
