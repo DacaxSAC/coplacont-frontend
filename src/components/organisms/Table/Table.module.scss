@@ -19,6 +19,7 @@
   grid-template-columns: var(--grid-template, 1fr);
   align-items: center;
   border-top: 1px solid $border-color;
+  
 
   &:first-child {
     border-top: none;
@@ -30,9 +31,15 @@
 }
 
 .cell {
-  padding: $spacing-md $spacing-lg;
-  font-size: $font-size-sm;
+  white-space: nowrap;
+  padding: $spacing-xs $spacing-lg;
+  overflow-x: auto;
+  font-size: $font-size-xs;
   color: $text-color;
+}
+
+.headerCell {
+  font-weight: $font-weight-semibold;
 }
 
 .actions {

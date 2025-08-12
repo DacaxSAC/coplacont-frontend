@@ -22,7 +22,6 @@
   border-radius: $border-radius-lg;
   box-shadow: $box-shadow-lg;
   max-width: 600px;
-  width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   z-index: $z-index-modal;
@@ -37,10 +36,15 @@
   border-bottom: 1px solid $neutral-3;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap:20px
+}
+
 .title {
   margin: 0;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
   color: $text-color-1;
 }
 

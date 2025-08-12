@@ -1,6 +1,6 @@
 @use "@/styles" as *;
 
-.CreateSaleForm {
+.CreatePurchaseForm {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
@@ -39,7 +39,7 @@
       }
     }
     
-    &--cliente {
+    &--proveedor {
       flex: 1;
     }
     

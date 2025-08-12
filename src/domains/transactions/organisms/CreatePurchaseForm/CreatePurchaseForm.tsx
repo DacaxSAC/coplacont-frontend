@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./CreateSaleForm.module.scss";
+import styles from "./CreatePurchaseForm.module.scss";
 
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
@@ -9,7 +9,7 @@ import { PersonsService } from "@/domains/persons/service/PersonsService";
 import type {Person} from "@/domains/persons/service/types";
 
 
-const TipoVentaEnum = {
+const TipoCompraEnum = {
   CONTADO: "contado",
   CREDITO: "credito",
 } as const;
@@ -47,7 +47,7 @@ const UnidadMedidaEnum = {
 } as const;
 
 
-type TipoVentaType = (typeof TipoVentaEnum)[keyof typeof TipoVentaEnum];
+type TipoCompraType = (typeof TipoCompraEnum)[keyof typeof TipoCompraEnum];
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
 type TipoCambioType = (typeof TipoCambioEnum)[keyof typeof TipoCambioEnum];
@@ -57,9 +57,9 @@ type UnidadMedidaType =
   (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum];
 
 /**
- * Interfaz para los items del detalle de la venta
+ * Interfaz para los items del detalle de la compra
  */
-interface DetalleVentaItem {
+interface DetalleCompraItem {
   id: string;
   producto: ProductoType;
   descripcion: string;
@@ -73,10 +73,10 @@ interface DetalleVentaItem {
   total: number;
 }
 
-interface CreateSaleFormState {
+interface CreatePurchaseFormState {
   correlativo: string;
-  cliente: string | "";
-  tipoVenta: TipoVentaType | "";
+  proveedor: string | "";
+  tipoCompra: TipoCompraType | "";
   tipoComprobante: TipoComprobanteType | "";
   fechaEmision: string;
   moneda: MonedaType | "";
@@ -87,9 +87,9 @@ interface CreateSaleFormState {
 }
 
 
-const tipoVentaOptions = [
-  { value: TipoVentaEnum.CONTADO, label: "Contado" },
-  { value: TipoVentaEnum.CREDITO, label: "Crédito" },
+const tipoCompraOptions = [
+  { value: TipoCompraEnum.CONTADO, label: "Contado" },
+  { value: TipoCompraEnum.CREDITO, label: "Crédito" },
 ];
 
 const tipoComprobanteOptions = [
@@ -140,12 +140,12 @@ const unidadMedidaOptions = [
   { value: UnidadMedidaEnum.CAJA, label: "Caja" },
 ];
 
-export const CreateSaleForm = () => {
+export const CreatePurchaseForm = () => {
   const navigate = useNavigate();
-  const [formState, setFormState] = useState<CreateSaleFormState>({
+  const [formState, setFormState] = useState<CreatePurchaseFormState>({
     correlativo: "",
-    cliente: "",
-    tipoVenta: "",
+    proveedor: "",
+    tipoCompra: "",
     tipoComprobante: "",
     fechaEmision: "",
     moneda: "",
@@ -156,7 +156,7 @@ export const CreateSaleForm = () => {
   });
 
   // Estados para el detalle de productos
-  const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
+  const [detalleCompra, setDetalleCompra] = useState<DetalleCompraItem[]>([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState<
     ProductoType | ""
   >("");
@@ -167,7 +167,7 @@ export const CreateSaleForm = () => {
 
   // Maneja los cambios en los campos de texto
   const handleInputChange =
-    (field: keyof CreateSaleFormState) =>
+    (field: keyof CreatePurchaseFormState) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormState((prev) => ({
         ...prev,
@@ -177,7 +177,7 @@ export const CreateSaleForm = () => {
 
   // Maneja los cambios en los ComboBox
   const handleComboBoxChange =
-    (field: keyof CreateSaleFormState) => (value: string | number) => {
+    (field: keyof CreatePurchaseFormState) => (value: string | number) => {
       setFormState((prev) => ({
         ...prev,
         [field]: String(value),
@@ -239,7 +239,7 @@ export const CreateSaleForm = () => {
     const isv = 0; // ISV temporal
     const total = subtotal + isv;
 
-    const nuevoItem: DetalleVentaItem = {
+    const nuevoItem: DetalleCompraItem = {
       id: `item-${Date.now()}`, // ID temporal
       producto: productoSeleccionado,
       descripcion,
@@ -253,7 +253,7 @@ export const CreateSaleForm = () => {
       total,
     };
 
-    setDetalleVenta((prev) => [...prev, nuevoItem]);
+    setDetalleCompra((prev) => [...prev, nuevoItem])
 
     // Limpiar los campos después de agregar
     setProductoSeleccionado("");
@@ -261,19 +261,19 @@ export const CreateSaleForm = () => {
     setCantidadIngresada("");
 
     console.log("Producto agregado:", nuevoItem);
-    console.log("Detalle actual:", [...detalleVenta, nuevoItem]);
+    console.log("Detalle actual:", [...detalleCompra, nuevoItem]);
   };
 
-  // Elimina un producto del detalle de la venta
-  const handleEliminarProducto = (record: DetalleVentaItem, index: number) => {
-    setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
+  // Elimina un producto del detalle de la compra
+  const handleEliminarProducto = (record: DetalleCompraItem, index: number) => {
+    setDetalleCompra((prev) => prev.filter((_, i) => i !== index));
     console.log("Producto eliminado:", record);
   };
 
-  // Maneja el envío del formulario de venta
-  const handleAceptarVenta = async () => {
+  // Maneja el envío del formulario de compra
+  const handleAceptarCompra = async () => {
     try {
-      const detallesAPI = detalleVenta.map((item) => ({
+      const detallesAPI = detalleCompra.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -284,10 +284,10 @@ export const CreateSaleForm = () => {
         descripcion: item.descripcion,
       }));
 
-      const ventaData = {
+      const compraData = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
-        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
-        tipoOperacion: "venta", // Valor fijo
+        idPersona: 1, // Dato fake - en producción vendría del proveedor seleccionado
+        tipoOperacion: "compra", // Valor fijo
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
         fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
@@ -298,18 +298,18 @@ export const CreateSaleForm = () => {
         detalles: detallesAPI,
       };
 
-      await TransactionsService.registerSale(ventaData);
+      await TransactionsService.registerSale(compraData);
 
-      navigate("/ventas");
+      navigate("/compras");
     } catch (error) {
-      console.error("Error al registrar la venta:", error);
+      console.error("Error al registrar la compra:", error);
     }
   };
 
-  // Maneja el envío del formulario de venta y navegación para nueva venta
-  const handleAceptarYNuevaVenta = async () => {
+  // Maneja el envío del formulario de compra y navegación para nueva compra
+  const handleAceptarYNuevaCompra = async () => {
     try {
-      const detallesAPI = detalleVenta.map((item) => ({
+      const detallesAPI = detalleCompra.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -320,10 +320,10 @@ export const CreateSaleForm = () => {
         descripcion: item.descripcion,
       }));
 
-      const ventaData = {
+      const compraData = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
-        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
-        tipoOperacion: "venta", // Valor fijo
+        idPersona: 1, // Dato fake - en producción vendría del proveedor seleccionado
+        tipoOperacion: "compra", // Valor fijo
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
         fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
@@ -334,12 +334,12 @@ export const CreateSaleForm = () => {
         detalles: detallesAPI,
       };
 
-      await TransactionsService.registerSale(ventaData);
+      await TransactionsService.registerSale(compraData);
 
       setFormState({
         correlativo: "",
-        cliente: "",
-        tipoVenta: "",
+        proveedor: "",
+        tipoCompra: "",
         tipoComprobante: "",
         fechaEmision: "",
         moneda: "",
@@ -348,14 +348,14 @@ export const CreateSaleForm = () => {
         numero: "",
         fechaVencimiento: "",
       });
-      setDetalleVenta([]);
+      setDetalleCompra([]);
       setProductoSeleccionado("");
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
 
-      navigate("/ventas/registrar");
+      navigate("/compras/registrar");
     } catch (error) {
-      console.error("Error al registrar la venta:", error);
+      console.error("Error al registrar la compra:", error);
     }
   };
 
@@ -372,8 +372,8 @@ export const CreateSaleForm = () => {
     "Acciones",
   ];
 
-  // Transforma los datos de detalle de venta a formato TableRow
-  const tableRows: TableRow[] = detalleVenta.map((item, index) => {
+  // Transforma los datos de detalle de compra a formato TableRow
+  const tableRows: TableRow[] = detalleCompra.map((item, index) => {
     const unidad = unidadMedidaOptions.find(
       (option) => option.value === item.unidadMedida
     );
@@ -402,30 +402,30 @@ export const CreateSaleForm = () => {
     };
   });
 
-  // get clients
-  const [clients, setClients] = useState<Person[]>([]);
+  // get providers
+  const [providers, setProviders] = useState<Person[]>([]);
   useEffect(() => {
-    PersonsService.getClients().then((data) => {setClients(data);console.log(data)});
+    PersonsService.getSuppliers().then((data) => {setProviders(data);console.log(data)});
   }, []);
 
-  // Crear opciones dinámicas para el ComboBox de clientes
-  const clientesOptionsFromAPI = clients.map(client => ({
-    value: client.id.toString(),
-    label: client.displayName
+  // Crear opciones dinámicas para el ComboBox de proveedores
+  const proveedoresOptionsFromAPI = providers.map(provider => ({
+    value: provider.id.toString(),
+    label: provider.displayName
   }));
 
   return (
-    <div className={styles.CreateSaleForm}>
+    <div className={styles.CreatePurchaseForm}>
       <Text size="xl" color="neutral-primary">
-        Cabecera de venta
+        Cabecera de compra
       </Text>
 
       {/** Formulario */}
-      <div className={styles.CreateSaleForm__Form}>
-        {/** Fila 1: Correlativo y Cliente */}
-        <div className={styles.CreateSaleForm__FormRow}>
+      <div className={styles.CreatePurchaseForm__Form}>
+        {/** Fila 1: Correlativo y Proveedor */}
+        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--correlativo"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--correlativo"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Correlativo
@@ -439,42 +439,42 @@ export const CreateSaleForm = () => {
           </div>
 
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--cliente"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--proveedor"]}`}
           >
             <Text size="xs" color="neutral-primary">
-              Cliente
+              Proveedor
             </Text>
             <ComboBox
               size="xs"
-              options={clientesOptionsFromAPI}
+              options={proveedoresOptionsFromAPI}
               variant="createSale"
-              name="cliente"
-              value={formState.cliente}
-              onChange={handleComboBoxChange("cliente")}
+              name="proveedor"
+              value={formState.proveedor}
+              onChange={handleComboBoxChange("proveedor")}
             />
           </div>
         </div>
 
-        {/** Fila 2: Tipo de venta y Tipo de comprobante */}
-        <div className={styles.CreateSaleForm__FormRow}>
+        {/** Fila 2: Tipo de compra y Tipo de comprobante */}
+        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--half"]}`}
           >
             <Text size="xs" color="neutral-primary">
-              Tipo de venta
+              Tipo de compra
             </Text>
             <ComboBox
               size="xs"
-              options={tipoVentaOptions}
+              options={tipoCompraOptions}
               variant="createSale"
-              name="tipoVenta"
-              value={formState.tipoVenta}
-              onChange={handleComboBoxChange("tipoVenta")}
+              name="tipoCompra"
+              value={formState.tipoCompra}
+              onChange={handleComboBoxChange("tipoCompra")}
             />
           </div>
 
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--half"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Tipo de comprobante
@@ -491,9 +491,9 @@ export const CreateSaleForm = () => {
         </div>
 
         {/** Fila 3: Fecha de emisión, Moneda y Tipo de cambio */}
-        <div className={styles.CreateSaleForm__FormRow}>
+        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Fecha de emisión
@@ -508,7 +508,7 @@ export const CreateSaleForm = () => {
           </div>
 
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Moneda
@@ -526,7 +526,7 @@ export const CreateSaleForm = () => {
           {/** Campo Tipo de cambio de la SUNAT */}
           {formState.moneda !== MonedaEnum.SOL && formState.moneda !== "" && (
             <div
-              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
             >
               <Text size="xs" color="neutral-primary">
                 Tipo de cambio de la SUNAT
@@ -544,9 +544,9 @@ export const CreateSaleForm = () => {
         </div>
 
         {/** Fila 4: Serie, Número y Fecha de vencimiento */}
-        <div className={styles.CreateSaleForm__FormRow}>
+        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Serie
@@ -560,7 +560,7 @@ export const CreateSaleForm = () => {
           </div>
 
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Número
@@ -574,7 +574,7 @@ export const CreateSaleForm = () => {
           </div>
 
           <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
               Fecha de vencimiento
@@ -593,12 +593,12 @@ export const CreateSaleForm = () => {
       <Divider />
 
       <Text size="xl" color="neutral-primary">
-        Detalle de venta
+        Detalle de compra
       </Text>
 
-      <div className={styles.CreateSaleForm__AddItems}>
+      <div className={styles.CreatePurchaseForm__AddItems}>
         <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--descripcion"]}`}
+          className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--descripcion"]}`}
         >
           <Text size="xs" color="neutral-primary">
             Producto / Servicio
@@ -614,7 +614,7 @@ export const CreateSaleForm = () => {
         </div>
 
         <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
+          className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
         >
           <Text size="xs" color="neutral-primary">
             Unidad de medida
@@ -635,7 +635,7 @@ export const CreateSaleForm = () => {
         </div>
 
         <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
+          className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
         >
           <Text size="xs" color="neutral-primary">
             Cantidad
@@ -650,7 +650,7 @@ export const CreateSaleForm = () => {
         </div>
 
         <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--button"]}`}
+          className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--button"]}`}
         >
           <Button size="small" onClick={handleAgregarProducto}>
             Agregar
@@ -659,7 +659,7 @@ export const CreateSaleForm = () => {
       </div>
 
       {/** Table */}
-      {detalleVenta.length > 0 && (
+      {detalleCompra.length > 0 && (
         <Table
           headers={tableHeaders}
           rows={tableRows}
@@ -669,10 +669,10 @@ export const CreateSaleForm = () => {
 
       <Divider />
 
-      <div className={styles.CreateSaleForm__Actions}>
-        <Button onClick={handleAceptarVenta}>Aceptar</Button>
-        <Button onClick={handleAceptarYNuevaVenta}>
-          Aceptar y nueva venta
+      <div className={styles.CreatePurchaseForm__Actions}>
+        <Button onClick={handleAceptarCompra}>Aceptar</Button>
+        <Button onClick={handleAceptarYNuevaCompra}>
+          Aceptar y nueva compra
         </Button>
       </div>
     </div>

@@ -25,7 +25,7 @@ export const Table: React.FC<TableProps> = ({ headers, rows, gridTemplate, class
       >
         <div className={`${styles.row} ${styles.header}`} role="row">
           {headers.map((h, i) => (
-            <div key={i} className={styles.cell} role="columnheader">
+            <div key={i} className={`${styles.cell} ${styles.headerCell}`} role="columnheader">
               {h}
             </div>
           ))}
