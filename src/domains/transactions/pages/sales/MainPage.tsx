@@ -14,9 +14,11 @@ import {
 } from './MainFilterData';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
+import { useSalesTemplateDownload } from './useSalesTemplateDownload';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
+  const { downloadSalesTemplate } = useSalesTemplateDownload();
 
   // State for sales data
   const [sales, setSales] = useState<Transaction[]>([]);
@@ -192,7 +194,7 @@ export const MainPage: React.FC = () => {
       >
         <div>
           <div style={{ marginBottom: '16px' }}>
-            <Button variant="secondary">⬇️ Descargar plantilla de Excel</Button>
+            <Button variant="secondary" onClick={downloadSalesTemplate}>⬇️ Descargar plantilla de Excel</Button>
           </div>
 
           <div style={{ marginBottom: '16px' }}>
