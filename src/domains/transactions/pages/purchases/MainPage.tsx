@@ -14,7 +14,7 @@ import {
 } from './HomePurchaseFilterData';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
-import { usePurchasesTemplateDownload } from './usePurchasesTemplateDownload';
+import { usePurchasesTemplateDownload } from '../../hooks/usePurchasesTemplateDownload';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
