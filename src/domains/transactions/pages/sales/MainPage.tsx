@@ -47,6 +47,10 @@ export const MainPage: React.FC = () => {
     navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`);
   }
 
+  const handleBulkRegister = () => {
+    navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.BULK_REGISTER}`);
+  }
+
   const handleTopFilter = () => {
     // TODO: conectar con servicio de ventas
     // Por ahora, solo mostramos en consola
@@ -67,7 +71,7 @@ export const MainPage: React.FC = () => {
       sale.fechaVencimiento,
       sale.moneda,
       sale.tipoCambio,
-      sale.totales.totalGeneral.toString()
+      sale.totales?.totalGeneral.toString()
     ],
   } as TableRow)), [sales]);
 
@@ -213,8 +217,8 @@ export const MainPage: React.FC = () => {
           <div>
             <Text as="h3" size="md" weight={600}>Seleccionar archivo</Text>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
-              <input type="file" accept=".xls,.xlsx" />
-              <Button>Subir Excel</Button>
+              <input type="file" accept=".csv,.xlsx" />
+              <Button onClick={handleBulkRegister}>Subir Excel</Button>
             </div>
           </div>
         </div>

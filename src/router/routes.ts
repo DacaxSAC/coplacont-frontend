@@ -72,6 +72,7 @@ export const SETTINGS_ROUTES = {
 export const COMMON_ROUTES = {
   MAIN: '/',
   REGISTER: '/register',
+  BULK_REGISTER: '/bulk-register',
 } as const;
 
 // Combinación de todas las rutas para facilitar el acceso
