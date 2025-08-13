@@ -157,6 +157,23 @@ export const CreatePurchaseForm = () => {
 
   // Estados para el detalle de productos
   const [detalleCompra, setDetalleCompra] = useState<DetalleCompraItem[]>([]);
+
+  // Obtener el correlativo al montar el componente
+  useEffect(() => {
+    const fetchCorrelativo = async () => {
+      try {
+        const response = await TransactionsService.getCorrelative('compra');
+        setFormState(prev => ({
+          ...prev,
+          correlativo: response.correlativo
+        }));
+      } catch (error) {
+        console.error('Error al obtener el correlativo:', error);
+      }
+    };
+
+    fetchCorrelativo();
+  }, []);
   const [productoSeleccionado, setProductoSeleccionado] = useState<
     ProductoType | ""
   >("");
@@ -411,7 +428,7 @@ export const CreatePurchaseForm = () => {
   // Crear opciones dinámicas para el ComboBox de proveedores
   const proveedoresOptionsFromAPI = providers.map(provider => ({
     value: provider.id.toString(),
-    label: provider.displayName
+    label: `${provider.documentNumber} - ${provider.displayName}`
   }));
 
   return (

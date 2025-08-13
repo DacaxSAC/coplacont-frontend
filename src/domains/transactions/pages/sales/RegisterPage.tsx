@@ -8,7 +8,6 @@ export const RegisterPage: React.FC = () => {
       subtitle="Permite registrar una nueva venta con sus datos."
     >
       <CreateSaleForm />
-      aaa
     </PageLayout>
   );
 };
