@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './Sidebar.module.scss';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from '@/components/atoms';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle/ThemeToggle';
 import { TransaccionesIcon, InventarioIcon, ContabilidadIcon, CierreContableIcon, CerrarSesionIcon, EstadosFinancierosIcon, ConfiguracionIcon } from '@/components/atoms';
-import { MAIN_ROUTES, TRANSACTIONS_ROUTES, INVENTORY_ROUTES, ACCOUNTING_ROUTES, FINANCIAL_CLOSING_ROUTES, FINANCIAL_STATEMENTS_ROUTES, SETTINGS_ROUTES } from '@/router/routes';
+import { MAIN_ROUTES, TRANSACTIONS_ROUTES, INVENTORY_ROUTES, ACCOUNTING_ROUTES, FINANCIAL_CLOSING_ROUTES, FINANCIAL_STATEMENTS_ROUTES, SETTINGS_ROUTES, AUTH_ROUTES } from '@/router/routes';
+import { useAuth } from '@/domains/auth';
 
 interface SidebarProps {
   userName: string;
@@ -13,6 +14,14 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate(AUTH_ROUTES.LOGIN, { replace: true });
+  };
+
   return (
     <aside className={styles.sidebar} >
 
@@ -108,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <CerrarSesionIcon />
-              <h3 className={styles.sectionTitle__title}>Cerrar Sesión</h3>
+              <Link to={AUTH_ROUTES.LOGIN} onClick={handleLogout} className={styles.sectionTitle__title}>Cerrar Sesión</Link>
             </div>
             
           </div>
