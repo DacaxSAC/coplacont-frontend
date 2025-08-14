@@ -7,6 +7,7 @@ import { EntitiesService } from "../../services";
 type FormEntidadProps = {
   entidad: Entidad | EntidadParcial;
   error: string;
+  setError: (error: string) => void;
   loading: boolean;
   readOnly?: boolean;
   onChange: (field: keyof Entidad, value: string | number | boolean) => void;
@@ -16,6 +17,7 @@ type FormEntidadProps = {
 export const FormEntidad = ({
   entidad,
   error,
+  setError,
   loading,
   readOnly = false,
   onChange,
@@ -38,6 +40,8 @@ export const FormEntidad = ({
     const response = await EntitiesService.updateEntidad(entidad.id!,entidadToUpdate);
     if(response.success){
       setIsEdit(false);
+    }else{
+      setError(response.message);
     }
     console.log(entidadToUpdate)
   }

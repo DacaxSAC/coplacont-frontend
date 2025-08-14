@@ -217,6 +217,7 @@ export const MainPage: React.FC = () => {
         buttonText={isView ? "Cerrar" : "Guardar"}
       >
         <FormEntidad
+          setError={setError}
           entidad={isView && selectedClient ? selectedClient : newClient}
           error={error}
           loading={loading}
