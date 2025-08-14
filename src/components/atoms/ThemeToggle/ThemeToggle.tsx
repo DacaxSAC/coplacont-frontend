@@ -14,8 +14,8 @@ export const ThemeToggle = () => {
     <div className={styles.themeToggle} onClick={toggleTheme}>
       <span className={styles.themeToggle__label}>Tema de color</span>
       <div className={styles.themeToggle__icons}>
-        <Logo src="../src/assets/sidebar/sun.svg" size={24} />
-        <Logo src="../src/assets/sidebar/moon.svg" size={24} />
+        <Logo src="/assets/sidebar/sun.svg" size={24} />
+        <Logo src="/assets/sidebar/moon.svg" size={24} />
       </div>
     </div>
   );
