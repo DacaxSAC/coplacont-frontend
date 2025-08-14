@@ -14,6 +14,13 @@ export interface Warehouse {
   fechaActualizacion: string;
 }
 
+export type WarehouseParcial = Pick<Warehouse, "nombre" | "ubicacion" | "descripcion" | "responsable" | "telefono" > & {
+  capacidadMaxima?: number;
+  id?: number;
+  estado?: boolean;
+};
+
+
 /**
  * Interface para el payload de creación de un almacén
  */
@@ -21,7 +28,6 @@ export interface CreateWarehousePayload {
   nombre: string;
   ubicacion: string;
   descripcion: string;
-  capacidadMaxima: number;
   responsable: string;
   telefono: string;
 }
