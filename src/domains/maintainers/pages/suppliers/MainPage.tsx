@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
-import styles from "./MainPage.module.scss";
 import {
   PageLayout,
   Table,
   Button,
   Modal,
-  Text,
-  ComboBox,
-  Input,
   CloseIcon,
   StateTag,
   CheckIcon
 } from "@/components";
 import { EntitiesService } from "../../services";
+import {CreateFormEntidad} from "../../organisms/CreateFormEntidad";
 import type { Entidad } from "../../services";
 
 export const MainPage: React.FC = () => {
@@ -32,6 +29,16 @@ export const MainPage: React.FC = () => {
     direccion: "",
     telefono: "",
   });
+
+  const handleSupplierChange = (
+    field: keyof Entidad,
+    value: string | number | boolean
+  ) => {
+    setNewSupplier((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const resetForm = () => {
     setNewSupplier({
@@ -192,160 +199,13 @@ export const MainPage: React.FC = () => {
         description="Ingresa los siguientes datos para registrar un proveedor."
         loading={loading}
       >
-        <div className={`${styles.MainPage__Form}`}>
-          {error && (
-            <Text as="p" color="danger" size="xs">
-              {error}
-            </Text>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Tipo de Entidad
-            </Text>
-            <ComboBox
-              options={[
-                { label: "JURIDICA", value: "JURIDICA" },
-                { label: "NATURAL", value: "NATURAL" },
-              ]}
-              size="xs"
-              variant="createSale"
-              value={newSupplier.tipo}
-              onChange={(value) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  tipo: value as Entidad["tipo"],
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Número de Documento
-            </Text>
-            <Input
-              disabled={!newSupplier.tipo}
-              size="xs"
-              variant="createSale"
-              value={newSupplier.numeroDocumento}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  numeroDocumento: e.target.value,
-                })
-              }
-            />
-          </div>
-          {newSupplier.tipo === "JURIDICA" && (
-            <div className={`${styles.MainPage__FormField}`}>
-              <Text size="xs" color="neutral-primary">
-                Razon Social
-              </Text>
-              <Input
-                size="xs"
-                variant="createSale"
-                value={newSupplier.razonSocial}
-                onChange={(e) =>
-                  setNewSupplier({
-                    ...newSupplier,
-                    razonSocial: e.target.value,
-                  })
-                }
-              />
-            </div>
-          )}
-          {newSupplier.tipo === "NATURAL" && (
-            <>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Nombre
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.nombre}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      nombre: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Paterno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.apellidoPaterno}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      apellidoPaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Materno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.apellidoMaterno}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      apellidoMaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Direccion
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newSupplier.direccion}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  direccion: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Telefono
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newSupplier.telefono}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  telefono: e.target.value,
-                })
-              }
-            />
-          </div>
-
-          <Button
-            disabled={loading}
-            size="medium"
-            onClick={hanldeCreateSupplier}
-          >
-            Guardar
-          </Button>
-        </div>
+        <CreateFormEntidad
+          entidad={newSupplier}
+          error={error}
+          loading={loading}
+          onChange={handleSupplierChange}
+          onSubmit={hanldeCreateSupplier}
+        />
       </Modal>
     </PageLayout>
   );

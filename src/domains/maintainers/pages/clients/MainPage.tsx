@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
-import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
 import {
   Table,
   Button,
   Modal,
-  Text,
-  ComboBox,
-  Input,
   CloseIcon,
   CheckIcon,
   StateTag,
