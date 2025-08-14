@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Inventario</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.PRODUCT}`}>Productos</Link></li>
+            <li><Link to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.INVENTORY}`}>Inventario</Link></li>
             <li><Link to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`}>Kardex</Link></li>
             <li><Link to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.INVENTORY_ADJUSTMENT}`}>Ajustes</Link></li>
           </ul>
