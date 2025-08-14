@@ -1,179 +1,182 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import styles from './MainPage.module.scss';
-
-import { Button, FormField, PageLayout, Table, type TableRow } from '@/components';
-import { AddDropdownButton } from '@/components';
-
-import type { Product } from '@/domains/maintainers/types';
-import { ProductService } from '@/domains/maintainers/services';
-import { ProductModal, ServiceModal } from '@/domains/maintainers/organisms';
+import { useState, useEffect } from "react";
+import { PageLayout } from "@/components";
+import {
+  Table,
+  Button,
+  CloseIcon,
+  CheckIcon,
+  StateTag,
+} from "@/components";
+import { ProductService } from "@/domains/maintainers/services";
+import type { Product } from "@/domains/maintainers/types";
+import { ProductModal } from "@/domains/maintainers/organisms";
 
 export const MainPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [codigo, setCodigo] = useState('');
-  const [status, setStatus] = useState('all');
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isView, setIsView] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [newProduct, setNewProduct] = useState({
+    descripcion: "",
+    unidadMedida: "",
+    codigo: "",
+    precio: "",
+    stockMinimo: 0,
+    categoriaId: 0,
+  });
 
-  useEffect(() => {
-    ProductService.getAll()
-      .then((data) => setProducts(Array.isArray(data) ? data : []))
-      .catch(() => setProducts([]));
-  }, []);
-
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const byCodigo = codigo ? p.codigo.includes(codigo) : true;
-      const byStatus = status === 'all' ? true : status === 'active' ? p.estado : !p.estado;
-      return byCodigo && byStatus;
+  const resetForm = () => {
+    setNewProduct({
+      descripcion: "",
+      unidadMedida: "",
+      codigo: "",
+      precio: "",
+      stockMinimo: 0,
+      categoriaId: 0,
     });
-  }, [products, codigo, status]);
-
-  const handleOpenEdit = (prod: Product) => {
-    setEditing(prod);
-    setIsEditOpen(true);
   };
 
-  const rows: TableRow[] = useMemo(() => filtered.map((p) => ({
+  const handleCreateProduct = async (data: {
+    descripcion: string;
+    unidadMedida: string;
+    codigo: string;
+    precio: string;
+    stockMinimo: number;
+    categoriaId: number;
+  }) => {
+    setLoading(true);
+    try {
+      const payload = { 
+        ...data, 
+        tipo: 'producto' as const, 
+        estado: true 
+      };
+      const created = await ProductService.create(payload);
+      setProducts((prev) => [created, ...prev]);
+      setIsOpen(false);
+      resetForm();
+    } catch (error) {
+      setError("Error al crear el producto");
+      console.error('Error al crear producto:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStateProduct = async (id: number, currentState: boolean) => {
+    setLoading(true);
+    try {
+      await ProductService.update(id, { estado: !currentState });
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, estado: !currentState } : p
+        )
+      );
+    } catch (error) {
+      setError("Error al cambiar estado del producto");
+      console.error('Error al cambiar estado:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModal = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const fetchProducts = () => {
+    ProductService.getAll().then((res: Product[]) => {
+      setProducts(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const headers = [
+    "Código",
+    "Descripción", 
+    "Unidad",
+    "Categoría",
+    "Precio",
+    "Stock Mín.",
+    "Estado",
+    "Acciones",
+  ];
+  
+  const rows = products.map((p) => ({
     id: p.id,
     cells: [
       p.codigo,
       p.descripcion,
-      p.unidadMedida,
-      p.categoria?.nombre || '-',
+      p.unidadMedida || "No especificado",
+      p.categoria?.nombre || "No especificado",
       p.precio,
       p.stockMinimo,
-      p.estado ? 'Activo' : 'Inactivo',
-      new Date(p.fechaCreacion).toLocaleDateString(),
-      (
-        <div key={`actions-${p.id}`} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <Button key={`edit-${p.id}`} type='edit' onClick={() => handleOpenEdit(p)} />
-          <Button key={`delete-${p.id}`} type='delete' variant='danger' onClick={() => handleDelete(p.id)} />
-        </div>
-      )
+      <StateTag state={p.estado} />,
+      <div style={{ display: "flex", gap: "8px" }}>
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {
+            setSelectedProduct(p);
+            setIsView(true);
+            setIsOpen(true);
+          }}
+        >
+          Ver detalles
+        </Button>
+
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {
+            handleStateProduct(p.id, p.estado);
+          }}
+        >
+          {p.estado ? <CloseIcon /> : <CheckIcon />}
+        </Button>
+      </div>,
     ],
-  })), [filtered]);
-
-  const headers = ['Código', 'Descripción', 'Unidad', 'Categoría', 'Precio', 'Stock Mín.', 'Estado', 'Creado', 'Acciones'];
-  const gridTemplate = '0.8fr 2fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1fr 1fr';
-
-  const handleCreateProduct = async (data: { descripcion: string; unidadMedida: string; codigo: string; precio: string; stockMinimo: number; categoriaId: number; }) => {
-    try {
-      const payload = { ...data, tipo: 'producto' as const, estado: true };
-      const created = await ProductService.create(payload);
-      setProducts((prev) => [created, ...prev]);
-      // ProductModal cierra por onClose()
-    } catch (error) {
-      console.error('Error al crear producto:', error);
-    }
-  };
-
-  const handleCreateService = (data: any) => {
-    console.log('Crear servicio:', data);
-  };
-
-  const handleUpdate = async (data: Parameters<typeof ProductService.update>[1]) => {
-    if (!editing) return;
-    try {
-      const updated = await ProductService.update(editing.id, data);
-      // Merge local to ensure UI refresh even if backend returns partial
-      setProducts((prev) => prev.map((prod) => prod.id === editing.id ? { ...prod, ...updated, ...data } : prod));
-    } catch (error) {
-      console.error('Error al actualizar producto:', error);
-    } finally {
-      setIsEditOpen(false);
-      setEditing(null);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await ProductService.delete(id);
-      setProducts((prev) => prev.filter((prod) => prod.id !== id));
-    } catch (error) {
-      console.error('Error al eliminar producto:', error);
-    }
-  };
-
-  const dropdownOptions = [
-    {
-      label: 'Nuevo producto',
-      onClick: () => setIsProductModalOpen(true)
-    },
-    {
-      label: 'Nuevo servicio',
-      onClick: () => setIsServiceModalOpen(true)
-    }
-  ];
+  }));
+  
+  const gridTemplate = "1fr 2fr 1fr 1.5fr 1fr 1fr 1fr 2fr";
 
   return (
-    <PageLayout 
-      title="Productos y servicios" 
-      subtitle="Gestiona el registro y actualización de productos y servicios."
-      header={<AddDropdownButton options={dropdownOptions} />}
+    <PageLayout
+      title="Productos"
+      subtitle="Listado de productos registrados"
+      header={
+        <Button
+          onClick={() => {
+            resetForm();
+            setIsView(false);
+            setIsOpen(true);
+          }}
+          size="large"
+        >
+          + Nuevo producto
+        </Button>
+      }
     >
-      <div className={styles.page}>
-        <section className={styles.filtersRow}>
-          <FormField
-            type="text"
-            label="Código"
-            placeholder="Seleccionar"
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-          />
-          <FormField
-            type="combobox"
-            label="Estado"
-            options={statusOptions}
-            value={status}
-            onChange={(v) => setStatus(v as string)}
-            placeholder="Seleccionar"
-          />
-          <div className={styles.alignEnd}>
-            <Button size="large">Filtrar búsqueda</Button>
-          </div>
-        </section>
-
-        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-      </div>
+      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <ProductModal
-        isOpen={isProductModalOpen}
-        onClose={() => setIsProductModalOpen(false)}
-        onSubmit={handleCreateProduct}
-      />
-
-      <ServiceModal
-        isOpen={isServiceModalOpen}
-        onClose={() => setIsServiceModalOpen(false)}
-        onSubmit={handleCreateService}
-      />
-
-      {/* Editar */}
-      <ProductModal
-        isOpen={isEditOpen}
-        onClose={() => { setIsEditOpen(false); setEditing(null); }}
-        onSubmit={handleUpdate}
-        title="Editar producto"
-        description="Actualiza los datos del producto o servicio."
-        submitLabel="Actualizar"
-        initialValues={editing ? {
-          descripcion: editing.descripcion,
-          unidadMedida: editing.unidadMedida,
-          codigo: editing.codigo,
-          precio: editing.precio,
-          stockMinimo: editing.stockMinimo,
-          categoriaId: editing.categoria?.id ?? 0,
-        } : undefined}
+        isOpen={isOpen}
+        onClose={handleModal}
+        onSubmit={isView ? async () => {} : handleCreateProduct}
+        initialValues={isView && selectedProduct ? {
+          descripcion: selectedProduct.descripcion,
+          unidadMedida: selectedProduct.unidadMedida,
+          codigo: selectedProduct.codigo,
+          precio: selectedProduct.precio,
+          stockMinimo: selectedProduct.stockMinimo,
+          categoriaId: selectedProduct.categoria?.id ?? 0,
+        } : newProduct}
       />
     </PageLayout>
   );
 };
-
-const statusOptions = [
-  { value: 'all', label: 'Todos' },
-  { value: 'active', label: 'Activos' },
-  { value: 'inactive', label: 'Inactivos' },
-];
