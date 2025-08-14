@@ -14,12 +14,20 @@ export const AUTH_ROUTES = {
 // Rutas principales de módulos
 export const MAIN_ROUTES = {
   HOME: '/',
+  MAINTAINERS: '/maintainers',
   TRANSACTIONS: '/transactions',
   INVENTORY: '/inventory',
   ACCOUNTING: '/accounting',
   FINANCIAL_CLOSING: '/financial-closing',
   FINANCIAL_STATEMENTS: '/financial-statements',
   SETTINGS: '/settings',
+} as const;
+
+// Rutas del módulo de transacciones
+export const MANTEINERS_ROUTES = {
+  CATEGORIES: '/categories',
+  PRODUCTS: '/products',
+  WAREHOUSES: '/warehouses',
 } as const;
 
 // Rutas del módulo de transacciones
