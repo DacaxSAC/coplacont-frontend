@@ -47,7 +47,7 @@ export const MainPage: React.FC = () => {
 
     ],
   }));
-  const gridTemplate = "1fr 2fr 2fr 2fr 1fr 2fr";
+  const gridTemplate = "1.5fr 2fr 1.5fr 2fr 1fr 2fr";
 
 
   return (
