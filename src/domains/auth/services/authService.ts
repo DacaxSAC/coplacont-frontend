@@ -10,11 +10,6 @@ export class AuthService {
   static async login(credentials: ILoginRequest): Promise<ILoginResponse> {
     try {
       const response = await authApi.login(credentials);
-
-      const { jwt, email } = response.data;
-      localStorage.setItem('jwt', jwt);
-      localStorage.setItem('user', JSON.stringify({ email }));
-
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error);

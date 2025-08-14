@@ -19,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
 
   const handleLogout = () => {
     logout();
-    navigate(AUTH_ROUTES.LOGIN, { replace: true });
+    navigate(`${AUTH_ROUTES.AUTH}${AUTH_ROUTES.LOGIN}`, { replace: true });
   };
 
   return (
@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <TransaccionesIcon />
-            <h3 className={styles.sectionTitle__title}>Transacciones</h3>  
+            <h3 className={styles.sectionTitle__title}>Transacciones</h3>
           </div>
           <ul className={styles.menuList}>
             <li><Link to={`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`}>Compras</Link></li>
@@ -111,15 +111,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <ul className={styles.menuList}>
               <li><Link to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`}>Periodos Contables</Link></li>
               <li><Link to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}>Usuarios y Roles</Link></li>
-              <li><Link to={`${MAIN_ROUTES.SETTINGS}/parameters`}>Parámetros</Link></li>
+              <li><Link to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}>Parámetros</Link></li>
             </ul>
           </div>
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <CerrarSesionIcon />
-              <Link to={AUTH_ROUTES.LOGIN} onClick={handleLogout} className={styles.sectionTitle__title}>Cerrar Sesión</Link>
+              <Link to={`${AUTH_ROUTES.AUTH}${AUTH_ROUTES.LOGIN}`} onClick={handleLogout} className={styles.sectionTitle__title}>Cerrar Sesión</Link>
             </div>
-            
+
           </div>
         </div>
       </nav>
