@@ -18,12 +18,16 @@
 
 .title {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: $spacing-lg;
-  font-size: $font-size-3xl;
-  font-weight: $font-weight-bold;
-  color: $text-color;
+
 }
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+}
+
 
 .subtitle {
   font-size: $font-size-lg;
