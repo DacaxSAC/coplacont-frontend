@@ -15,12 +15,27 @@ interface CreateProductModalProps {
     stockMinimo: number;
     categoriaId: number;
   }) => void;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  initialValues?: {
+    descripcion: string;
+    unidadMedida: string;
+    codigo: string;
+    precio: string;
+    stockMinimo: number;
+    categoriaId: number;
+  };
 }
 
 export const Main: React.FC<CreateProductModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  title = 'Creación de nuevo producto',
+  description = 'Ingresa los siguientes datos para registrar un producto.',
+  submitLabel = 'Guardar',
+  initialValues
 }) => {
   const [descripcion, setDescripcion] = useState('');
   const [unidadMedida, setUnidadMedida] = useState('');
@@ -37,6 +52,26 @@ export const Main: React.FC<CreateProductModalProps> = ({
         .catch(() => setCategories([]));
     }
   }, [isOpen]);
+
+  // Cargar valores iniciales cuando cambian
+  useEffect(() => {
+    if (initialValues) {
+      setDescripcion(initialValues.descripcion);
+      setUnidadMedida(initialValues.unidadMedida);
+      setCodigo(initialValues.codigo);
+      setPrecio(initialValues.precio);
+      setStockMinimo(initialValues.stockMinimo.toString());
+      setCategoriaId(initialValues.categoriaId.toString());
+    } else {
+      // Reset form
+      setDescripcion('');
+      setUnidadMedida('');
+      setCodigo('');
+      setPrecio('');
+      setStockMinimo('');
+      setCategoriaId('');
+    }
+  }, [initialValues, isOpen]);
 
   const categoryOptions = categories.map(cat => ({
     value: cat.id.toString(),
@@ -81,8 +116,8 @@ export const Main: React.FC<CreateProductModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      title="Creación de nuevo producto"
-      description="Ingresa los siguientes datos para registrar un producto."
+      title={title}
+      description={description}
       onClose={handleClose}
       footer={
         <Button
@@ -91,7 +126,7 @@ export const Main: React.FC<CreateProductModalProps> = ({
           onClick={handleSubmit}
           disabled={!isFormValid}
         >
-          Guardar
+          {submitLabel}
         </Button>
       }
     >

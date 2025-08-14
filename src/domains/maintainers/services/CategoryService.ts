@@ -1,5 +1,5 @@
 import  { CategoryApi } from '../api';
-import type { Category } from '../types';
+import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from '../types';
 
 
 export class CategoryService {
@@ -13,12 +13,12 @@ export class CategoryService {
         return response.data;
     }
 
-    static async create(category: Category): Promise<Category> {
+    static async create(category: CreateCategoryPayload): Promise<Category> {
         const response = await CategoryApi.postCategory(category);
         return response.data;
     }
 
-    static async update(id: number, category: Category): Promise<Category> {
+    static async update(id: number, category: UpdateCategoryPayload): Promise<Category> {
         const response = await CategoryApi.patchCategory(id, category);
         return response.data;
     }

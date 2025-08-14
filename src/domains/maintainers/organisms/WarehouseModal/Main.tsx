@@ -1,18 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Main.module.scss';
 import { Modal, FormField, Button } from '@/components';
-import type { CreateWarehousePayload } from '../../types';
+import type { CreateWarehousePayload, UpdateWarehousePayload } from '../../types';
+
+// Allow bivariance on callback parameter so consumers can pass a narrower type (create or update)
+type BivariantCallback<T> = { bivarianceHack(arg: T): void | Promise<void> }['bivarianceHack'];
 
 interface CreateWarehouseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateWarehousePayload) => void;
+  onSubmit: BivariantCallback<CreateWarehousePayload | UpdateWarehousePayload>;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  initialValues?: {
+    nombre: string;
+    ubicacion: string;
+    descripcion: string;
+    capacidadMaxima: number;
+    responsable: string;
+    telefono: string;
+  };
 }
 
 export const Main: React.FC<CreateWarehouseModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  title = 'Agregar nuevo almacén',
+  description = 'Ingresa los siguientes datos para registrar un almacén.',
+  submitLabel = 'Guardar',
+  initialValues
 }) => {
   const [nombre, setNombre] = useState('');
   const [ubicacion, setUbicacion] = useState('');
@@ -20,6 +38,21 @@ export const Main: React.FC<CreateWarehouseModalProps> = ({
   const [capacidadMaxima, setCapacidadMaxima] = useState('');
   const [responsable, setResponsable] = useState('');
   const [telefono, setTelefono] = useState('');
+
+  useEffect(() => {
+    if (initialValues && isOpen) {
+      setNombre(initialValues.nombre ?? '');
+      setUbicacion(initialValues.ubicacion ?? '');
+      setDescripcion(initialValues.descripcion ?? '');
+      setCapacidadMaxima(String(initialValues.capacidadMaxima ?? ''));
+      setResponsable(initialValues.responsable ?? '');
+      setTelefono(initialValues.telefono ?? '');
+    }
+    if (!initialValues && isOpen) {
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValues, isOpen]);
 
   const handleSubmit = () => {
     if (!nombre.trim() || !ubicacion.trim() || !responsable.trim()) return;
@@ -57,8 +90,8 @@ export const Main: React.FC<CreateWarehouseModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      title="Agregar nuevo almacén"
-      description="Ingresa los siguientes datos para registrar un almacén."
+      title={title}
+      description={description}
       onClose={handleClose}
       footer={
         <Button
@@ -67,7 +100,7 @@ export const Main: React.FC<CreateWarehouseModalProps> = ({
           onClick={handleSubmit}
           disabled={!isFormValid}
         >
-          Guardar
+          {submitLabel}
         </Button>
       }
     >

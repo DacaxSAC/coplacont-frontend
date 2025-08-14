@@ -13,6 +13,8 @@ export const MainPage: React.FC = () => {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editing, setEditing] = useState<Category | null>(null);
 
   useEffect(() => {
     CategoryService.getAll()
@@ -28,6 +30,11 @@ export const MainPage: React.FC = () => {
     });
   }, [categories, code, status]);
 
+  const handleOpenEdit = (cat: Category) => {
+    setEditing(cat);
+    setIsEditOpen(true);
+  };
+
   const rows: TableRow[] = useMemo(() => filtered.map((c) => ({
     id: c.id,
     cells: [
@@ -35,15 +42,52 @@ export const MainPage: React.FC = () => {
       c.nombre,
       c.descripcion || '-',
       c.estado ? 'Activo' : 'Inactivo',
-      new Date(c.fechaCreacion).toLocaleDateString(),
+      (
+        <div key={`actions-${c.id}`} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <Button key={`edit-${c.id}`} type='edit' onClick={() => handleOpenEdit(c)} />
+          <Button key={`delete-${c.id}`} type='delete' variant='danger' onClick={() => handleDelete(c.id)} />
+        </div>
+      )
     ],
   })), [filtered]);
 
-  const headers = ['Código', 'Nombre', 'Descripción', 'Estado', 'Creado'];
+  const headers = ['Código', 'Nombre', 'Descripción', 'Estado', 'Acciones'];
   const gridTemplate = '0.6fr 1.2fr 2fr 0.8fr 1fr';
 
-  const handleCreate = (data: { nombre: string; descripcion: string }) => {
-    console.log('Crear categoría:', data);
+  const handleCreate = async (data: Parameters<typeof CategoryService.create>[0]) => {
+    try {
+      const created = await CategoryService.create(data);
+      setCategories((prev) => [created, ...prev]);
+    } catch (error) {
+      console.error('Error al crear categoría:', error);
+    }
+  };
+
+  const handleUpdate = async (data: Parameters<typeof CategoryService.update>[1]) => {
+    if (!editing) return;
+    try {
+      const updated = await CategoryService.update(editing.id, data);
+      // Aseguramos la actualización en la tabla haciendo merge local de los cambios
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === editing.id ? { ...cat, ...updated, ...data } : cat
+        )
+      );
+    } catch (error) {
+      console.error('Error al actualizar categoría:', error);
+    } finally {
+      setIsEditOpen(false);
+      setEditing(null);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await CategoryService.delete(id);
+      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error);
+    }
   };
 
   return (
@@ -77,10 +121,22 @@ export const MainPage: React.FC = () => {
         <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
       </div>
 
+      {/* Crear */}
       <CategoryModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onSubmit={handleCreate}
+      />
+
+      {/* Editar */}
+      <CategoryModal
+        isOpen={isEditOpen}
+        onClose={() => { setIsEditOpen(false); setEditing(null); }}
+        onSubmit={handleUpdate}
+        title="Editar categoría"
+        description="Actualiza los datos de la categoría."
+        submitLabel="Actualizar"
+        initialValues={{ nombre: editing?.nombre ?? '', descripcion: editing?.descripcion ?? '' }}
       />
     </PageLayout>
   );

@@ -13,6 +13,8 @@ export const MainPage: React.FC = () => {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editing, setEditing] = useState<Warehouse | null>(null);
 
   useEffect(() => {
     WarehouseService.getAll()
@@ -28,6 +30,33 @@ export const MainPage: React.FC = () => {
     });
   }, [warehouses, code, status]);
 
+  const handleOpenEdit = (w: Warehouse) => {
+    setEditing(w);
+    setIsEditOpen(true);
+  };
+
+  const handleUpdate = async (data: Parameters<typeof WarehouseService.update>[1]) => {
+    if (!editing) return;
+    try {
+      const updated = await WarehouseService.update(editing.id, data);
+      setWarehouses((prev) => prev.map((wh) => wh.id === editing.id ? { ...wh, ...updated, ...data } : wh));
+    } catch (error) {
+      console.error('Error al actualizar almacén:', error);
+    } finally {
+      setIsEditOpen(false);
+      setEditing(null);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await WarehouseService.delete(id);
+      setWarehouses((prev) => prev.filter((wh) => wh.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar almacén:', error);
+    }
+  };
+
   const rows: TableRow[] = useMemo(() => filtered.map((w) => ({
     id: w.id,
     cells: [
@@ -37,11 +66,17 @@ export const MainPage: React.FC = () => {
       w.responsable,
       String(w.capacidadMaxima),
       w.estado ? 'Activo' : 'Inactivo',
+      (
+        <div key={`actions-${w.id}`} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <Button key={`edit-${w.id}`} type='edit' onClick={() => handleOpenEdit(w)} />
+          <Button key={`delete-${w.id}`} type='delete' variant='danger' onClick={() => handleDelete(w.id)} />
+        </div>
+      )
     ],
   })), [filtered]);
 
-  const headers = ['Código', 'Nombre', 'Ubicación', 'Responsable', 'Capacidad', 'Estado'];
-  const gridTemplate = '0.6fr 1.2fr 1.2fr 1fr 0.8fr 0.8fr';
+  const headers = ['Código', 'Nombre', 'Ubicación', 'Responsable', 'Capacidad', 'Estado', 'Acciones'];
+  const gridTemplate = '0.6fr 1.2fr 1.2fr 1fr 0.8fr 0.8fr 1fr';
 
   const handleCreate = async (data: Parameters<typeof WarehouseService.create>[0]) => {
     // Podríamos llamar al servicio real aquí
@@ -85,6 +120,24 @@ export const MainPage: React.FC = () => {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onSubmit={handleCreate}
+      />
+
+      {/* Editar */}
+      <WarehouseModal
+        isOpen={isEditOpen}
+        onClose={() => { setIsEditOpen(false); setEditing(null); }}
+        onSubmit={handleUpdate}
+        title="Editar almacén"
+        description="Actualiza los datos del almacén."
+        submitLabel="Actualizar"
+        initialValues={editing ? {
+          nombre: editing.nombre,
+          ubicacion: editing.ubicacion,
+          descripcion: editing.descripcion,
+          capacidadMaxima: editing.capacidadMaxima,
+          responsable: editing.responsable,
+          telefono: editing.telefono,
+        } : undefined}
       />
     </PageLayout>
   );

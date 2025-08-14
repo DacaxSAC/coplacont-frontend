@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Main.module.scss';
 import { Modal, FormField, Button } from '@/components';
 
@@ -6,15 +6,32 @@ interface CreateCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { nombre: string; descripcion: string }) => void;
+  // Opcionales para reutilizar el modal en edición
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  initialValues?: Partial<{ nombre: string; descripcion: string }>;
 }
 
 export const Main: React.FC<CreateCategoryModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  title = 'Agregar nueva categoría',
+  description = 'Ingresa los siguientes datos para registrar una categoría.',
+  submitLabel = 'Guardar',
+  initialValues,
 }) => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
+
+  // Cargar valores iniciales cuando se abre el modal o cambian
+  useEffect(() => {
+    if (isOpen) {
+      setNombre(initialValues?.nombre ?? '');
+      setDescripcion(initialValues?.descripcion ?? '');
+    }
+  }, [isOpen, initialValues?.nombre, initialValues?.descripcion]);
 
   const handleSubmit = () => {
     if (!nombre.trim()) return;
@@ -37,8 +54,8 @@ export const Main: React.FC<CreateCategoryModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      title="Agregar nueva categoría"
-      description="Ingresa los siguientes datos para registrar una categoría."
+      title={title}
+      description={description}
       onClose={handleClose}
       footer={
         <Button
@@ -47,7 +64,7 @@ export const Main: React.FC<CreateCategoryModalProps> = ({
           onClick={handleSubmit}
           disabled={!nombre.trim()}
         >
-          Guardar
+          {submitLabel}
         </Button>
       }
     >

@@ -14,6 +14,8 @@ export const MainPage: React.FC = () => {
   const [status, setStatus] = useState('all');
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editing, setEditing] = useState<Product | null>(null);
 
   useEffect(() => {
     ProductService.getAll()
@@ -29,6 +31,11 @@ export const MainPage: React.FC = () => {
     });
   }, [products, codigo, status]);
 
+  const handleOpenEdit = (prod: Product) => {
+    setEditing(prod);
+    setIsEditOpen(true);
+  };
+
   const rows: TableRow[] = useMemo(() => filtered.map((p) => ({
     id: p.id,
     cells: [
@@ -40,18 +47,54 @@ export const MainPage: React.FC = () => {
       p.stockMinimo,
       p.estado ? 'Activo' : 'Inactivo',
       new Date(p.fechaCreacion).toLocaleDateString(),
+      (
+        <div key={`actions-${p.id}`} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <Button key={`edit-${p.id}`} type='edit' onClick={() => handleOpenEdit(p)} />
+          <Button key={`delete-${p.id}`} type='delete' variant='danger' onClick={() => handleDelete(p.id)} />
+        </div>
+      )
     ],
   })), [filtered]);
 
-  const headers = ['Código', 'Descripción', 'Unidad', 'Categoría', 'Precio', 'Stock Mín.', 'Estado', 'Creado'];
-  const gridTemplate = '0.8fr 2fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1fr';
+  const headers = ['Código', 'Descripción', 'Unidad', 'Categoría', 'Precio', 'Stock Mín.', 'Estado', 'Creado', 'Acciones'];
+  const gridTemplate = '0.8fr 2fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1fr 1fr';
 
-  const handleCreateProduct = (data: any) => {
-    console.log('Crear producto:', data);
+  const handleCreateProduct = async (data: { descripcion: string; unidadMedida: string; codigo: string; precio: string; stockMinimo: number; categoriaId: number; }) => {
+    try {
+      const payload = { ...data, tipo: 'producto' as const, estado: true };
+      const created = await ProductService.create(payload);
+      setProducts((prev) => [created, ...prev]);
+      // ProductModal cierra por onClose()
+    } catch (error) {
+      console.error('Error al crear producto:', error);
+    }
   };
 
   const handleCreateService = (data: any) => {
     console.log('Crear servicio:', data);
+  };
+
+  const handleUpdate = async (data: Parameters<typeof ProductService.update>[1]) => {
+    if (!editing) return;
+    try {
+      const updated = await ProductService.update(editing.id, data);
+      // Merge local to ensure UI refresh even if backend returns partial
+      setProducts((prev) => prev.map((prod) => prod.id === editing.id ? { ...prod, ...updated, ...data } : prod));
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+    } finally {
+      setIsEditOpen(false);
+      setEditing(null);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await ProductService.delete(id);
+      setProducts((prev) => prev.filter((prod) => prod.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+    }
   };
 
   const dropdownOptions = [
@@ -106,6 +149,24 @@ export const MainPage: React.FC = () => {
         isOpen={isServiceModalOpen}
         onClose={() => setIsServiceModalOpen(false)}
         onSubmit={handleCreateService}
+      />
+
+      {/* Editar */}
+      <ProductModal
+        isOpen={isEditOpen}
+        onClose={() => { setIsEditOpen(false); setEditing(null); }}
+        onSubmit={handleUpdate}
+        title="Editar producto"
+        description="Actualiza los datos del producto o servicio."
+        submitLabel="Actualizar"
+        initialValues={editing ? {
+          descripcion: editing.descripcion,
+          unidadMedida: editing.unidadMedida,
+          codigo: editing.codigo,
+          precio: editing.precio,
+          stockMinimo: editing.stockMinimo,
+          categoriaId: editing.categoria?.id ?? 0,
+        } : undefined}
       />
     </PageLayout>
   );
