@@ -14,9 +14,11 @@ import {
 } from './HomePurchaseFilterData';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
+import { usePurchasesTemplateDownload } from '../../hooks/usePurchasesTemplateDownload';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
+  const { downloadPurchasesTemplate } = usePurchasesTemplateDownload();
 
   // State for purchases
   const [purchases, setPurchases] = useState<Transaction[]>([]);
@@ -43,6 +45,10 @@ export const MainPage: React.FC = () => {
 
   const handleRegisterPurchase = () => {
     navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.REGISTER}`);
+  }
+
+  const handleBulkRegister = () => {
+    navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.BULK_REGISTER}`);
   }
 
   const handleTopFilter = () => {
@@ -192,7 +198,8 @@ export const MainPage: React.FC = () => {
       >
         <div>
           <div style={{ marginBottom: '16px' }}>
-            <Button variant="secondary">⬇️ Descargar plantilla de Excel</Button>
+-            <Button variant="secondary">⬇️ Descargar plantilla de Excel</Button>
++            <Button variant="secondary" onClick={downloadPurchasesTemplate}>⬇️ Descargar plantilla de Excel</Button>
           </div>
 
           <div style={{ marginBottom: '16px' }}>
@@ -211,8 +218,8 @@ export const MainPage: React.FC = () => {
           <div>
             <Text as="h3" size="md" weight={600}>Seleccionar archivo</Text>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
-              <input type="file" accept=".xls,.xlsx" />
-              <Button>Subir Excel</Button>
+              <input type="file" accept=".csv,.xlsx" />
+              <Button onClick={handleBulkRegister}>Subir Excel</Button>
             </div>
           </div>
         </div>

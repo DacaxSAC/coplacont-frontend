@@ -27,6 +27,7 @@ export const transactionsApi = {
     getSales: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_VENTAS),
     getPurchases: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_COMPRAS),
     getTypeExchange: (date: string)  => apiClient.get(TRANSACTIONS_ENDPOINTS.TIPO_CAMBIO_SUNAT, {params: {date}}),
+    getSiguienteCorrelative: (tipoOperacion: 'venta' | 'compra') => apiClient.get(`${TRANSACTIONS_ENDPOINTS.GET_SIGUIENTE_CORRELATIVO}?tipoOperacion=${tipoOperacion}`),
 } as const;
 
 export type TransactionsApi = typeof transactionsApi;

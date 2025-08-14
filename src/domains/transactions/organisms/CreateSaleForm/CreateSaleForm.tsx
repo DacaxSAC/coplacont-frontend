@@ -52,6 +52,23 @@ export const CreateSaleForm = () => {
 
   // Estados para el detalle de productos
   const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
+
+  // Obtener el correlativo al montar el componente
+  useEffect(() => {
+    const fetchCorrelativo = async () => {
+      try {
+        const response = await TransactionsService.getCorrelative('venta');
+        setFormState(prev => ({
+          ...prev,
+          correlativo: response.correlativo
+        }));
+      } catch (error) {
+        console.error('Error al obtener el correlativo:', error);
+      }
+    };
+
+    fetchCorrelativo();
+  }, []);
   const [productoSeleccionado, setProductoSeleccionado] = useState<
     ProductoType | ""
   >("");
@@ -281,6 +298,7 @@ export const CreateSaleForm = () => {
     EntitiesService.getClients().then((data) => {setClients(data);console.log(data)});
   }, []);
 
+
   const getFilteredClientOptions = () => {
     let filteredClients = clients;
 
@@ -304,6 +322,7 @@ export const CreateSaleForm = () => {
     const selectedClient = clients.find(client => client.id.toString() === formState.cliente);
     return selectedClient ? selectedClient.id : null;
   };
+
 
   return (
     <div className={styles.CreateSaleForm}>

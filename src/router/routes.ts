@@ -6,9 +6,9 @@
 // Rutas de autenticación
 export const AUTH_ROUTES = {
   AUTH: '/auth',
-  LOGIN: '/auth/login',
-  RECOVERY_PASSWORD: '/auth/recovery-password',
-  NEW_PASSWORD: '/auth/new-password',
+  LOGIN: 'login',
+  RECOVERY_PASSWORD: 'recovery-password',
+  NEW_PASSWORD: 'new-password',
 } as const;
 
 // Rutas principales de módulos
@@ -35,7 +35,7 @@ export const TRANSACTIONS_ROUTES = {
 export const INVENTORY_ROUTES = {
   PRODUCT: '/product',
   KARDEX: '/kardex',
-  INVENTORY_ADJUSTMENT: '/inventory-adjusment',
+  INVENTORY_ADJUSTMENT: '/inventory-adjustment',
 } as const;
 
 // Rutas del módulo de contabilidad
@@ -72,6 +72,7 @@ export const SETTINGS_ROUTES = {
 export const COMMON_ROUTES = {
   MAIN: '/',
   REGISTER: '/register',
+  BULK_REGISTER: '/bulk-register',
 } as const;
 
 // Combinación de todas las rutas para facilitar el acceso

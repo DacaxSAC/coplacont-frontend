@@ -1,4 +1,4 @@
-import React, { useState } from 'react';  
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AuthLayout, AuthHeader } from '@/components';
@@ -16,6 +16,36 @@ export const NewPasswordPage: React.FC = () => {
   const [passwordSuccess, setPasswordSuccess] = useState<string>('');
   const [isValidToken, setIsValidToken] = useState<boolean>(false);
   const [isPasswordUpdated, setIsPasswordUpdated] = useState<boolean>(false);
+
+  useEffect(() => {
+    /** Valida el token de restablecimiento de contraseña*/
+    const validateToken = async () => {// Si no hay token en la URL
+      if (!token) {
+        setPasswordError('No se proporcionó un token de restablecimiento válido.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await AuthService.validateResetToken(token);
+        console.log(response)
+
+        // Validar la respuesta del servicio
+        if (response.success) {
+          setIsValidToken(true);
+        } else {
+          setPasswordError(response.message || 'Token de restablecimiento inválido o expirado.');
+        }
+      } catch (error) {
+        console.error('Error validating token:', error);
+        setPasswordError('Error al validar el token. Por favor, solicita un nuevo enlace de restablecimiento.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateToken();
+  }, [token]);
 
   /**
    * Maneja el proceso de creación de nueva contraseña
@@ -39,7 +69,7 @@ export const NewPasswordPage: React.FC = () => {
         setIsPasswordUpdated(true);
         // Redirigir al login después de 2 segundos
         setTimeout(() => {
-          navigate(AUTH_ROUTES.LOGIN);
+          navigate(`${AUTH_ROUTES.AUTH}${AUTH_ROUTES.LOGIN}`);
         }, 2000);
       } else {
         setPasswordError(response.message || 'Error al actualizar la contraseña');

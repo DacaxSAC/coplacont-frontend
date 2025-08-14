@@ -3,7 +3,7 @@ import styles from './MainPage.module.scss';
 import type { Transaction } from '../../services/types';
 import { TransactionsService } from '../../services/TransactionsService';
 
-import { Button, PageLayout, FormField, Text, Modal } from '@/components';
+import { Button, PageLayout, FormField, Text } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
@@ -14,9 +14,12 @@ import {
 } from './MainFilterData';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
+import { useSalesTemplateDownload } from '../../hooks/useSalesTemplateDownload';
+import { BulkUploadModal } from '../../organisms/BulkUpdateModal';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();
+  const { downloadSalesTemplate } = useSalesTemplateDownload();
 
   // State for sales data
   const [sales, setSales] = useState<Transaction[]>([]);
@@ -45,6 +48,10 @@ export const MainPage: React.FC = () => {
     navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`);
   }
 
+  const handleBulkRegister = () => {
+    navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.BULK_REGISTER}`);
+  }
+
   const handleTopFilter = () => {
     // TODO: conectar con servicio de ventas
     // Por ahora, solo mostramos en consola
@@ -65,7 +72,7 @@ export const MainPage: React.FC = () => {
       sale.fechaVencimiento,
       sale.moneda,
       sale.tipoCambio,
-      sale.totales.totalGeneral.toString()
+      sale.totales?.totalGeneral.toString()
     ],
   } as TableRow)), [sales]);
 
@@ -88,7 +95,6 @@ export const MainPage: React.FC = () => {
     <PageLayout
       title="Ventas"
       subtitle={`Muestra la lista de ventas de AGOSTO 2025.`}
-      className={styles.homeSalePage}
     >
       {/* Barra de filtros superior */}
       <section className={styles.filtersTop}>
@@ -184,39 +190,12 @@ export const MainPage: React.FC = () => {
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       {/* Modal Subir ventas */}
-      <Modal
-        isOpen={isUploadOpen}
-        onClose={() => setUploadOpen(false)}
-        title="Subir ventas"
-        description="Sube un Excel y genera los registros de forma masiva."
-      >
-        <div>
-          <div style={{ marginBottom: '16px' }}>
-            <Button variant="secondary">⬇️ Descargar plantilla de Excel</Button>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <Text as="h3" size="md" weight={600}>Información a tener en cuenta</Text>
-            <ul style={{ marginTop: '8px' }}>
-              <li>Se proporciona un Excel de ejemplo para facilitar el registro.</li>
-              <li>La cabecera (fila 1) no debe borrarse.</li>
-              <li>Los registros deben ingresarse desde la fila 2.</li>
-              <li>Las Notas de Crédito y Débito no se cargan automáticamente, se registran manualmente.</li>
-              <li>Las fechas deben tener el formato DÍA/MES/AÑO.</li>
-              <li>Los códigos con ceros a la izquierda (ej. 01, 02, 03) deben estar en formato TEXTO.</li>
-              <li>El archivo Excel debe tener un máximo de 500 registros o filas.</li>
-            </ul>
-          </div>
-
-          <div>
-            <Text as="h3" size="md" weight={600}>Seleccionar archivo</Text>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
-              <input type="file" accept=".xls,.xlsx" />
-              <Button>Subir Excel</Button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <BulkUploadModal
+        show={isUploadOpen}
+        setShow={setUploadOpen}
+        onDownload={downloadSalesTemplate}
+        onUpload={(file) => handleBulkRegister()}
+      />
     </PageLayout>
   );
 };

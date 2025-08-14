@@ -17,7 +17,7 @@ export const ProtectedRoute: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={AUTH_ROUTES.LOGIN} replace />;
+    return <Navigate to={`${AUTH_ROUTES.AUTH}/${AUTH_ROUTES.LOGIN}`} replace />;
   }
 
   return (
