@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './Table.module.scss';
 import { Text } from '@/components/atoms';
+import { NoDataIcon } from '@/components/atoms';
 
 export type TableRow = {
   id: number | string;
@@ -58,33 +59,17 @@ export default Table;
 export const EmptyState: React.FC = () => {
   const title = "Sin datos"
   const subtitle = "No se encontraron registros para mostrar"
-  const defaultIcon = (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path 
-        d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" 
-        fill="#d1d5db" 
-      />
-      <path 
-        d="M12 21L13 18L16 19L13 20L12 21Z" 
-        fill="#d1d5db"
-      />
-      <path 
-        d="M3 12L6 11L5 8L6 11L9 12L6 13L5 16L6 13L3 12Z" 
-        fill="#d1d5db"
-      />
-    </svg>
-  );
 
   return (
 
     <section className={styles.tableWrapper}>
     <div className={styles.emptyState}>
       <div className={styles.emptyState__icon}>
-        {defaultIcon}
+        <NoDataIcon />
       </div>
       <Text
-        size="lg" 
-        color="neutral-primary" 
+        size="xl" 
+        color="info" 
         weight={500}
         className={styles.emptyState__title}
       >
@@ -92,7 +77,7 @@ export const EmptyState: React.FC = () => {
       </Text>
       <Text
         size="md" 
-        color="neutral-secondary"
+        color="info"
         className={styles.emptyState__subtitle}
       >
         {subtitle}
