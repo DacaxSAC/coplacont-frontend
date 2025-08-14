@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./PageLayout.module.scss";
 import { Text, Divider } from "@/components";
-import { Button } from "@/components";
 
 interface PageLayoutProps {
   title: string;
@@ -9,8 +8,6 @@ interface PageLayoutProps {
   header?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-  button?: boolean;
-  textButton?:string;
 }
 
 export const PageLayout: React.FC<PageLayoutProps> = ({ title, subtitle, header, className, children }) => {

@@ -41,7 +41,7 @@
   }
 
   &--large {
-    padding: $spacing-2xl $spacing-xl;
+    padding: $spacing-sm $spacing-3xl;
     font-size: $font-size-lg;
     min-height: 48px;
   }
@@ -115,23 +115,5 @@
   // RESPONSIVE
   // -----------------------------------------------------------------------------
 
-  @include respond-to(sm) {
-    &--small {
-      padding: $spacing-xs $spacing-sm;
-      font-size: $font-size-xs;
-      min-height: 28px;
-    }
 
-    &--medium {
-      padding: $spacing-sm $spacing-md;
-      font-size: $font-size-sm;
-      min-height: 36px;
-    }
-
-    &--large {
-      padding: $spacing-md $spacing-lg;
-      font-size: $font-size-md;
-      min-height: 44px;
-    }
-  }
 }

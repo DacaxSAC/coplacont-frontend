@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PageLayout } from '@/components';
-import { Table } from '@/components';
+import { Table, Button } from '@/components';
 import { EntitiesService } from '../../services';
 import type { Entidad } from '../../services';
 
@@ -19,7 +19,15 @@ export const MainPage: React.FC = () => {
   const gridTemplate = '1fr 1.5fr 2fr 2fr 1fr 2fr';
 
   return (
-    <PageLayout title='Clientes' subtitle='Listado de clientes registrados' button={true} textButton='+ Nuevo cliente'>
+    <PageLayout 
+      title='Clientes' 
+      subtitle='Listado de clientes registrados'
+      header={
+        <Button size='large'>
+          + Nuevo cliente
+        </Button>
+      }
+    >
       <div>
         
       </div>
