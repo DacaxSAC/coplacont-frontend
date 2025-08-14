@@ -216,7 +216,7 @@ export const MainPage: React.FC = () => {
         title="Agregar nuevo proveedor"
         description="Ingresa los siguientes datos para registrar un proveedor."
         loading={loading}
-        buttonText={isView ? "Cerrar" : "Guardar"}
+        buttonText={"Cerrar"}
       >
         <FormEntidad
           setError={setError}

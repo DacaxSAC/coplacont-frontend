@@ -49,6 +49,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CATEGORIES}`}>Categorías</Link></li>
             <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.PRODUCTS}`}>Productos</Link></li>
             <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.WAREHOUSES}`}>Almacenes</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CLIENTS}`}>Clientes</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.SUPPLIERS}`}>Proveedores</Link></li>
           </ul>
         </div>
 
