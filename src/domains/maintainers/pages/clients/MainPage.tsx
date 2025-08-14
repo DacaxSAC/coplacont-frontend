@@ -1,9 +1,20 @@
 import { useState, useEffect } from "react";
 import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
-import { Table, Button, Modal, Text, ComboBox, Input, CloseIcon, CheckIcon,StateTag } from "@/components";
+import {
+  Table,
+  Button,
+  Modal,
+  Text,
+  ComboBox,
+  Input,
+  CloseIcon,
+  CheckIcon,
+  StateTag,
+} from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
+import { CreateFormEntidad } from "../../organisms/CreateFormEntidad";
 
 export const MainPage: React.FC = () => {
   const [clients, setClients] = useState<Entidad[]>([]);
@@ -22,6 +33,16 @@ export const MainPage: React.FC = () => {
     direccion: "",
     telefono: "",
   });
+
+  const handleClientChange = (
+    field: keyof Entidad,
+    value: string | number | boolean
+  ) => {
+    setNewClient((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const resetForm = () => {
     setNewClient({
@@ -96,9 +117,9 @@ export const MainPage: React.FC = () => {
 
   const handleStateClient = async (id: number, state: boolean) => {
     let response;
-    if(state){
+    if (state) {
       response = await EntitiesService.deleteEntidad(id);
-    }else{
+    } else {
       response = await EntitiesService.restoreEntidad(id);
     }
 
@@ -138,15 +159,27 @@ export const MainPage: React.FC = () => {
       c.tipo,
       c.numeroDocumento,
       c.nombreCompleto,
-      c.direccion!==''?c.direccion:'No especificado',
-      c.telefono!==''?c.telefono:'No especificado',
+      c.direccion !== "" ? c.direccion : "No especificado",
+      c.telefono !== "" ? c.telefono : "No especificado",
       <StateTag state={c.activo} />,
-      <div style={{display:'flex', gap:'8px'}}>
-        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>Ver detalles</Button>
-        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{handleStateClient(c.id, c.activo)}}>
-          {c.activo? <CloseIcon />:<CheckIcon />}
+      <div style={{ display: "flex", gap: "8px" }}>
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {}}
+        >
+          Ver detalles
         </Button>
-      </div>
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {
+            handleStateClient(c.id, c.activo);
+          }}
+        >
+          {c.activo ? <CloseIcon /> : <CheckIcon />}
+        </Button>
+      </div>,
     ],
   }));
   const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 1fr 2fr";
@@ -170,160 +203,13 @@ export const MainPage: React.FC = () => {
         description="Ingresa los siguientes datos para registrar un cliente."
         loading={loading}
       >
-        <div className={`${styles.MainPage__Form}`}>
-          {error && (
-            <Text as="p" color="danger" size="xs">
-              {error}
-            </Text>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Tipo de Entidad
-            </Text>
-            <ComboBox
-              options={[
-                { label: "JURIDICA", value: "JURIDICA" },
-                { label: "NATURAL", value: "NATURAL" },
-              ]}
-              size="xs"
-              variant="createSale"
-              value={newClient.tipo}
-              onChange={(value) =>
-                setNewClient({
-                  ...newClient,
-                  tipo: value as Entidad["tipo"],
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Número de Documento
-            </Text>
-            <Input
-              disabled={!newClient.tipo}
-              size="xs"
-              variant="createSale"
-              value={newClient.numeroDocumento}
-              onChange={(e) =>
-                setNewClient({
-                  ...newClient,
-                  numeroDocumento: e.target.value,
-                })
-              }
-            />
-          </div>
-          {newClient.tipo === "JURIDICA" && (
-            <div className={`${styles.MainPage__FormField}`}>
-              <Text size="xs" color="neutral-primary">
-                Razon Social
-              </Text>
-              <Input
-                size="xs"
-                variant="createSale"
-                value={newClient.razonSocial}
-                onChange={(e) =>
-                  setNewClient({
-                    ...newClient,
-                    razonSocial: e.target.value,
-                  })
-                }
-              />
-            </div>
-          )}
-          {newClient.tipo === "NATURAL" && (
-            <>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Nombre
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newClient.nombre}
-                  onChange={(e) =>
-                    setNewClient({
-                      ...newClient,
-                      nombre: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Paterno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newClient.apellidoPaterno}
-                  onChange={(e) =>
-                    setNewClient({
-                      ...newClient,
-                      apellidoPaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Materno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newClient.apellidoMaterno}
-                  onChange={(e) =>
-                    setNewClient({
-                      ...newClient,
-                      apellidoMaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Direccion
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newClient.direccion}
-              onChange={(e) =>
-                setNewClient({
-                  ...newClient,
-                  direccion: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Telefono
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newClient.telefono}
-              onChange={(e) =>
-                setNewClient({
-                  ...newClient,
-                  telefono: e.target.value,
-                })
-              }
-            />
-          </div>
-
-          <Button
-            disabled={loading}
-            size="medium"
-            onClick={handleCreateClient}
-          >
-            Guardar
-          </Button>
-        </div>
+        <CreateFormEntidad
+          entidad={newClient}
+          error={error}
+          loading={loading}
+          onChange={handleClientChange}
+          onSubmit={handleCreateClient}
+        />
       </Modal>
     </PageLayout>
   );
