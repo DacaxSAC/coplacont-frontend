@@ -1,29 +1,34 @@
 import { useState, useEffect } from "react";
 import { PageLayout, Button, Table } from "@/components";
+import { InventoryService } from "../../services/InventoryService";
 import type { InventoryItem } from "../../services/types";
 
 export const MainPage: React.FC = () => {
-
-  //Por ahora
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
+  const fetchInventory = async () => {
+    try {
+      const response = await InventoryService.getInventory();
+        setInventory(response);
+        console.log(response);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
 
   useEffect(() => {
-    //Logica para cargar kardex
+    fetchInventory();
   }, []);
 
   const headers = [
-    "Fecha",
-    "Tipo",
-    "Tipo de comprobante",
-    "Cod de comprobante",
-    "Cantidad",
-    "Saldo",
-    "Costo Unitario",
-    "Costo Total",
+    "Código almacen",
+    "Almacén",
+    "Código producto",
+    "Producto",
+    "Stock Actual",
+    "Acciones",
   ];
 
-  //Actualizar cuando se consuma el endpoint dekardex
   const rows = inventory.map((i) => ({
     id: i.id,
     cells: [
@@ -42,13 +47,21 @@ export const MainPage: React.FC = () => {
 
     ],
   }));
-  const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
+  const gridTemplate = "1.5fr 2fr 1.5fr 2fr 1fr 2fr";
 
 
   return (
      <PageLayout
-      title="Kardex"
-      subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
+      title="Inventario"
+      subtitle="Listado de productos disponibles con sus cantidades actuales en stock."
+      header={
+        <Button
+          onClick={() => {}}
+          size="large"
+        >
+          + Producto a almacen
+        </Button>
+      }
     >
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
     </PageLayout>

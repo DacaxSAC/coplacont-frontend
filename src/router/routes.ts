@@ -43,7 +43,7 @@ export const TRANSACTIONS_ROUTES = {
 
 // Rutas del módulo de inventario
 export const INVENTORY_ROUTES = {
-  PRODUCT: '/product',
+  INVENTORY: '/',
   KARDEX: '/kardex',
   INVENTORY_ADJUSTMENT: '/inventory-adjustment',
 } as const;

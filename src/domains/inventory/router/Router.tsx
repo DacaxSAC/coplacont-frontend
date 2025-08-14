@@ -2,7 +2,8 @@ import { Route, Routes } from "react-router-dom";
 
 import { 
     KardexRouter,
-    InventoryAdjusmentRouter
+    InventoryAdjusmentRouter,
+    InventoryRouter
 } from '../pages';
 import { INVENTORY_ROUTES } from '@/router';
 
@@ -11,6 +12,7 @@ export const Router = () => {
     <Routes>
       <Route path={INVENTORY_ROUTES.KARDEX} element={<KardexRouter />} />
       <Route path={INVENTORY_ROUTES.INVENTORY_ADJUSTMENT} element={<InventoryAdjusmentRouter />} />
+      <Route path={INVENTORY_ROUTES.INVENTORY} element={<InventoryRouter />} />
     </Routes>
   );
 };
