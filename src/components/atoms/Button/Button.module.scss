@@ -11,7 +11,6 @@
   border: none;
   border-radius: $border-radius-xl;
   font-family: $font-family-primary;
-  font-weight: $font-weight-medium;
   line-height: $line-height-normal;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -41,14 +40,28 @@
   }
 
   &--large {
-    padding: $spacing-lg $spacing-xl;
+    padding: $spacing-sm $spacing-3xl;
     font-size: $font-size-lg;
     min-height: 48px;
+  }
+
+  &--tableItemSize {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-xs;
   }
 
   // -----------------------------------------------------------------------------
   // VARIANTES DE ESTILO
   // -----------------------------------------------------------------------------
+
+  &--tableItemStyle {
+    background-color: $bg-color;
+    color: $text-color;
+    border: 1px solid $border-color;
+    &:hover{
+      background-color: $bg-color-secondary;
+    }
+  }
 
   &--primary {
     background-color: $primary-blue;
@@ -115,23 +128,5 @@
   // RESPONSIVE
   // -----------------------------------------------------------------------------
 
-  @include respond-to(sm) {
-    &--small {
-      padding: $spacing-xs $spacing-sm;
-      font-size: $font-size-xs;
-      min-height: 28px;
-    }
 
-    &--medium {
-      padding: $spacing-sm $spacing-md;
-      font-size: $font-size-sm;
-      min-height: 36px;
-    }
-
-    &--large {
-      padding: $spacing-md $spacing-lg;
-      font-size: $font-size-md;
-      min-height: 44px;
-    }
-  }
 }
