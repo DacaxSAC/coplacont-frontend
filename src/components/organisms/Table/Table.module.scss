@@ -19,7 +19,7 @@
   display: grid;
   grid-template-columns: var(--grid-template, 1fr);
   align-items: center;
-  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
   
 
   &:first-child {
