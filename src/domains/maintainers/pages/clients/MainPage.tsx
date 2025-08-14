@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
-import { Table, Button, Modal, Text, ComboBox, Input } from "@/components";
+import { Table, Button, Modal, Text, ComboBox, Input, CloseIcon, StateTag } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
 
@@ -114,6 +114,7 @@ export const MainPage: React.FC = () => {
     "Nombre Completo",
     "Dirección",
     "Teléfono",
+    "Estado",
     "Acciones",
   ];
   const rows = clients.map((c) => ({
@@ -122,11 +123,18 @@ export const MainPage: React.FC = () => {
       c.tipo,
       c.numeroDocumento,
       c.nombreCompleto,
-      c.direccion,
-      c.telefono,
+      c.direccion!==''?c.direccion:'No especificado',
+      c.telefono!==''?c.telefono:'No especificado',
+      <StateTag state={c.activo} />,
+      <div style={{display:'flex', gap:'8px'}}>
+        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>Ver detalles</Button>
+        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>
+          <CloseIcon />
+        </Button>
+      </div>
     ],
   }));
-  const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 2fr";
+  const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 1fr 2fr";
 
   return (
     <PageLayout

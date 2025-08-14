@@ -7,3 +7,6 @@ export * from './InventarioIcon';
 export * from './CerrarSesionIcon';
 export * from './EstadosFinancierosIcon';
 export * from './ConfiguracionIcon';
+export * from './CloseIcon';
+export * from './InfoIcon';
+export * from './CheckIcon';

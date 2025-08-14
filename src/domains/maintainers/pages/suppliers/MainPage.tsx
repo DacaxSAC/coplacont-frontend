@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
-import { Table, Button, Modal, Text, ComboBox, Input } from "@/components";
+import { Table, Button, Modal, Text, ComboBox, Input, CloseIcon,StateTag } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
 
@@ -116,6 +116,7 @@ export const MainPage: React.FC = () => {
     "Nombre Completo",
     "Dirección",
     "Teléfono",
+    "Estado",
     "Acciones",
   ];
   const rows = suppliers.map((s) => ({
@@ -124,11 +125,19 @@ export const MainPage: React.FC = () => {
       s.tipo,
       s.numeroDocumento,
       s.nombreCompleto,
-      s.direccion,
-      s.telefono,
+      s.direccion!==''?s.direccion:'No especificado',
+      s.telefono!==''?s.telefono:'No especificado',
+      <StateTag state={s.activo} />,
+      <div style={{display:'flex', gap:'8px'}}>
+        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>Ver detalles</Button>
+        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>
+          <CloseIcon />
+        </Button>
+      </div>
+     
     ],
   }));
-  const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 2fr";
+  const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 1fr 2fr";
 
   return (
     <PageLayout
