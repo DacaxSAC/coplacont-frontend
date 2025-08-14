@@ -218,6 +218,7 @@ export const MainPage: React.FC = () => {
       >
         <FormEntidad
           setError={setError}
+          setLoading={setLoading}
           entidad={isView && selectedClient ? selectedClient : newClient}
           error={error}
           loading={loading}

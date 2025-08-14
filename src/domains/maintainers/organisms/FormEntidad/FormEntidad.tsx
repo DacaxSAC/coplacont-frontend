@@ -9,6 +9,7 @@ type FormEntidadProps = {
   error: string;
   setError: (error: string) => void;
   loading: boolean;
+  setLoading: (loading: boolean) => void;
   readOnly?: boolean;
   onChange: (field: keyof Entidad, value: string | number | boolean) => void;
   onSubmit?: () => void;
@@ -19,6 +20,7 @@ export const FormEntidad = ({
   error,
   setError,
   loading,
+  setLoading,
   readOnly = false,
   onChange,
   onSubmit
@@ -37,13 +39,14 @@ export const FormEntidad = ({
   const [isEdit, setIsEdit] = useState(false);
 
   const handleUpdateEntidad = async () => {
+    setLoading(true);
     const response = await EntitiesService.updateEntidad(entidad.id!,entidadToUpdate);
     if(response.success){
       setIsEdit(false);
     }else{
       setError(response.message);
     }
-    console.log(entidadToUpdate)
+    setLoading(false);
   }
 
   return (
