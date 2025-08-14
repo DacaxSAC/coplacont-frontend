@@ -9,9 +9,18 @@
 }
 
 .header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.title {
   display: flex;
   justify-content: space-between;
   gap: $spacing-lg;
+
 }
 
 .header-text {
@@ -19,11 +28,6 @@
   flex-direction: column;
 }
 
-.title {
-  font-size: $font-size-3xl;
-  font-weight: $font-weight-bold;
-  color: $text-color;
-}
 
 .subtitle {
   font-size: $font-size-lg;
@@ -33,4 +37,6 @@
 .content {
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }

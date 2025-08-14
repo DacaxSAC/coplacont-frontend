@@ -2,9 +2,9 @@ import React from 'react';
 import styles from './Button.module.scss';
 
 export interface ButtonProps {
-  children?: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'small' | 'medium' | 'large';
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'danger' | 'tableItemStyle';
+  size?: 'small' | 'medium' | 'large' | 'tableItemSize';
   disabled?: boolean;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset' | 'edit' | 'delete';

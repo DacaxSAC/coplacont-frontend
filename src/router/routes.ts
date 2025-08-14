@@ -24,10 +24,12 @@ export const MAIN_ROUTES = {
 } as const;
 
 // Rutas del módulo de transacciones
-export const MANTEINERS_ROUTES = {
+export const MAINTAINERS_ROUTES = {
   CATEGORIES: '/categories',
   PRODUCTS: '/products',
   WAREHOUSES: '/warehouses',
+  CLIENTS: '/clients',
+  SUPPLIERS: '/suppliers',
 } as const;
 
 // Rutas del módulo de transacciones

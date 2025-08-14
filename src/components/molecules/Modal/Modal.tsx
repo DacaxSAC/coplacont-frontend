@@ -10,6 +10,8 @@ export interface ModalProps {
   children?: React.ReactNode;
   /** Contenido opcional para el pie del modal. Si se provee, reemplaza el footer por defecto. */
   footer?: React.ReactNode;
+  loading?: boolean;
+  buttonText?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,6 +21,8 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   footer,
+  loading,
+  buttonText = "Cancelar",
 }) => {
   // Close on Escape
   useEffect(() => {
@@ -82,6 +86,9 @@ export const Modal: React.FC<ModalProps> = ({
               Cancelar
             </Button>
           )}
+          <Button disabled={loading} size="medium" variant="secondary" onClick={onClose}>
+            {buttonText}
+          </Button>
         </div>
       </div>
     </div>
