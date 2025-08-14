@@ -4,16 +4,20 @@ import {
     ProductsRouter,
     CategoriesRouter,
     WarehouseRouter,
+    ClientsRouter,
+    SuppliersRouter,
 } from '../pages';
 
-import { MANTEINERS_ROUTES } from '@/router';
+import { MAINTAINERS_ROUTES } from '@/router';
 
 export const Router = () => {
   return (
     <Routes>
-      <Route path={MANTEINERS_ROUTES.PRODUCTS} element={<ProductsRouter />} />
-      <Route path={MANTEINERS_ROUTES.CATEGORIES} element={<CategoriesRouter />} />
-      <Route path={MANTEINERS_ROUTES.WAREHOUSES} element={<WarehouseRouter />} />
+      <Route path={MAINTAINERS_ROUTES.PRODUCTS} element={<ProductsRouter />} />
+      <Route path={MAINTAINERS_ROUTES.CATEGORIES} element={<CategoriesRouter />} />
+      <Route path={MAINTAINERS_ROUTES.CLIENTS} element={<ClientsRouter />} />
+      <Route path={MAINTAINERS_ROUTES.SUPPLIERS} element={<SuppliersRouter />} />
+      <Route path={MAINTAINERS_ROUTES.WAREHOUSES} element={<WarehouseRouter />} />
     </Routes> 
   );
 };
