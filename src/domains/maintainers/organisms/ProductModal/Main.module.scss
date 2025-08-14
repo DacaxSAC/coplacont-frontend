@@ -1,16 +1,15 @@
-@use '@/styles' as *;
+@use "@/styles" as *;
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: $spacing-xl;
-  padding-top: $spacing-sm;
+  gap: 1rem;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-lg;
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .actions {
