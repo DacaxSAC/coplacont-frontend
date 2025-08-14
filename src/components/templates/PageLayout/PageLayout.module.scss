@@ -10,8 +10,13 @@
 
 .header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: $spacing-lg;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
