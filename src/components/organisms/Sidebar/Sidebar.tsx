@@ -26,8 +26,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
     <aside className={styles.sidebar} >
 
       <div className={styles.header}>
-        <Logo src='../src/assets/sidebar/logo.svg' width={141} height={52} />
-        <Logo src='../src/assets/sidebar/hide.svg' size={18} />
+        <Logo src='/assets/sidebar/logo.svg' width={141} height={52} />
+        <Logo src='/assets/sidebar/hide.svg' size={18} />
       </div>
 
       <div className={styles.userInfo}>
