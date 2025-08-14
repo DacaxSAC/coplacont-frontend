@@ -79,10 +79,12 @@ export const MainPage: React.FC = () => {
   const gridTemplate = '0.6fr 1.2fr 1.2fr 1fr 0.8fr 0.8fr 1fr';
 
   const handleCreate = async (data: Parameters<typeof WarehouseService.create>[0]) => {
-    // Podríamos llamar al servicio real aquí
-    // const created = await WarehouseService.create(data);
-    // setWarehouses((prev) => [created, ...prev]);
-    console.log('Crear almacén:', data);
+    try {
+      const created = await WarehouseService.create(data);
+      setWarehouses((prev) => [created, ...prev]);
+    } catch (error) {
+      console.error('Error al crear almacén:', error);
+    }
   };
 
   return (
