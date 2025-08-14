@@ -26,6 +26,7 @@ export const transactionsApi = {
     }) => apiClient.post(TRANSACTIONS_ENDPOINTS.REGISTRAR_VENTA, payload),
     getSales: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_VENTAS),
     getPurchases: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_COMPRAS),
+    getTypeExchange: (date: string)  => apiClient.get(TRANSACTIONS_ENDPOINTS.TIPO_CAMBIO_SUNAT, {params: {date}}),
 } as const;
 
 export type TransactionsApi = typeof transactionsApi;

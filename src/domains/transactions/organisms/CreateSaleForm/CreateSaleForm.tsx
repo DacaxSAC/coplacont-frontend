@@ -8,127 +8,31 @@ import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/entities";
 import type { Entidad } from "@/domains/entities/service";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
+import {
+  TipoVentaEnum,
+  TipoProductoVentaEnum,
+  TipoComprobanteEnum,
+  MonedaEnum,
+  ProductoEnum,
+  UnidadMedidaEnum,
+} from "./enums";
+import type {
+  TipoVentaType,
+  TipoProductoVentaType,
+  TipoComprobanteType,
+  MonedaType,
+  ProductoType,
+  UnidadMedidaType,
+} from "./enums";
+import {
+  tipoVentaOptions,
+  tipoProductoVentaOptions,
+  tipoComprobanteOptions,
+  monedaOptions,
+  unidadMedidaOptions,
+} from "./types";
+import type {CreateSaleFormState, DetalleVentaItem} from "./types";
 
-const TipoVentaEnum = {
-  CONTADO: "contado",
-  CREDITO: "credito",
-} as const;
-
-const TipoComprobanteEnum = {
-  FACTURA: "FACTURA",
-  BOLETA: "BOLETA",
-  NOTA_CREDITO: "nc",
-  NOTA_DEBITO: "nd",
-} as const;
-
-const MonedaEnum = {
-  SOL: "sol",
-  DOLAR: "dol",
-} as const;
-
-const ProductoEnum = {
-  PRODUCTO_A: "prod-001",
-  PRODUCTO_B: "prod-002",
-  SERVICIO_A: "serv-001",
-  SERVICIO_B: "serv-002",
-} as const;
-
-const UnidadMedidaEnum = {
-  UNIDAD: "und",
-  KILOGRAMO: "kg",
-  METRO: "m",
-  LITRO: "lt",
-  CAJA: "cja",
-} as const;
-
-
-type TipoVentaType = (typeof TipoVentaEnum)[keyof typeof TipoVentaEnum];
-type TipoComprobanteType =
-  (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
-type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
-type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum];
-type UnidadMedidaType =
-  (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum];
-
-/**
- * Interfaz para los items del detalle de la venta
- */
-interface DetalleVentaItem {
-  id: string;
-  producto: ProductoType;
-  descripcion: string;
-  unidadMedida: UnidadMedidaType;
-  cantidad: number;
-  precioUnitario: number;
-  subtotal: number;
-  baseGravado: number;
-  igv: number;
-  isv: number;
-  total: number;
-}
-
-// Agregar estado para el tipo de cambio como string
-interface CreateSaleFormState {
-  correlativo: string;
-  cliente: string | "";
-  tipoVenta: TipoVentaType | "";
-  tipoComprobante: TipoComprobanteType | "";
-  fechaEmision: string;
-  moneda: MonedaType | "";
-  tipoCambio: string;
-  serie: string;
-  numero: string;
-  fechaVencimiento: string;
-}
-
-
-const tipoVentaOptions = [
-  { value: TipoVentaEnum.CONTADO, label: "Contado" },
-  { value: TipoVentaEnum.CREDITO, label: "Crédito" },
-];
-
-const tipoComprobanteOptions = [
-  { value: TipoComprobanteEnum.FACTURA, label: "Factura" },
-  { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
-  { value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
-  { value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
-];
-
-const monedaOptions = [
-  { value: MonedaEnum.SOL, label: "Sol" },
-  { value: MonedaEnum.DOLAR, label: "Dólar" },
-];
-
-const productosOptions = [
-  {
-    value: ProductoEnum.PRODUCTO_A,
-    label: "Producto A - Descripción del producto A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD,
-  },
-  {
-    value: ProductoEnum.PRODUCTO_B,
-    label: "Producto B - Descripción del producto B",
-    unidadMedida: UnidadMedidaEnum.KILOGRAMO,
-  },
-  {
-    value: ProductoEnum.SERVICIO_A,
-    label: "Servicio A - Descripción del servicio A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD,
-  },
-  {
-    value: ProductoEnum.SERVICIO_B,
-    label: "Servicio B - Descripción del servicio B",
-    unidadMedida: UnidadMedidaEnum.METRO,
-  },
-];
-
-const unidadMedidaOptions = [
-  { value: UnidadMedidaEnum.UNIDAD, label: "Unidad" },
-  { value: UnidadMedidaEnum.KILOGRAMO, label: "Kilogramo" },
-  { value: UnidadMedidaEnum.METRO, label: "Metro" },
-  { value: UnidadMedidaEnum.LITRO, label: "Litro" },
-  { value: UnidadMedidaEnum.CAJA, label: "Caja" },
-];
 
 export const CreateSaleForm = () => {
   const navigate = useNavigate();
@@ -136,6 +40,7 @@ export const CreateSaleForm = () => {
     correlativo: "",
     cliente: "",
     tipoVenta: "",
+    tipoProductoVenta: "",
     tipoComprobante: "",
     fechaEmision: "",
     moneda: "",
@@ -155,7 +60,6 @@ export const CreateSaleForm = () => {
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
 
-  // Maneja los cambios en los campos de texto
   const handleInputChange =
     (field: keyof CreateSaleFormState) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +69,6 @@ export const CreateSaleForm = () => {
       }));
     };
 
-  // Maneja los cambios en los ComboBox
   const handleComboBoxChange =
     (field: keyof CreateSaleFormState) => (value: string | number) => {
       setFormState((prev) => ({
@@ -174,123 +77,85 @@ export const CreateSaleForm = () => {
       }));
     };
 
-  /**
-   * Función para verificar si el campo moneda debe estar habilitado
-   * Solo se habilita cuando hay una fecha de emisión
-   */
+  const handleTipoComprobanteChange = (value: string | number) => {
+    const tipoComprobanteValue = String(value) as TipoComprobanteType;
+    
+    setFormState((prev) => ({
+      ...prev,
+      tipoComprobante: tipoComprobanteValue,
+      cliente: "", // Limpiar cliente al cambiar tipo de comprobante
+    }));
+  };
+
   const isMonedaEnabled = (): boolean => {
     return formState.fechaEmision !== "";
   };
 
-  /**
-   * Función para verificar si el campo cliente debe estar habilitado
-   * Solo se habilita cuando el tipo de comprobante es FACTURA o BOLETA
-   */
   const isClienteEnabled = (): boolean => {
     return formState.tipoComprobante === TipoComprobanteEnum.FACTURA || 
            formState.tipoComprobante === TipoComprobanteEnum.BOLETA;
   };
 
-  /**
-   * Maneja el cambio de moneda y actualiza el tipo de cambio
-   */
-  const handleMonedaChange = (value: string | number) => {
-    const monedaValue = String(value) as MonedaType;
-    
-    setFormState((prev) => ({
-      ...prev,
-      moneda: monedaValue,
-      tipoCambio: monedaValue === MonedaEnum.DOLAR ? "3.75" : "", // TODO: Obtener de servicio
-    }));
+  const isDetalleVentaEnabled = () => {
+    return formState.tipoProductoVenta !== "";
   };
 
-  // Maneja el cambio de producto seleccionado
-  const handleProductoChange = (value: string | number) => {
-    const productoValue = String(value) as ProductoType;
-    setProductoSeleccionado(productoValue);
-
-    // Buscar la unidad de medida correspondiente al producto seleccionado
-    const productoOption = productosOptions.find(
-      (option) => option.value === productoValue
-    );
-    if (productoOption) {
-      setUnidadMedidaSeleccionada(productoOption.unidadMedida);
+  /**
+   * Maneja el cambio de moneda y actualiza el tipo de cambio
+   * Si se selecciona dólar, obtiene el tipo de cambio de la SUNAT según la fecha de emisión
+   */
+  const handleMonedaChange = async (value: string | number) => {
+    const monedaValue = String(value) as MonedaType;
+    
+    if (monedaValue === MonedaEnum.DOLAR) {
+      try {
+        // Obtener tipo de cambio de la SUNAT usando la fecha de emisión
+         const typeExchangeData = await TransactionsService.getTypeExchange(formState.fechaEmision);
+         
+         setFormState((prev) => ({
+           ...prev,
+           moneda: monedaValue,
+           tipoCambio: typeExchangeData.data?.compra?.toString() || "3.75", // Usar el valor de compra
+         }));
+      } catch (error) {
+        console.error('Error al obtener tipo de cambio:', error);
+        // En caso de error, usar valor por defecto
+        setFormState((prev) => ({
+          ...prev,
+          moneda: monedaValue,
+          tipoCambio: "3.75",
+        }));
+      }
+    } else {
+      // Para soles, limpiar el tipo de cambio
+      setFormState((prev) => ({
+        ...prev,
+        moneda: monedaValue,
+        tipoCambio: "",
+      }));
     }
   };
 
-  // Maneja el cambio de unidad de medida seleccionada
-  const handleUnidadMedidaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUnidadMedidaSeleccionada(e.target.value as UnidadMedidaType);
-  };
+  // Maneja el cambio de producto seleccionado
+  //const handleProductoChange = (value: string | number) => {
+  //  const productoValue = String(value) as ProductoType;
+  //  setProductoSeleccionado(productoValue);
+//
+  //  // Buscar la unidad de medida correspondiente al producto seleccionado
+  //  const productoOption = productosOptions.find(
+  //    (option) => option.value === productoValue
+  //  );
+  //  if (productoOption) {
+  //    setUnidadMedidaSeleccionada(productoOption.unidadMedida);
+  //  }
+  //};
+
 
   // Maneja el cambio de cantidad ingresada
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCantidadIngresada(e.target.value);
   };
 
-    // Agrega un producto al detalle de la venta
-  const handleAgregarProducto = () => {
-    if (
-      !productoSeleccionado ||
-      !unidadMedidaSeleccionada ||
-      !cantidadIngresada
-    ) {
-      console.log("Todos los campos son requeridos");
-      return;
-    }
-
-    const cantidad = parseFloat(cantidadIngresada);
-    if (isNaN(cantidad) || cantidad <= 0) {
-      console.log("La cantidad debe ser un número válido mayor a 0");
-      return;
-    }
-
-    // Obtener la descripción del producto seleccionado
-    const productoOption = productosOptions.find(
-      (option) => option.value === productoSeleccionado
-    );
-    const descripcion = productoOption ? productoOption.label : "";
-
-    // Precio unitario temporal (en una implementación real vendría de la API)
-    const precioUnitario = 10.0;
-    const subtotal = cantidad * precioUnitario;
-    const baseGravado = subtotal / 1.18; // Base sin IGV
-    const igv = subtotal - baseGravado; // IGV 18%
-    const isv = 0; // ISV temporal
-    const total = subtotal + isv;
-
-    const nuevoItem: DetalleVentaItem = {
-      id: `item-${Date.now()}`, // ID temporal
-      producto: productoSeleccionado,
-      descripcion,
-      unidadMedida: unidadMedidaSeleccionada,
-      cantidad,
-      precioUnitario,
-      subtotal,
-      baseGravado,
-      igv,
-      isv,
-      total,
-    };
-
-    setDetalleVenta((prev) => [...prev, nuevoItem]);
-
-    // Limpiar los campos después de agregar
-    setProductoSeleccionado("");
-    setUnidadMedidaSeleccionada("");
-    setCantidadIngresada("");
-
-    console.log("Producto agregado:", nuevoItem);
-    console.log("Detalle actual:", [...detalleVenta, nuevoItem]);
-  };
-
-  // Elimina un producto del detalle de la venta
-  const handleEliminarProducto = (record: DetalleVentaItem, index: number) => {
-    setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
-    console.log("Producto eliminado:", record);
-  };
-
-  // Maneja el envío del formulario de venta
   const handleAceptarVenta = async () => {
     try {
       const detallesAPI = detalleVenta.map((item) => ({
@@ -305,9 +170,10 @@ export const CreateSaleForm = () => {
       }));
 
       const ventaData = {
-        correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
-        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
+        correlativo: formState.correlativo || "CORR-12345",
+        idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
         tipoOperacion: "venta", // Valor fijo
+        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", // Tipo de producto/venta
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
         fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
@@ -326,7 +192,6 @@ export const CreateSaleForm = () => {
     }
   };
 
-  // Maneja el envío del formulario de venta y navegación para nueva venta
   const handleAceptarYNuevaVenta = async () => {
     try {
       const detallesAPI = detalleVenta.map((item) => ({
@@ -342,8 +207,9 @@ export const CreateSaleForm = () => {
 
       const ventaData = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
-        idPersona: 1, // Dato fake - en producción vendría del cliente seleccionado
+        idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
         tipoOperacion: "venta", // Valor fijo
+        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", // Tipo de producto/venta
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
         fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
@@ -360,6 +226,7 @@ export const CreateSaleForm = () => {
         correlativo: "",
         cliente: "",
         tipoVenta: "",
+        tipoProductoVenta: "",
         tipoComprobante: "",
         fechaEmision: "",
         moneda: "",
@@ -379,20 +246,6 @@ export const CreateSaleForm = () => {
     }
   };
 
-  const tableHeaders = [
-    "Descripción",
-    "Cantidad",
-    "Unidad",
-    "Precio Unitario",
-    "Subtotal",
-    "Base Gravado",
-    "IGV",
-    "ISV",
-    "Total",
-    "Acciones",
-  ];
-
-  // Transforma los datos de detalle de venta a formato TableRow
   const tableRows: TableRow[] = detalleVenta.map((item, index) => {
     const unidad = unidadMedidaOptions.find(
       (option) => option.value === item.unidadMedida
@@ -414,7 +267,7 @@ export const CreateSaleForm = () => {
           key={`delete-${item.id}`}
           size="small"
           variant="danger"
-          onClick={() => handleEliminarProducto(item, index)}
+          onClick={() => {}}
         >
           Eliminar
         </Button>,
@@ -422,17 +275,35 @@ export const CreateSaleForm = () => {
     };
   });
 
-  // get clients
+  // CLIENTES
   const [clients, setClients] = useState<Entidad[]>([]);
   useEffect(() => {
     EntitiesService.getClients().then((data) => {setClients(data);console.log(data)});
   }, []);
 
-  // Crear opciones dinámicas para el ComboBox de clientes
-  const clientesOptionsFromAPI = clients.map(client => ({
-    value: client.id.toString(),
-    label: client.numeroDocumento +' '+'-'+' '+  client.nombreCompleto
-  }));
+  const getFilteredClientOptions = () => {
+    let filteredClients = clients;
+
+    if (formState.tipoComprobante === TipoComprobanteEnum.FACTURA) {
+      filteredClients = clients.filter(client => client.tipo === 'JURIDICA');
+    } else if (formState.tipoComprobante === TipoComprobanteEnum.BOLETA) {
+      filteredClients = clients.filter(client => client.tipo === 'NATURAL');
+    }
+
+    return filteredClients.map(client => ({
+      value: client.id.toString(),
+      label: `${client.razonSocial || client.nombreCompleto} - ${client.numeroDocumento}`,
+    }));
+  };
+
+  const clientesOptionsFromAPI = getFilteredClientOptions();
+
+  const getSelectedClientId = (): number | null => {
+    if (!formState.cliente) return null;
+    
+    const selectedClient = clients.find(client => client.id.toString() === formState.cliente);
+    return selectedClient ? selectedClient.id : null;
+  };
 
   return (
     <div className={styles.CreateSaleForm}>
@@ -471,7 +342,7 @@ export const CreateSaleForm = () => {
               variant="createSale"
               name="tipoComprobante"
               value={formState.tipoComprobante}
-              onChange={handleComboBoxChange("tipoComprobante")}
+              onChange={handleTipoComprobanteChange}
             />
           </div>
 
@@ -540,7 +411,7 @@ export const CreateSaleForm = () => {
                 size="xs"
                 variant="createSale"
                 value={formState.tipoCambio}
-                disabled={true} // Siempre bloqueado
+                disabled={true}
               />
             </div>
           )}
@@ -549,7 +420,7 @@ export const CreateSaleForm = () => {
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
           >
             <Text size="xs" color="neutral-primary">
-              Tipo de venta
+              Condiciones de pago
             </Text>
             <ComboBox
               size="xs"
@@ -564,6 +435,22 @@ export const CreateSaleForm = () => {
 
         {/** Fila 4: Serie, Número y Fecha de vencimiento */}
         <div className={styles.CreateSaleForm__FormRow}>
+          <div
+            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Tipo de venta
+            </Text>
+            <ComboBox
+              size="xs"
+              options={tipoProductoVentaOptions}
+              variant="createSale"
+              name="tipoProductoVenta"
+              value={formState.tipoProductoVenta}
+              onChange={handleComboBoxChange("tipoProductoVenta")}
+            />
+          </div>
+
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
@@ -616,21 +503,22 @@ export const CreateSaleForm = () => {
       </Text>
 
       <div className={styles.CreateSaleForm__AddItems}>
-        <div
+        {/**<div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--descripcion"]}`}
         >
           <Text size="xs" color="neutral-primary">
-            Producto / Servicio
+            Producto
           </Text>
           <ComboBox
-            options={productosOptions}
+            options={getFilteredProductosOptions(formState.tipoProductoVenta)}
             variant="createSale"
             size="xs"
             name="producto"
             value={productoSeleccionado}
             onChange={handleProductoChange}
+            disabled={!isDetalleVentaEnabled()}
           />
-        </div>
+        </div>*/}
 
         <div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
@@ -648,8 +536,7 @@ export const CreateSaleForm = () => {
                   )?.label || ""
                 : ""
             }
-            onChange={handleUnidadMedidaChange}
-            disabled={true}
+            disabled={!isDetalleVentaEnabled()}
           />
         </div>
 
@@ -665,26 +552,59 @@ export const CreateSaleForm = () => {
             variant="createSale"
             value={cantidadIngresada}
             onChange={handleCantidadChange}
+            disabled={!isDetalleVentaEnabled()}
           />
+        </div>
+
+        <div
+            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Precio unitario
+            </Text>
+            <ComboBox
+              size="xs"
+              options={tipoProductoVentaOptions}
+              variant="createSale"
+              name="tipoProductoVenta"
+              value={formState.tipoProductoVenta}
+              onChange={handleComboBoxChange("tipoProductoVenta")}
+            />
+        </div>
+
+        <div
+            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Almacen
+            </Text>
+            <ComboBox
+              size="xs"
+              options={tipoProductoVentaOptions}
+              variant="createSale"
+              name="tipoProductoVenta"
+              value={formState.tipoProductoVenta}
+              onChange={handleComboBoxChange("tipoProductoVenta")}
+            />
         </div>
 
         <div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--button"]}`}
         >
-          <Button size="small" onClick={handleAgregarProducto}>
+          <Button size="small" onClick={() => {}} disabled={!isDetalleVentaEnabled()}>
             Agregar
           </Button>
         </div>
       </div>
 
       {/** Table */}
-      {detalleVenta.length > 0 && (
+      {/**{detalleVenta.length > 0 && (
         <Table
           headers={tableHeaders}
           rows={tableRows}
           gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
         />
-      )}
+      )}*/}
 
       <Divider />
 

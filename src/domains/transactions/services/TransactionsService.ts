@@ -47,4 +47,14 @@ export class TransactionsService {
       throw handleApiError(error);
     }
   }
+
+  /**
+   * Obtiene el tipo de cambio de la SUNAT
+   * @param date - Fecha en formato YYYY-MM-DD
+   * @returns Promise con el tipo de cambio
+   */
+  static async getTypeExchange(date: string) {
+      const response = await transactionsApi.getTypeExchange(date);
+      return response.data;
+  }
 }
