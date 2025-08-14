@@ -6,17 +6,21 @@ import {
   Modal,
   CloseIcon,
   StateTag,
-  CheckIcon
+  CheckIcon,
 } from "@/components";
 import { EntitiesService } from "../../services";
-import {CreateFormEntidad} from "../../organisms/CreateFormEntidad";
+import { FormEntidad } from "../../organisms/FormEntidad";
 import type { Entidad } from "../../services";
 
 export const MainPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Entidad[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<Entidad | null>(
+    null
+  );
   const [newSupplier, setNewSupplier] = useState({
     esProveedor: true,
     esCliente: false,
@@ -164,16 +168,23 @@ export const MainPage: React.FC = () => {
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => {}}
+          onClick={() => {
+            setSelectedSupplier(s);
+            setIsView(true);
+            setIsOpen(true);
+          }}
         >
           Ver detalles
         </Button>
+
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => {handleStateSupplier(s.id, s.activo)}}
+          onClick={() => {
+            handleStateSupplier(s.id, s.activo);
+          }}
         >
-          {s.activo? <CloseIcon />:<CheckIcon />} 
+          {s.activo ? <CloseIcon /> : <CheckIcon />}
         </Button>
       </div>,
     ],
@@ -185,7 +196,14 @@ export const MainPage: React.FC = () => {
       title="Proveedores"
       subtitle="Listado de proveedores registrados"
       header={
-        <Button onClick={handleModal} size="large">
+        <Button
+          onClick={() => {
+            resetForm();
+            setIsView(false);
+            setIsOpen(true);
+          }}
+          size="large"
+        >
           + Nuevo proveedor
         </Button>
       }
@@ -199,12 +217,13 @@ export const MainPage: React.FC = () => {
         description="Ingresa los siguientes datos para registrar un proveedor."
         loading={loading}
       >
-        <CreateFormEntidad
-          entidad={newSupplier}
+        <FormEntidad
+          entidad={isView && selectedSupplier ? selectedSupplier : newSupplier}
           error={error}
           loading={loading}
           onChange={handleSupplierChange}
-          onSubmit={hanldeCreateSupplier}
+          onSubmit={isView ? undefined : hanldeCreateSupplier}
+          readOnly={isView}
         />
       </Modal>
     </PageLayout>

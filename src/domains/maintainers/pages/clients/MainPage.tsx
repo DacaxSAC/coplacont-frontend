@@ -10,13 +10,17 @@ import {
 } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
-import { CreateFormEntidad } from "../../organisms/CreateFormEntidad";
+import {FormEntidad} from "../../organisms/FormEntidad";
 
 export const MainPage: React.FC = () => {
   const [clients, setClients] = useState<Entidad[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Entidad | null>(
+    null
+  );
   const [newClient, setNewClient] = useState({
     esProveedor: false,
     esCliente: true,
@@ -162,7 +166,11 @@ export const MainPage: React.FC = () => {
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => {}}
+          onClick={() => {
+            setSelectedClient(c);
+            setIsView(true);
+            setIsOpen(true);
+          }}
         >
           Ver detalles
         </Button>
@@ -185,7 +193,14 @@ export const MainPage: React.FC = () => {
       title="Clientes"
       subtitle="Listado de clientes registrados"
       header={
-        <Button onClick={handleModal} size="large">
+        <Button
+          onClick={() => {
+            resetForm();
+            setIsView(false);
+            setIsOpen(true);
+          }}
+          size="large"
+        >
           + Nuevo cliente
         </Button>
       }
@@ -199,12 +214,13 @@ export const MainPage: React.FC = () => {
         description="Ingresa los siguientes datos para registrar un cliente."
         loading={loading}
       >
-        <CreateFormEntidad
-          entidad={newClient}
+        <FormEntidad
+          entidad={isView && selectedClient ? selectedClient : newClient}
           error={error}
           loading={loading}
           onChange={handleClientChange}
-          onSubmit={handleCreateClient}
+          onSubmit={isView ? undefined : handleCreateClient}
+          readOnly={isView}
         />
       </Modal>
     </PageLayout>

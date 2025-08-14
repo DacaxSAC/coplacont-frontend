@@ -1,24 +1,26 @@
-import styles from './CreateFormEntidad.module.scss';
+import styles from './FormEntidad.module.scss';
 import type { Entidad, EntidadParcial } from "../../services";
 import { Text, ComboBox, Input, Button } from "@/components";
 
-type CreateFormEntidadProps = {
+type FormEntidadProps = {
   entidad: Entidad | EntidadParcial;
   error: string;
   loading: boolean;
+  readOnly?: boolean; // <-- Nuevo
   onChange: (field: keyof Entidad, value: string | number | boolean) => void;
-  onSubmit: () => void;
+  onSubmit?: () => void; // <-- Ahora opcional, porque en modo lectura no se envía
 };
 
-export const CreateFormEntidad = ({
+export const FormEntidad = ({
   entidad,
   error,
   loading,
+  readOnly = false,
   onChange,
   onSubmit
-}: CreateFormEntidadProps) => {
+}: FormEntidadProps) => {
   return (
-    <div className={styles.CreateFormEntidad__Form}>
+    <div className={styles.FormEntidad__Form}>
       {error && (
         <Text as="p" color="danger" size="xs">
           {error}
@@ -26,7 +28,7 @@ export const CreateFormEntidad = ({
       )}
 
       {/* Tipo de Entidad */}
-      <div className={styles.CreateFormEntidad__FormField}>
+      <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">
           Tipo de Entidad
         </Text>
@@ -39,16 +41,17 @@ export const CreateFormEntidad = ({
           variant="createSale"
           value={entidad.tipo}
           onChange={(value) => onChange("tipo", value)}
+          disabled={readOnly}
         />
       </div>
 
       {/* Número de Documento */}
-      <div className={styles.CreateFormEntidad__FormField}>
+      <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">
           Número de Documento
         </Text>
         <Input
-          disabled={!entidad.tipo}
+          disabled={readOnly || !entidad.tipo}
           size="xs"
           variant="createSale"
           value={entidad.numeroDocumento}
@@ -58,7 +61,7 @@ export const CreateFormEntidad = ({
 
       {/* Razon Social o Datos Naturales */}
       {entidad.tipo === "JURIDICA" && (
-        <div className={styles.CreateFormEntidad__FormField}>
+        <div className={styles.FormEntidad__FormField}>
           <Text size="xs" color="neutral-primary">
             Razon Social
           </Text>
@@ -67,13 +70,14 @@ export const CreateFormEntidad = ({
             variant="createSale"
             value={entidad.razonSocial || ""}
             onChange={(e) => onChange("razonSocial", e.target.value)}
+            disabled={readOnly}
           />
         </div>
       )}
 
       {entidad.tipo === "NATURAL" && (
         <>
-          <div className={styles.CreateFormEntidad__FormField}>
+          <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">
               Nombre
             </Text>
@@ -82,9 +86,10 @@ export const CreateFormEntidad = ({
               variant="createSale"
               value={entidad.nombre || ""}
               onChange={(e) => onChange("nombre", e.target.value)}
+              disabled={readOnly}
             />
           </div>
-          <div className={styles.CreateFormEntidad__FormField}>
+          <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">
               Apellido Paterno
             </Text>
@@ -93,9 +98,10 @@ export const CreateFormEntidad = ({
               variant="createSale"
               value={entidad.apellidoPaterno || ""}
               onChange={(e) => onChange("apellidoPaterno", e.target.value)}
+              disabled={readOnly}
             />
           </div>
-          <div className={styles.CreateFormEntidad__FormField}>
+          <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">
               Apellido Materno
             </Text>
@@ -104,13 +110,14 @@ export const CreateFormEntidad = ({
               variant="createSale"
               value={entidad.apellidoMaterno || ""}
               onChange={(e) => onChange("apellidoMaterno", e.target.value)}
+              disabled={readOnly}
             />
           </div>
         </>
       )}
 
       {/* Direccion */}
-      <div className={styles.CreateFormEntidad__FormField}>
+      <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">
           Direccion
         </Text>
@@ -119,11 +126,12 @@ export const CreateFormEntidad = ({
           variant="createSale"
           value={entidad.direccion}
           onChange={(e) => onChange("direccion", e.target.value)}
+          disabled={readOnly}
         />
       </div>
 
       {/* Telefono */}
-      <div className={styles.CreateFormEntidad__FormField}>
+      <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">
           Telefono
         </Text>
@@ -132,13 +140,16 @@ export const CreateFormEntidad = ({
           variant="createSale"
           value={entidad.telefono}
           onChange={(e) => onChange("telefono", e.target.value)}
+          disabled={readOnly}
         />
       </div>
 
-      {/* Botón Guardar */}
-      <Button disabled={loading} size="medium" onClick={onSubmit}>
-        Guardar
-      </Button>
+      {/* Botón Guardar - solo si no es readOnly */}
+      {!readOnly && (
+        <Button disabled={loading} size="medium" onClick={onSubmit}>
+          Guardar
+        </Button>
+      )}
     </div>
   );
 };
