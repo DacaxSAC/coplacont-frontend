@@ -79,13 +79,13 @@ export const Modal: React.FC<ModalProps> = ({
         <div className={styles.content}>{children}</div>
 
         <div className={styles.footer}>
-          {footer !== undefined ? (
+          {/**footer !== undefined ? (
             footer
           ) : (
             <Button variant="secondary" onClick={onClose}>
               Cancelar
             </Button>
-          )}
+          )*/}
           <Button disabled={loading} size="medium" variant="secondary" onClick={onClose}>
             {buttonText}
           </Button>
