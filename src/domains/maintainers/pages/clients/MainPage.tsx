@@ -10,7 +10,7 @@ import {
 } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
-import {FormEntidad} from "../../organisms/FormEntidad";
+import { FormEntidad } from "../../organisms/FormEntidad";
 
 export const MainPage: React.FC = () => {
   const [clients, setClients] = useState<Entidad[]>([]);
@@ -114,6 +114,8 @@ export const MainPage: React.FC = () => {
 
     setLoading(false);
   };
+
+
 
   const handleStateClient = async (id: number, state: boolean) => {
     let response;

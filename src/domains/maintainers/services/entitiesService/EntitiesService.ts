@@ -1,5 +1,5 @@
 import { entitiesApi } from '../../api/entitiesApi';
-import type { Entidad, EntidadParcial } from './types';
+import type { Entidad, EntidadParcial, EntidadToUpdate } from './types';
 
 export class EntitiesService {
     static async getClients(): Promise<Entidad[]> {
@@ -47,6 +47,20 @@ export class EntitiesService {
             return {success: false, message: 'Error al restaurar la entidad'};
         }
     }
+
+    static async updateEntidad(id: number, data: EntidadToUpdate): Promise<{success:boolean; message:string; data?:Entidad}> {
+        try {
+            const response = await entitiesApi.updateEntidad(id, data);
+            if(response.data.success) {
+                return {success: true, message: 'Entidad actualizada con éxito', data: response.data.data};
+            } else {
+                return {success: false, message: response.data.message};
+            }
+        } catch (error) {
+            return {success: false, message: 'Error al actualizar la entidad'};
+        }
+    }
+
 
 
 

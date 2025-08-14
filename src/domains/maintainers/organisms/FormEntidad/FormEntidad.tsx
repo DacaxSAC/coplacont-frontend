@@ -6,9 +6,9 @@ type FormEntidadProps = {
   entidad: Entidad | EntidadParcial;
   error: string;
   loading: boolean;
-  readOnly?: boolean; // <-- Nuevo
+  readOnly?: boolean;
   onChange: (field: keyof Entidad, value: string | number | boolean) => void;
-  onSubmit?: () => void; // <-- Ahora opcional, porque en modo lectura no se envía
+  onSubmit?: () => void;
 };
 
 export const FormEntidad = ({
@@ -29,9 +29,7 @@ export const FormEntidad = ({
 
       {/* Tipo de Entidad */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">
-          Tipo de Entidad
-        </Text>
+        <Text size="xs" color="neutral-primary">Tipo de Entidad</Text>
         <ComboBox
           options={[
             { label: "JURIDICA", value: "JURIDICA" },
@@ -47,9 +45,7 @@ export const FormEntidad = ({
 
       {/* Número de Documento */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">
-          Número de Documento
-        </Text>
+        <Text size="xs" color="neutral-primary">Número de Documento</Text>
         <Input
           disabled={readOnly || !entidad.tipo}
           size="xs"
@@ -62,9 +58,7 @@ export const FormEntidad = ({
       {/* Razon Social o Datos Naturales */}
       {entidad.tipo === "JURIDICA" && (
         <div className={styles.FormEntidad__FormField}>
-          <Text size="xs" color="neutral-primary">
-            Razon Social
-          </Text>
+          <Text size="xs" color="neutral-primary">Razon Social</Text>
           <Input
             size="xs"
             variant="createSale"
@@ -78,9 +72,7 @@ export const FormEntidad = ({
       {entidad.tipo === "NATURAL" && (
         <>
           <div className={styles.FormEntidad__FormField}>
-            <Text size="xs" color="neutral-primary">
-              Nombre
-            </Text>
+            <Text size="xs" color="neutral-primary">Nombre</Text>
             <Input
               size="xs"
               variant="createSale"
@@ -90,9 +82,7 @@ export const FormEntidad = ({
             />
           </div>
           <div className={styles.FormEntidad__FormField}>
-            <Text size="xs" color="neutral-primary">
-              Apellido Paterno
-            </Text>
+            <Text size="xs" color="neutral-primary">Apellido Paterno</Text>
             <Input
               size="xs"
               variant="createSale"
@@ -102,9 +92,7 @@ export const FormEntidad = ({
             />
           </div>
           <div className={styles.FormEntidad__FormField}>
-            <Text size="xs" color="neutral-primary">
-              Apellido Materno
-            </Text>
+            <Text size="xs" color="neutral-primary">Apellido Materno</Text>
             <Input
               size="xs"
               variant="createSale"
@@ -118,9 +106,7 @@ export const FormEntidad = ({
 
       {/* Direccion */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">
-          Direccion
-        </Text>
+        <Text size="xs" color="neutral-primary">Direccion</Text>
         <Input
           size="xs"
           variant="createSale"
@@ -132,9 +118,7 @@ export const FormEntidad = ({
 
       {/* Telefono */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">
-          Telefono
-        </Text>
+        <Text size="xs" color="neutral-primary">Telefono</Text>
         <Input
           size="xs"
           variant="createSale"
@@ -144,7 +128,6 @@ export const FormEntidad = ({
         />
       </div>
 
-      {/* Botón Guardar - solo si no es readOnly */}
       {!readOnly && (
         <Button disabled={loading} size="medium" onClick={onSubmit}>
           Guardar
