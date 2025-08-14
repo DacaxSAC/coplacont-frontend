@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from '@/components/atoms';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle/ThemeToggle';
 import { TransaccionesIcon, InventarioIcon, ContabilidadIcon, CierreContableIcon, CerrarSesionIcon, EstadosFinancierosIcon, ConfiguracionIcon } from '@/components/atoms';
-import { MAIN_ROUTES, TRANSACTIONS_ROUTES, INVENTORY_ROUTES, ACCOUNTING_ROUTES, FINANCIAL_CLOSING_ROUTES, FINANCIAL_STATEMENTS_ROUTES, SETTINGS_ROUTES, AUTH_ROUTES } from '@/router/routes';
+import { MAIN_ROUTES, TRANSACTIONS_ROUTES, INVENTORY_ROUTES, ACCOUNTING_ROUTES, FINANCIAL_CLOSING_ROUTES, FINANCIAL_STATEMENTS_ROUTES, SETTINGS_ROUTES, AUTH_ROUTES, MANTEINERS_ROUTES } from '@/router/routes';
 import { useAuth } from '@/domains/auth';
 
 interface SidebarProps {
@@ -40,6 +40,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
       </div>
 
       <nav className={styles.navigation}>
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>
+            <TransaccionesIcon />
+            <h3 className={styles.sectionTitle__title}>Mantenedores</h3>
+          </div>
+          <ul className={styles.menuList}>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MANTEINERS_ROUTES.CATEGORIES}`}>Categorías</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MANTEINERS_ROUTES.PRODUCTS}`}>Productos</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MANTEINERS_ROUTES.WAREHOUSES}`}>Almacenes</Link></li>
+          </ul>
+        </div>
+
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <TransaccionesIcon />
