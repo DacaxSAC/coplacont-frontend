@@ -1,6 +1,5 @@
-import { entitiesApi } from '../api/entitiesApi';
+import { entitiesApi } from '../../api/entitiesApi';
 import type { Entidad } from './types';
-
 
 export class EntitiesService {
     static async getClients(): Promise<Entidad[]> {
@@ -9,7 +8,6 @@ export class EntitiesService {
     }
     static async getSuppliers(): Promise<Entidad[]> {
         const response = await entitiesApi.getSuppliers();
-        console.log(response)
         return response.data.data;
     }
 }
