@@ -9,6 +9,7 @@ export interface ModalProps {
   onClose: () => void;
   children?: React.ReactNode;
   loading?: boolean;
+  buttonText?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,6 +19,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   loading,
+  buttonText = "Cancelar",
 }) => {
   // Close on Escape
   useEffect(() => {
@@ -75,7 +77,7 @@ export const Modal: React.FC<ModalProps> = ({
 
         <div className={styles.footer}>
           <Button disabled={loading} size="medium" variant="secondary" onClick={onClose}>
-            Cancelar
+            {buttonText}
           </Button>
         </div>
       </div>

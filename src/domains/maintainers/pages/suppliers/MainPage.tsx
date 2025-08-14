@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
-import styles from "./MainPage.module.scss";
 import {
   PageLayout,
   Table,
   Button,
   Modal,
-  Text,
-  ComboBox,
-  Input,
   CloseIcon,
   StateTag,
-  CheckIcon
+  CheckIcon,
 } from "@/components";
 import { EntitiesService } from "../../services";
+import { FormEntidad } from "../../organisms/FormEntidad";
 import type { Entidad } from "../../services";
 
 export const MainPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Entidad[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<Entidad | null>(
+    null
+  );
   const [newSupplier, setNewSupplier] = useState({
     esProveedor: true,
     esCliente: false,
@@ -32,6 +33,16 @@ export const MainPage: React.FC = () => {
     direccion: "",
     telefono: "",
   });
+
+  const handleSupplierChange = (
+    field: keyof Entidad,
+    value: string | number | boolean
+  ) => {
+    setNewSupplier((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const resetForm = () => {
     setNewSupplier({
@@ -157,16 +168,23 @@ export const MainPage: React.FC = () => {
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => {}}
+          onClick={() => {
+            setSelectedSupplier(s);
+            setIsView(true);
+            setIsOpen(true);
+          }}
         >
           Ver detalles
         </Button>
+
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => {handleStateSupplier(s.id, s.activo)}}
+          onClick={() => {
+            handleStateSupplier(s.id, s.activo);
+          }}
         >
-          {s.activo? <CloseIcon />:<CheckIcon />} 
+          {s.activo ? <CloseIcon /> : <CheckIcon />}
         </Button>
       </div>,
     ],
@@ -178,7 +196,14 @@ export const MainPage: React.FC = () => {
       title="Proveedores"
       subtitle="Listado de proveedores registrados"
       header={
-        <Button onClick={handleModal} size="large">
+        <Button
+          onClick={() => {
+            resetForm();
+            setIsView(false);
+            setIsOpen(true);
+          }}
+          size="large"
+        >
           + Nuevo proveedor
         </Button>
       }
@@ -191,161 +216,17 @@ export const MainPage: React.FC = () => {
         title="Agregar nuevo proveedor"
         description="Ingresa los siguientes datos para registrar un proveedor."
         loading={loading}
+        buttonText={isView ? "Cerrar" : "Guardar"}
       >
-        <div className={`${styles.MainPage__Form}`}>
-          {error && (
-            <Text as="p" color="danger" size="xs">
-              {error}
-            </Text>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Tipo de Entidad
-            </Text>
-            <ComboBox
-              options={[
-                { label: "JURIDICA", value: "JURIDICA" },
-                { label: "NATURAL", value: "NATURAL" },
-              ]}
-              size="xs"
-              variant="createSale"
-              value={newSupplier.tipo}
-              onChange={(value) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  tipo: value as Entidad["tipo"],
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Número de Documento
-            </Text>
-            <Input
-              disabled={!newSupplier.tipo}
-              size="xs"
-              variant="createSale"
-              value={newSupplier.numeroDocumento}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  numeroDocumento: e.target.value,
-                })
-              }
-            />
-          </div>
-          {newSupplier.tipo === "JURIDICA" && (
-            <div className={`${styles.MainPage__FormField}`}>
-              <Text size="xs" color="neutral-primary">
-                Razon Social
-              </Text>
-              <Input
-                size="xs"
-                variant="createSale"
-                value={newSupplier.razonSocial}
-                onChange={(e) =>
-                  setNewSupplier({
-                    ...newSupplier,
-                    razonSocial: e.target.value,
-                  })
-                }
-              />
-            </div>
-          )}
-          {newSupplier.tipo === "NATURAL" && (
-            <>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Nombre
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.nombre}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      nombre: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Paterno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.apellidoPaterno}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      apellidoPaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className={`${styles.MainPage__FormField}`}>
-                <Text size="xs" color="neutral-primary">
-                  Apellido Materno
-                </Text>
-                <Input
-                  size="xs"
-                  variant="createSale"
-                  value={newSupplier.apellidoMaterno}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      apellidoMaterno: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </>
-          )}
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Direccion
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newSupplier.direccion}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  direccion: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className={`${styles.MainPage__FormField}`}>
-            <Text size="xs" color="neutral-primary">
-              Telefono
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={newSupplier.telefono}
-              onChange={(e) =>
-                setNewSupplier({
-                  ...newSupplier,
-                  telefono: e.target.value,
-                })
-              }
-            />
-          </div>
-
-          <Button
-            disabled={loading}
-            size="medium"
-            onClick={hanldeCreateSupplier}
-          >
-            Guardar
-          </Button>
-        </div>
+        <FormEntidad
+          setError={setError}
+          entidad={isView && selectedSupplier ? selectedSupplier : newSupplier}
+          error={error}
+          loading={loading}
+          onChange={handleSupplierChange}
+          onSubmit={isView ? undefined : hanldeCreateSupplier}
+          readOnly={isView}
+        />
       </Modal>
     </PageLayout>
   );

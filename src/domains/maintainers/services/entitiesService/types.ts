@@ -24,7 +24,12 @@ interface Entidad {
   updatedAt: string;
 }
 
-export type EntidadParcial = Pick<Entidad, "esProveedor" | "esCliente" | "tipo" | "numeroDocumento" | "nombre" | "apellidoMaterno" | "apellidoPaterno" | "razonSocial" | "direccion" | "telefono">;
+export type EntidadParcial = Pick<Entidad, "esProveedor" | "esCliente" | "tipo" | "numeroDocumento" | "nombre" | "apellidoMaterno" | "apellidoPaterno" | "razonSocial" | "direccion" | "telefono"> & {
+  id?: number;
+};
+
+
+export type EntidadToUpdate = Pick<Entidad, "nombre" | "apellidoMaterno" | "apellidoPaterno" | "razonSocial" | "direccion" | "telefono">;
 
 /**
  * Interface para el response de la API de personas
