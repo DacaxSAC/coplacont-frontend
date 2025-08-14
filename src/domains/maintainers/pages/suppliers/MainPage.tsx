@@ -19,7 +19,7 @@ export const MainPage: React.FC = () => {
   const gridTemplate = '1fr 1.5fr 2fr 2fr 1fr 2fr';
 
   return (
-    <PageLayout title='Proveedores' subtitle='Listado de proveedores registrados'>
+    <PageLayout title='Proveedores' subtitle='Listado de proveedores registrados' button={true} textButton='+ Nuevo proveedor'>
       <div>
         
       </div>

@@ -9,12 +9,17 @@
 }
 
 .header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.title {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
-}
-
-.title {
   font-size: $font-size-3xl;
   font-weight: $font-weight-bold;
   color: $text-color;
