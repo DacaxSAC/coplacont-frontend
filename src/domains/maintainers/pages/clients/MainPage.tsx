@@ -115,8 +115,6 @@ export const MainPage: React.FC = () => {
     setLoading(false);
   };
 
-
-
   const handleStateClient = async (id: number, state: boolean) => {
     let response;
     if (state) {
@@ -139,6 +137,7 @@ export const MainPage: React.FC = () => {
   const fetchClients = () => {
     EntitiesService.getClients().then((res) => {
       setClients(res);
+      console.log(res);
     });
   };
 
@@ -215,6 +214,7 @@ export const MainPage: React.FC = () => {
         title="Agregar nuevo cliente"
         description="Ingresa los siguientes datos para registrar un cliente."
         loading={loading}
+        buttonText={isView ? "Cerrar" : "Guardar"}
       >
         <FormEntidad
           entidad={isView && selectedClient ? selectedClient : newClient}

@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import styles from './FormEntidad.module.scss';
-import type { Entidad, EntidadParcial } from "../../services";
+import type { Entidad, EntidadParcial, EntidadToUpdate } from "../../services";
 import { Text, ComboBox, Input, Button } from "@/components";
+import { EntitiesService } from "../../services";
 
 type FormEntidadProps = {
   entidad: Entidad | EntidadParcial;
@@ -19,6 +21,27 @@ export const FormEntidad = ({
   onChange,
   onSubmit
 }: FormEntidadProps) => {
+
+
+  const [entidadToUpdate, setEntidadToUpdate] = useState<EntidadToUpdate>({
+    nombre: entidad.nombre,
+    apellidoMaterno: entidad.apellidoMaterno,
+    apellidoPaterno: entidad.apellidoPaterno,
+    razonSocial: entidad.razonSocial,
+    direccion: entidad.direccion,
+    telefono: entidad.telefono,
+  });
+
+  const [isEdit, setIsEdit] = useState(false);
+
+  const handleUpdateEntidad = async () => {
+    const response = await EntitiesService.updateEntidad(entidad.id!,entidadToUpdate);
+    if(response.success){
+      setIsEdit(false);
+    }
+    console.log(entidadToUpdate)
+  }
+
   return (
     <div className={styles.FormEntidad__Form}>
       {error && (
@@ -62,9 +85,18 @@ export const FormEntidad = ({
           <Input
             size="xs"
             variant="createSale"
-            value={entidad.razonSocial || ""}
-            onChange={(e) => onChange("razonSocial", e.target.value)}
-            disabled={readOnly}
+            value={isEdit ? entidadToUpdate.razonSocial ?? "" : entidad.razonSocial ?? ""}
+            onChange={(e) => {
+              if(isEdit){
+                setEntidadToUpdate({
+                  ...entidadToUpdate,
+                  razonSocial: e.target.value
+                })
+              }else{
+                onChange("razonSocial", e.target.value)
+              } 
+            }}
+            disabled={isEdit? false : readOnly}
           />
         </div>
       )}
@@ -76,9 +108,18 @@ export const FormEntidad = ({
             <Input
               size="xs"
               variant="createSale"
-              value={entidad.nombre || ""}
-              onChange={(e) => onChange("nombre", e.target.value)}
-              disabled={readOnly}
+              value={isEdit ? entidadToUpdate.nombre ?? "" : entidad.nombre ?? ""}
+              onChange={(e) => {
+                if(isEdit){
+                  setEntidadToUpdate({
+                    ...entidadToUpdate,
+                    nombre: e.target.value
+                  })
+                }else{
+                  onChange("nombre", e.target.value)
+                } 
+              }}
+              disabled={isEdit? false : readOnly}
             />
           </div>
           <div className={styles.FormEntidad__FormField}>
@@ -86,9 +127,18 @@ export const FormEntidad = ({
             <Input
               size="xs"
               variant="createSale"
-              value={entidad.apellidoPaterno || ""}
-              onChange={(e) => onChange("apellidoPaterno", e.target.value)}
-              disabled={readOnly}
+              value={isEdit ? entidadToUpdate.apellidoPaterno ?? "" : entidad.apellidoPaterno ?? ""}
+              onChange={(e) => {
+                if(isEdit){
+                  setEntidadToUpdate({
+                    ...entidadToUpdate,
+                    apellidoPaterno: e.target.value
+                  })
+                }else{
+                  onChange("apellidoPaterno", e.target.value)
+                } 
+              }}
+              disabled={isEdit? false : readOnly}
             />
           </div>
           <div className={styles.FormEntidad__FormField}>
@@ -96,9 +146,18 @@ export const FormEntidad = ({
             <Input
               size="xs"
               variant="createSale"
-              value={entidad.apellidoMaterno || ""}
-              onChange={(e) => onChange("apellidoMaterno", e.target.value)}
-              disabled={readOnly}
+              value={isEdit ? entidadToUpdate.apellidoMaterno?? "" : entidad.apellidoMaterno ?? ""}
+              onChange={(e) => {
+                if(isEdit){
+                  setEntidadToUpdate({
+                    ...entidadToUpdate,
+                    apellidoMaterno: e.target.value
+                  })
+                }else{
+                  onChange("apellidoMaterno", e.target.value)
+                } 
+              }}
+              disabled={isEdit? false : readOnly}
             />
           </div>
         </>
@@ -110,9 +169,18 @@ export const FormEntidad = ({
         <Input
           size="xs"
           variant="createSale"
-          value={entidad.direccion}
-          onChange={(e) => onChange("direccion", e.target.value)}
-          disabled={readOnly}
+          value={isEdit?entidadToUpdate.direccion:entidad.direccion}
+          onChange={(e) => {
+            if(isEdit){
+              setEntidadToUpdate({
+                ...entidadToUpdate,
+                direccion: e.target.value
+              })
+            }else{
+              onChange("direccion", e.target.value)
+            } 
+          }}
+          disabled={isEdit? false : readOnly}
         />
       </div>
 
@@ -122,17 +190,31 @@ export const FormEntidad = ({
         <Input
           size="xs"
           variant="createSale"
-          value={entidad.telefono}
-          onChange={(e) => onChange("telefono", e.target.value)}
-          disabled={readOnly}
+          value={isEdit ? entidadToUpdate.telefono ?? "" : entidad.telefono ?? ""}
+          onChange={(e) =>{
+            if(isEdit){
+              setEntidadToUpdate({
+                ...entidadToUpdate,
+                telefono: e.target.value
+              })
+            }else{
+              onChange("telefono", e.target.value)
+            } 
+          }}
+          disabled={isEdit? false : readOnly}
         />
       </div>
 
-      {!readOnly && (
-        <Button disabled={loading} size="medium" onClick={onSubmit}>
-          Guardar
+      {!readOnly || isEdit ? (
+        <Button disabled={loading} size="medium" onClick={isEdit? handleUpdateEntidad : onSubmit}>
+          Guardar {isEdit? "actualización" : "nuevo registro"}
         </Button>
-      )}
+      ):(
+        <Button disabled={loading} size="medium" onClick={() => setIsEdit(true)}>
+          Activar edición
+        </Button>
+      )
+      }
     </div>
   );
 };
