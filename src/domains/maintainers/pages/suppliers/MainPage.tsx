@@ -220,6 +220,7 @@ export const MainPage: React.FC = () => {
       >
         <FormEntidad
           setError={setError}
+          setLoading={setLoading}
           entidad={isView && selectedSupplier ? selectedSupplier : newSupplier}
           error={error}
           loading={loading}
