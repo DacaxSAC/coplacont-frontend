@@ -32,7 +32,15 @@
     }
     
     &--correlativo {
-      width: 150px;
+      width: 200px; // Mismo ancho que tipo de comprobante
+      
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+    
+    &--tipo-comprobante {
+      width: 200px; // Mismo ancho que correlativo
       
       @media (max-width: 768px) {
         width: 100%;
@@ -40,7 +48,7 @@
     }
     
     &--cliente {
-      flex: 1;
+      flex: 1; // Ocupa el resto del espacio disponible
     }
     
     &--half {

@@ -5,8 +5,8 @@ import styles from "./CreateSaleForm.module.scss";
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
-import { PersonsService } from "@/domains/persons/service/PersonsService";
-import type {Person} from "@/domains/persons/service/types";
+import { EntitiesService } from "@/domains/entities";
+import type { Entidad } from "@/domains/entities/service";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoVentaEnum = {
@@ -19,11 +19,6 @@ const TipoComprobanteEnum = {
   BOLETA: "BOLETA",
   NOTA_CREDITO: "nc",
   NOTA_DEBITO: "nd",
-} as const;
-
-const TipoCambioEnum = {
-  SUNAT: "sunat",
-  SBS: "sbs",
 } as const;
 
 const MonedaEnum = {
@@ -50,7 +45,6 @@ const UnidadMedidaEnum = {
 type TipoVentaType = (typeof TipoVentaEnum)[keyof typeof TipoVentaEnum];
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
-type TipoCambioType = (typeof TipoCambioEnum)[keyof typeof TipoCambioEnum];
 type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
 type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum];
 type UnidadMedidaType =
@@ -73,6 +67,7 @@ interface DetalleVentaItem {
   total: number;
 }
 
+// Agregar estado para el tipo de cambio como string
 interface CreateSaleFormState {
   correlativo: string;
   cliente: string | "";
@@ -80,7 +75,7 @@ interface CreateSaleFormState {
   tipoComprobante: TipoComprobanteType | "";
   fechaEmision: string;
   moneda: MonedaType | "";
-  tipoCambio: TipoCambioType | "";
+  tipoCambio: string;
   serie: string;
   numero: string;
   fechaVencimiento: string;
@@ -97,11 +92,6 @@ const tipoComprobanteOptions = [
   { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
   { value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
   { value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
-];
-
-const tipoCambioOptions = [
-  { value: TipoCambioEnum.SUNAT, label: "SUNAT" },
-  { value: TipoCambioEnum.SBS, label: "SBS" },
 ];
 
 const monedaOptions = [
@@ -183,6 +173,36 @@ export const CreateSaleForm = () => {
         [field]: String(value),
       }));
     };
+
+  /**
+   * Función para verificar si el campo moneda debe estar habilitado
+   * Solo se habilita cuando hay una fecha de emisión
+   */
+  const isMonedaEnabled = (): boolean => {
+    return formState.fechaEmision !== "";
+  };
+
+  /**
+   * Función para verificar si el campo cliente debe estar habilitado
+   * Solo se habilita cuando el tipo de comprobante es FACTURA o BOLETA
+   */
+  const isClienteEnabled = (): boolean => {
+    return formState.tipoComprobante === TipoComprobanteEnum.FACTURA || 
+           formState.tipoComprobante === TipoComprobanteEnum.BOLETA;
+  };
+
+  /**
+   * Maneja el cambio de moneda y actualiza el tipo de cambio
+   */
+  const handleMonedaChange = (value: string | number) => {
+    const monedaValue = String(value) as MonedaType;
+    
+    setFormState((prev) => ({
+      ...prev,
+      moneda: monedaValue,
+      tipoCambio: monedaValue === MonedaEnum.DOLAR ? "3.75" : "", // TODO: Obtener de servicio
+    }));
+  };
 
   // Maneja el cambio de producto seleccionado
   const handleProductoChange = (value: string | number) => {
@@ -403,15 +423,15 @@ export const CreateSaleForm = () => {
   });
 
   // get clients
-  const [clients, setClients] = useState<Person[]>([]);
+  const [clients, setClients] = useState<Entidad[]>([]);
   useEffect(() => {
-    PersonsService.getClients().then((data) => {setClients(data);console.log(data)});
+    EntitiesService.getClients().then((data) => {setClients(data);console.log(data)});
   }, []);
 
   // Crear opciones dinámicas para el ComboBox de clientes
   const clientesOptionsFromAPI = clients.map(client => ({
     value: client.id.toString(),
-    label: client.displayName
+    label: client.numeroDocumento +' '+'-'+' '+  client.nombreCompleto
   }));
 
   return (
@@ -424,6 +444,7 @@ export const CreateSaleForm = () => {
       <div className={styles.CreateSaleForm__Form}>
         {/** Fila 1: Correlativo y Cliente */}
         <div className={styles.CreateSaleForm__FormRow}>
+    
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--correlativo"]}`}
           >
@@ -435,41 +456,6 @@ export const CreateSaleForm = () => {
               variant="createSale"
               value={formState.correlativo}
               onChange={handleInputChange("correlativo")}
-            />
-          </div>
-
-          <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--cliente"]}`}
-          >
-            <Text size="xs" color="neutral-primary">
-              Cliente
-            </Text>
-            <ComboBox
-              size="xs"
-              options={clientesOptionsFromAPI}
-              variant="createSale"
-              name="cliente"
-              value={formState.cliente}
-              onChange={handleComboBoxChange("cliente")}
-            />
-          </div>
-        </div>
-
-        {/** Fila 2: Tipo de venta y Tipo de comprobante */}
-        <div className={styles.CreateSaleForm__FormRow}>
-          <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
-          >
-            <Text size="xs" color="neutral-primary">
-              Tipo de venta
-            </Text>
-            <ComboBox
-              size="xs"
-              options={tipoVentaOptions}
-              variant="createSale"
-              name="tipoVenta"
-              value={formState.tipoVenta}
-              onChange={handleComboBoxChange("tipoVenta")}
             />
           </div>
 
@@ -488,9 +474,27 @@ export const CreateSaleForm = () => {
               onChange={handleComboBoxChange("tipoComprobante")}
             />
           </div>
+
+          <div
+            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--cliente"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Cliente
+            </Text>
+            <ComboBox
+              size="xs"
+              options={clientesOptionsFromAPI}
+              variant="createSale"
+              name="cliente"
+              value={formState.cliente}
+              onChange={handleComboBoxChange("cliente")}
+              disabled={!isClienteEnabled()} // Habilitado solo para FACTURA o BOLETA
+            />
+          </div>
         </div>
 
-        {/** Fila 3: Fecha de emisión, Moneda y Tipo de cambio */}
+
+        {/** Fila 2: Fecha de emisión, Moneda y Tipo de cambio */}
         <div className={styles.CreateSaleForm__FormRow}>
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
@@ -519,11 +523,12 @@ export const CreateSaleForm = () => {
               variant="createSale"
               name="moneda"
               value={formState.moneda}
-              onChange={handleComboBoxChange("moneda")}
+              onChange={handleMonedaChange} // Usar el nuevo manejador
+              disabled={!isMonedaEnabled()} // Habilitado solo cuando hay fecha de emisión
             />
           </div>
 
-          {/** Campo Tipo de cambio de la SUNAT */}
+          {/** Campo Tipo de cambio de la SUNAT - Ahora como Input bloqueado */}
           {formState.moneda !== MonedaEnum.SOL && formState.moneda !== "" && (
             <div
               className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
@@ -531,16 +536,30 @@ export const CreateSaleForm = () => {
               <Text size="xs" color="neutral-primary">
                 Tipo de cambio de la SUNAT
               </Text>
-              <ComboBox
+              <Input
                 size="xs"
-                options={tipoCambioOptions}
                 variant="createSale"
-                name="tipoCambio"
                 value={formState.tipoCambio}
-                onChange={handleComboBoxChange("tipoCambio")}
+                disabled={true} // Siempre bloqueado
               />
             </div>
           )}
+          
+          <div
+            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
+          >
+            <Text size="xs" color="neutral-primary">
+              Tipo de venta
+            </Text>
+            <ComboBox
+              size="xs"
+              options={tipoVentaOptions}
+              variant="createSale"
+              name="tipoVenta"
+              value={formState.tipoVenta}
+              onChange={handleComboBoxChange("tipoVenta")}
+            />
+          </div>
         </div>
 
         {/** Fila 4: Serie, Número y Fecha de vencimiento */}

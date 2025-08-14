@@ -5,8 +5,8 @@ import styles from "./CreatePurchaseForm.module.scss";
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
-import { PersonsService } from "@/domains/persons/service/PersonsService";
-import type {Person} from "@/domains/persons/service/types";
+import { EntitiesService } from "@/domains/entities/service";
+import type { Entidad } from "@/domains/entities/service/types";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoCompraEnum = {
@@ -403,15 +403,15 @@ export const CreatePurchaseForm = () => {
   });
 
   // get providers
-  const [providers, setProviders] = useState<Person[]>([]);
+  const [providers, setProviders] = useState<Entidad[]>([]);
   useEffect(() => {
-    PersonsService.getSuppliers().then((data) => {setProviders(data);console.log(data)});
+    EntitiesService.getSuppliers().then((data) => {setProviders(data);console.log(data)});
   }, []);
 
   // Crear opciones dinámicas para el ComboBox de proveedores
   const proveedoresOptionsFromAPI = providers.map(provider => ({
     value: provider.id.toString(),
-    label: provider.displayName
+    label: provider.numeroDocumento +' '+'-'+' '+ provider.nombreCompleto
   }));
 
   return (
