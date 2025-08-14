@@ -5,10 +5,10 @@ import styles from "./CreatePurchaseForm.module.scss";
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
-import { EntitiesService } from "@/domains/entities";
+import { EntitiesService } from "@/domains/maintainers/services";
 import { MaintainersService } from "@/domains/maintainers/services";
 import type { Product, Warehouse } from "@/domains/maintainers/services";
-import type { Entidad } from "@/domains/entities/service";
+import type { Entidad } from "@/domains/maintainers/services";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoCompraEnum = {
