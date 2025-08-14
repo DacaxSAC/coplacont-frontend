@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
-import { Table, Button, Modal, Text, ComboBox, Input, CloseIcon, StateTag } from "@/components";
+import { Table, Button, Modal, Text, ComboBox, Input, CloseIcon, CheckIcon,StateTag } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
 
@@ -94,6 +94,21 @@ export const MainPage: React.FC = () => {
     setLoading(false);
   };
 
+  const handleStateClient = async (id: number, state: boolean) => {
+    let response;
+    if(state){
+      response = await EntitiesService.deleteEntidad(id);
+    }else{
+      response = await EntitiesService.restoreEntidad(id);
+    }
+
+    if (response.success) {
+      fetchClients();
+    } else {
+      setError(response.message);
+    }
+  };
+
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
@@ -128,8 +143,8 @@ export const MainPage: React.FC = () => {
       <StateTag state={c.activo} />,
       <div style={{display:'flex', gap:'8px'}}>
         <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>Ver detalles</Button>
-        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{}}>
-          <CloseIcon />
+        <Button size="tableItemSize" variant="tableItemStyle" onClick={()=>{handleStateClient(c.id, c.activo)}}>
+          {c.activo? <CloseIcon />:<CheckIcon />}
         </Button>
       </div>
     ],
