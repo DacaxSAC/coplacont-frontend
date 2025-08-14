@@ -429,6 +429,7 @@ export const CreatePurchaseForm = () => {
   const proveedoresOptionsFromAPI = providers.map(provider => ({
     value: provider.id.toString(),
     label: provider.numeroDocumento +' '+'-'+' '+ provider.nombreCompleto
+  }));
 
   return (
     <div className={styles.CreatePurchaseForm}>
@@ -604,6 +605,7 @@ export const CreatePurchaseForm = () => {
             />
           </div>
         </div>
+
       </div>
 
       <Divider />

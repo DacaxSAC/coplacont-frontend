@@ -6,6 +6,8 @@ import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/entities";
+import { MaintainersService } from "@/domains/maintainers/services";
+import type { Product, Warehouse } from "@/domains/maintainers/services";
 import type { Entidad } from "@/domains/entities/service";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import {
@@ -31,8 +33,7 @@ import {
   monedaOptions,
   unidadMedidaOptions,
 } from "./types";
-import type {CreateSaleFormState, DetalleVentaItem} from "./types";
-
+import type { CreateSaleFormState, DetalleVentaItem } from "./types";
 
 export const CreateSaleForm = () => {
   const navigate = useNavigate();
@@ -57,13 +58,13 @@ export const CreateSaleForm = () => {
   useEffect(() => {
     const fetchCorrelativo = async () => {
       try {
-        const response = await TransactionsService.getCorrelative('venta');
-        setFormState(prev => ({
+        const response = await TransactionsService.getCorrelative("venta");
+        setFormState((prev) => ({
           ...prev,
-          correlativo: response.correlativo
+          correlativo: response.correlativo,
         }));
       } catch (error) {
-        console.error('Error al obtener el correlativo:', error);
+        console.error("Error al obtener el correlativo:", error);
       }
     };
 
@@ -96,7 +97,7 @@ export const CreateSaleForm = () => {
 
   const handleTipoComprobanteChange = (value: string | number) => {
     const tipoComprobanteValue = String(value) as TipoComprobanteType;
-    
+
     setFormState((prev) => ({
       ...prev,
       tipoComprobante: tipoComprobanteValue,
@@ -109,8 +110,10 @@ export const CreateSaleForm = () => {
   };
 
   const isClienteEnabled = (): boolean => {
-    return formState.tipoComprobante === TipoComprobanteEnum.FACTURA || 
-           formState.tipoComprobante === TipoComprobanteEnum.BOLETA;
+    return (
+      formState.tipoComprobante === TipoComprobanteEnum.FACTURA ||
+      formState.tipoComprobante === TipoComprobanteEnum.BOLETA
+    );
   };
 
   const isDetalleVentaEnabled = () => {
@@ -123,19 +126,21 @@ export const CreateSaleForm = () => {
    */
   const handleMonedaChange = async (value: string | number) => {
     const monedaValue = String(value) as MonedaType;
-    
+
     if (monedaValue === MonedaEnum.DOLAR) {
       try {
         // Obtener tipo de cambio de la SUNAT usando la fecha de emisión
-         const typeExchangeData = await TransactionsService.getTypeExchange(formState.fechaEmision);
-         
-         setFormState((prev) => ({
-           ...prev,
-           moneda: monedaValue,
-           tipoCambio: typeExchangeData.data?.compra?.toString() || "3.75", // Usar el valor de compra
-         }));
+        const typeExchangeData = await TransactionsService.getTypeExchange(
+          formState.fechaEmision
+        );
+
+        setFormState((prev) => ({
+          ...prev,
+          moneda: monedaValue,
+          tipoCambio: typeExchangeData.data?.compra?.toString() || "3.75", // Usar el valor de compra
+        }));
       } catch (error) {
-        console.error('Error al obtener tipo de cambio:', error);
+        console.error("Error al obtener tipo de cambio:", error);
         // En caso de error, usar valor por defecto
         setFormState((prev) => ({
           ...prev,
@@ -157,7 +162,7 @@ export const CreateSaleForm = () => {
   //const handleProductoChange = (value: string | number) => {
   //  const productoValue = String(value) as ProductoType;
   //  setProductoSeleccionado(productoValue);
-//
+  //
   //  // Buscar la unidad de medida correspondiente al producto seleccionado
   //  const productoOption = productosOptions.find(
   //    (option) => option.value === productoValue
@@ -166,7 +171,6 @@ export const CreateSaleForm = () => {
   //    setUnidadMedidaSeleccionada(productoOption.unidadMedida);
   //  }
   //};
-
 
   // Maneja el cambio de cantidad ingresada
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -257,7 +261,9 @@ export const CreateSaleForm = () => {
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
 
-      navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`);
+      navigate(
+        `${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`
+      );
     } catch (error) {
       console.error("Error al registrar la venta:", error);
     }
@@ -294,23 +300,37 @@ export const CreateSaleForm = () => {
 
   // CLIENTES
   const [clients, setClients] = useState<Entidad[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   useEffect(() => {
-    EntitiesService.getClients().then((data) => {setClients(data);console.log(data)});
+    EntitiesService.getClients().then((data) => {
+      setClients(data);
+      console.log(data);
+    });
+    MaintainersService.getProducts().then((data) => {
+      setProducts(data);
+      console.log(data);
+    });
+    MaintainersService.getWarehouses().then((data) => {
+      setWarehouses(data);
+      console.log(data);
+    });
   }, []);
-
 
   const getFilteredClientOptions = () => {
     let filteredClients = clients;
 
     if (formState.tipoComprobante === TipoComprobanteEnum.FACTURA) {
-      filteredClients = clients.filter(client => client.tipo === 'JURIDICA');
+      filteredClients = clients.filter((client) => client.tipo === "JURIDICA");
     } else if (formState.tipoComprobante === TipoComprobanteEnum.BOLETA) {
-      filteredClients = clients.filter(client => client.tipo === 'NATURAL');
+      filteredClients = clients.filter((client) => client.tipo === "NATURAL");
     }
 
-    return filteredClients.map(client => ({
+    return filteredClients.map((client) => ({
       value: client.id.toString(),
-      label: `${client.razonSocial || client.nombreCompleto} - ${client.numeroDocumento}`,
+      label: `${client.razonSocial || client.nombreCompleto} - ${
+        client.numeroDocumento
+      }`,
     }));
   };
 
@@ -318,11 +338,12 @@ export const CreateSaleForm = () => {
 
   const getSelectedClientId = (): number | null => {
     if (!formState.cliente) return null;
-    
-    const selectedClient = clients.find(client => client.id.toString() === formState.cliente);
+
+    const selectedClient = clients.find(
+      (client) => client.id.toString() === formState.cliente
+    );
     return selectedClient ? selectedClient.id : null;
   };
-
 
   return (
     <div className={styles.CreateSaleForm}>
@@ -334,7 +355,6 @@ export const CreateSaleForm = () => {
       <div className={styles.CreateSaleForm__Form}>
         {/** Fila 1: Correlativo y Cliente */}
         <div className={styles.CreateSaleForm__FormRow}>
-    
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--correlativo"]}`}
           >
@@ -382,7 +402,6 @@ export const CreateSaleForm = () => {
             />
           </div>
         </div>
-
 
         {/** Fila 2: Fecha de emisión, Moneda y Tipo de cambio */}
         <div className={styles.CreateSaleForm__FormRow}>
@@ -434,7 +453,7 @@ export const CreateSaleForm = () => {
               />
             </div>
           )}
-          
+
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--half"]}`}
           >
@@ -513,6 +532,7 @@ export const CreateSaleForm = () => {
             />
           </div>
         </div>
+
       </div>
 
       <Divider />
@@ -522,6 +542,24 @@ export const CreateSaleForm = () => {
       </Text>
 
       <div className={styles.CreateSaleForm__AddItems}>
+
+        <div
+          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+        >
+          <Text size="xs" color="neutral-primary">
+            Almacen
+          </Text>
+          <ComboBox
+            size="xs"
+            options={tipoProductoVentaOptions}
+            variant="createSale"
+            name="tipoProductoVenta"
+            value={formState.tipoProductoVenta}
+            onChange={handleComboBoxChange("tipoProductoVenta")}
+          />
+        </div>
+
+
         {/**<div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--descripcion"]}`}
         >
@@ -560,6 +598,14 @@ export const CreateSaleForm = () => {
         </div>
 
         <div
+          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+        >
+          <Text size="xs" color="neutral-primary">
+            Precio unitario
+          </Text>
+        </div>
+
+        <div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
         >
           <Text size="xs" color="neutral-primary">
@@ -576,41 +622,13 @@ export const CreateSaleForm = () => {
         </div>
 
         <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
-          >
-            <Text size="xs" color="neutral-primary">
-              Precio unitario
-            </Text>
-            <ComboBox
-              size="xs"
-              options={tipoProductoVentaOptions}
-              variant="createSale"
-              name="tipoProductoVenta"
-              value={formState.tipoProductoVenta}
-              onChange={handleComboBoxChange("tipoProductoVenta")}
-            />
-        </div>
-
-        <div
-            className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
-          >
-            <Text size="xs" color="neutral-primary">
-              Almacen
-            </Text>
-            <ComboBox
-              size="xs"
-              options={tipoProductoVentaOptions}
-              variant="createSale"
-              name="tipoProductoVenta"
-              value={formState.tipoProductoVenta}
-              onChange={handleComboBoxChange("tipoProductoVenta")}
-            />
-        </div>
-
-        <div
           className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--button"]}`}
         >
-          <Button size="small" onClick={() => {}} disabled={!isDetalleVentaEnabled()}>
+          <Button
+            size="small"
+            onClick={() => {}}
+            disabled={!isDetalleVentaEnabled()}
+          >
             Agregar
           </Button>
         </div>
