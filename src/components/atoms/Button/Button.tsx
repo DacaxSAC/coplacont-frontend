@@ -8,6 +8,7 @@ export interface ButtonProps {
   disabled?: boolean;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
+  className?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -17,13 +18,14 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   onClick,
   type = 'button',
+  className,
 }) => {
-  const className = `${styles.button} ${styles[`button--${variant}`]} ${styles[`button--${size}`]} ${disabled ? styles['button--disabled'] : ''}`.trim();
+  const classNameMain = `${styles.button} ${styles[`button--${variant}`]} ${styles[`button--${size}`]} ${disabled ? styles['button--disabled'] : ''} ${className}`.trim();
 
   return (
     <button
       type={type}
-      className={className}
+        className={`${classNameMain} ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

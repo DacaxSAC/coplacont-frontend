@@ -5,10 +5,10 @@ import styles from "./CreatePurchaseForm.module.scss";
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
-import { EntitiesService } from "@/domains/maintainers/services";
-import { MaintainersService } from "@/domains/maintainers/services";
-import type { Product, Warehouse } from "@/domains/maintainers/services";
-import type { Entidad } from "@/domains/maintainers/services";
+import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
+import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import type { Product, Warehouse } from "@/domains/maintainers/types";
+import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoCompraEnum = {
@@ -206,8 +206,8 @@ export const CreatePurchaseForm = () => {
     const loadMaintainerData = async () => {
       try {
         const [productosData, almacenesData] = await Promise.all([
-          MaintainersService.getProducts(),
-          MaintainersService.getWarehouses(),
+          ProductService.getAll(),
+          WarehouseService.getAll(),
         ]);
         setProductos(productosData);
         setAlmacenes(almacenesData);

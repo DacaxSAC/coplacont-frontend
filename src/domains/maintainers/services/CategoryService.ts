@@ -1,0 +1,35 @@
+import  { CategoryApi } from '../api';
+import type { Category } from '../types';
+
+
+export class CategoryService {
+    static async getAll(): Promise<Category[]> {
+        const response = await CategoryApi.getCategories();
+        return response.data;
+    }
+    
+    static async getById(id: number): Promise<Category> {
+        const response = await CategoryApi.getCategory(id);
+        return response.data;
+    }
+
+    static async create(category: Category): Promise<Category> {
+        const response = await CategoryApi.postCategory(category);
+        return response.data;
+    }
+
+    static async update(id: number, category: Category): Promise<Category> {
+        const response = await CategoryApi.patchCategory(id, category);
+        return response.data;
+    }
+
+    static async delete(id: number): Promise<void> {
+        await CategoryApi.deleteCategory(id);
+    }
+
+    static async getByName(name: string): Promise<Category[]> {
+        const response = await CategoryApi.getCategoryByName(name);
+        return response.data;
+    }
+
+}

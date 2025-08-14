@@ -1,3 +1,3 @@
-export * from './MaintainersService';
-export * from './types';
-export * from './entitiesService';
+export { CategoryService } from './CategoryService';
+export { ProductService } from './ProductService';
+export { WarehouseService } from './WarehouseService';

@@ -1,4 +1,4 @@
-import { entitiesApi } from '../api/entitiesApi';
+import { entitiesApi } from '../../api/entitiesApi';
 import type { Entidad } from './types';
 
 

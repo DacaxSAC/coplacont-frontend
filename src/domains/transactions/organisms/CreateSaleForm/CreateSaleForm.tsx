@@ -5,10 +5,10 @@ import styles from "./CreateSaleForm.module.scss";
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
-import { EntitiesService } from "@/domains/maintainers/services";
-import { MaintainersService } from "@/domains/maintainers/services";
-import type { Product, Warehouse } from "@/domains/maintainers/services";
-import type { Entidad } from "@/domains/maintainers/services";
+import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
+import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import type { Product, Warehouse } from "@/domains/maintainers/types";
+import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import {
   TipoVentaEnum,
@@ -324,11 +324,11 @@ export const CreateSaleForm = () => {
       setClients(data);
       console.log(data);
     });
-    MaintainersService.getProducts().then((data) => {
+    ProductService.getAll().then((data) => {
       setProducts(data);
       console.log(data);
     });
-    MaintainersService.getWarehouses().then((data) => {
+    WarehouseService.getAll().then((data) => {
       setWarehouses(data);
       console.log(data);
     });
