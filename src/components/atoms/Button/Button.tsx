@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Button.module.scss';
 
 export interface ButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'danger' | 'tableItemStyle';
   size?: 'small' | 'medium' | 'large' | 'tableItemSize';
   disabled?: boolean;
