@@ -121,6 +121,23 @@ export const CreateSaleForm = () => {
   };
 
   /**
+   * Valida si todas las cabeceras obligatorias están completas
+   * @returns {boolean} true si todas las cabeceras obligatorias están completas
+   */
+  const areRequiredHeadersComplete = (): boolean => {
+    return (
+      formState.tipoComprobante !== "" &&
+      formState.fechaEmision !== "" &&
+      formState.moneda !== "" &&
+      formState.tipoVenta !== "" &&
+      formState.tipoProductoVenta !== "" &&
+      formState.serie !== "" &&
+      formState.numero !== "" &&
+      formState.fechaVencimiento !== ""
+    );
+  };
+
+  /**
    * Maneja el cambio de moneda y actualiza el tipo de cambio
    * Si se selecciona dólar, obtiene el tipo de cambio de la SUNAT según la fecha de emisión
    */
@@ -362,6 +379,7 @@ export const CreateSaleForm = () => {
               Correlativo
             </Text>
             <Input
+              disabled={true}
               size="xs"
               variant="createSale"
               value={formState.correlativo}
@@ -471,7 +489,7 @@ export const CreateSaleForm = () => {
           </div>
         </div>
 
-        {/** Fila 4: Serie, Número y Fecha de vencimiento */}
+        {/** Fila 3: Serie, Número y Fecha de vencimiento */}
         <div className={styles.CreateSaleForm__FormRow}>
           <div
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
@@ -537,117 +555,129 @@ export const CreateSaleForm = () => {
 
       <Divider />
 
-      <Text size="xl" color="neutral-primary">
-        Detalle de venta
-      </Text>
-
-      <div className={styles.CreateSaleForm__AddItems}>
-
-        <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
-        >
-          <Text size="xs" color="neutral-primary">
-            Almacen
+      {/* Mostrar sección de detalle solo si se ha seleccionado un tipo de producto venta */}
+      {formState.tipoProductoVenta && (
+        <>
+          <Text size="xl" color="neutral-primary">
+            Detalle de venta
           </Text>
-          <ComboBox
-            size="xs"
-            options={tipoProductoVentaOptions}
-            variant="createSale"
-            name="tipoProductoVenta"
-            value={formState.tipoProductoVenta}
-            onChange={handleComboBoxChange("tipoProductoVenta")}
-          />
-        </div>
+
+          <div className={styles.CreateSaleForm__AddItems}>
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Almacen
+              </Text>
+              <ComboBox
+                size="xs"
+                options={tipoProductoVentaOptions}
+                variant="createSale"
+                name="tipoProductoVenta"
+                value={formState.tipoProductoVenta}
+                onChange={handleComboBoxChange("tipoProductoVenta")}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Producto
+              </Text>
+              <ComboBox
+                size="xs"
+                options={tipoProductoVentaOptions}
+                variant="createSale"
+                name="tipoProductoVenta"
+                value={formState.tipoProductoVenta}
+                onChange={handleComboBoxChange("tipoProductoVenta")}
+                disabled={!isDetalleVentaEnabled()}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Unidad de medida
+              </Text>
+              <Input
+                size="xs"
+                variant="createSale"
+                value={
+                  unidadMedidaSeleccionada
+                    ? unidadMedidaOptions.find(
+                        (option) => option.value === unidadMedidaSeleccionada
+                      )?.label || ""
+                    : ""
+                }
+                disabled={!isDetalleVentaEnabled()}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Precio unitario
+              </Text>
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Cantidad
+              </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={cantidadIngresada}
+                onChange={handleCantidadChange}
+                disabled={!isDetalleVentaEnabled()}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--button"]}`}
+            >
+              <Button
+                size="small"
+                onClick={() => {}}
+                disabled={!isDetalleVentaEnabled()}
+              >
+                Agregar
+              </Button>
+            </div>
+          </div>
+
+          {/** Table */}
+          {/**{detalleVenta.length > 0 && (
+            <Table
+              headers={tableHeaders}
+              rows={tableRows}
+              gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
+            />
+          )}*/}
+       <Divider />
+        </>
+      )}
 
 
-        {/**<div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--descripcion"]}`}
-        >
-          <Text size="xs" color="neutral-primary">
-            Producto
-          </Text>
-          <ComboBox
-            options={getFilteredProductosOptions(formState.tipoProductoVenta)}
-            variant="createSale"
-            size="xs"
-            name="producto"
-            value={productoSeleccionado}
-            onChange={handleProductoChange}
-            disabled={!isDetalleVentaEnabled()}
-          />
-        </div>*/}
-
-        <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
-        >
-          <Text size="xs" color="neutral-primary">
-            Unidad de medida
-          </Text>
-          <Input
-            size="xs"
-            variant="createSale"
-            value={
-              unidadMedidaSeleccionada
-                ? unidadMedidaOptions.find(
-                    (option) => option.value === unidadMedidaSeleccionada
-                  )?.label || ""
-                : ""
-            }
-            disabled={!isDetalleVentaEnabled()}
-          />
-        </div>
-
-        <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
-        >
-          <Text size="xs" color="neutral-primary">
-            Precio unitario
-          </Text>
-        </div>
-
-        <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
-        >
-          <Text size="xs" color="neutral-primary">
-            Cantidad
-          </Text>
-          <Input
-            size="xs"
-            type="number"
-            variant="createSale"
-            value={cantidadIngresada}
-            onChange={handleCantidadChange}
-            disabled={!isDetalleVentaEnabled()}
-          />
-        </div>
-
-        <div
-          className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--button"]}`}
-        >
-          <Button
-            size="small"
-            onClick={() => {}}
-            disabled={!isDetalleVentaEnabled()}
-          >
-            Agregar
-          </Button>
-        </div>
-      </div>
-
-      {/** Table */}
-      {/**{detalleVenta.length > 0 && (
-        <Table
-          headers={tableHeaders}
-          rows={tableRows}
-          gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
-        />
-      )}*/}
-
-      <Divider />
 
       <div className={styles.CreateSaleForm__Actions}>
-        <Button onClick={handleAceptarVenta}>Aceptar</Button>
-        <Button onClick={handleAceptarYNuevaVenta}>
+        <Button 
+          onClick={handleAceptarVenta}
+          disabled={!areRequiredHeadersComplete()}
+        >
+          Aceptar
+        </Button>
+        <Button 
+          onClick={handleAceptarYNuevaVenta}
+          disabled={!areRequiredHeadersComplete()}
+        >
           Aceptar y nueva venta
         </Button>
       </div>

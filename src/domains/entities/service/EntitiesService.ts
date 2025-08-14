@@ -9,6 +9,7 @@ export class EntitiesService {
     }
     static async getSuppliers(): Promise<Entidad[]> {
         const response = await entitiesApi.getSuppliers();
+        console.log(response)
         return response.data.data;
     }
 }
