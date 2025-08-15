@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PageLayout } from "@/components";
 import {
   Table,
+  type TableRow,
   Button,
   CloseIcon,
   CheckIcon,
@@ -20,6 +21,7 @@ export const MainPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productType, setProductType] = useState<'producto' | 'servicio'>('producto');
+  const [isLoading, setIsLoading] = useState(true);
   const [newProduct, setNewProduct] = useState({
     codigo: "",
     nombre: "",
@@ -80,14 +82,35 @@ export const MainPage: React.FC = () => {
     }
   };
 
+  const handleDeleteProduct = async (id: number) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+      try {
+        await ProductService.delete(id);
+        fetchProducts();
+      } catch (error) {
+        console.error("Error al eliminar producto:", error);
+      }
+    }
+  };
+
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
 
   const fetchProducts = () => {
-    ProductService.getAll().then((res: Product[]) => {
-      setProducts(res);
-    });
+    setIsLoading(true);
+    ProductService.getAll()
+      .then((res: Product[]) => {
+        console.log('Productos cargados:', res);
+        setProducts(res);
+      })
+      .catch((error) => {
+        console.error('Error al cargar productos:', error);
+        setProducts([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -104,41 +127,44 @@ export const MainPage: React.FC = () => {
     "Acciones",
   ];
   
-  const rows = products.map((p) => ({
-    id: p.id,
-    cells: [
-      p.codigo,
-      p.nombre,
-      p.descripcion,
-      p.unidadMedida || "No especificado",
-      p.categoria?.nombre || "No especificado",
-      <StateTag state={p.estado} />,
-      <div style={{ display: "flex", gap: "8px" }}>
-        <Button
-          size="tableItemSize"
-          variant="tableItemStyle"
-          onClick={() => {
-            setSelectedProduct(p);
-            setIsView(true);
-            setIsOpen(true);
-          }}
-        >
-          Ver detalles
-        </Button>
-        <Button
-          size="tableItemSize"
-          variant="tableItemStyle"
-          onClick={() => {
-            handleStateProduct(p.id, p.estado);
-          }}
-        >
-          {p.estado ? <CloseIcon /> : <CheckIcon />}
-        </Button>
-      </div>,
-    ],
-  }));
+  const rows: TableRow[] = products.map((p) => {
+    console.log('Producto individual:', p);
+    return {
+      id: p.id,
+      cells: [
+        p.codigo || "No asignado",
+        p.nombre || "Sin nombre",
+        p.descripcion || "Sin descripción",
+        p.unidadMedida || "Sin unidad",
+        p.categoria?.nombre || "Sin categoría",
+        <StateTag state={p.estado} />,
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button
+            size="tableItemSize"
+            variant="tableItemStyle"
+            onClick={() => {
+              setSelectedProduct(p);
+              setIsView(true);
+              setIsOpen(true);
+            }}
+          >
+            Ver detalles
+          </Button>
+          <Button
+            size="tableItemSize"
+            variant="tableItemStyle"
+            onClick={() => {
+              handleStateProduct(p.id, p.estado);
+            }}
+          >
+            {p.estado ? <CloseIcon /> : <CheckIcon />}
+          </Button>
+        </div>,
+      ],
+    };
+  });
   
-  const gridTemplate = "1fr 2fr 1fr 1.5fr 1fr 1fr 1fr 2fr";
+  const gridTemplate = "1.5fr 2fr 1.5fr 1fr 1.5fr 1fr 2.5fr";
 
   return (
     <PageLayout
@@ -169,7 +195,18 @@ export const MainPage: React.FC = () => {
         />
       }
     >
-      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+      {isLoading ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>Cargando productos...</div>
+      ) : products.length === 0 ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>No hay productos disponibles</div>
+      ) : (
+        <>
+          <div style={{ padding: '10px', fontSize: '12px', color: '#666' }}>
+            Total de productos: {products.length}
+          </div>
+          <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+        </>
+      )}
 
       <ProductModal
         isOpen={isOpen}
