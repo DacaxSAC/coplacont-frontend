@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./FormCategory.module.scss";
-import { Text, Input, Button } from "@/components";
+import { Text, Input, Button, ComboBox } from "@/components";
 import type { Category, CreateCategoryPayload } from "../../types";
 import { CategoryService } from "../../services";
 
@@ -30,6 +30,7 @@ export const FormCategory = ({
   const [categoryToUpdate, setCategoryToUpdate] = useState<CreateCategoryPayload>({
     nombre: category.nombre,
     descripcion: category.descripcion,
+    tipo: (category as Category).tipo || 'producto',
   });
 
   const [isEdit, setIsEdit] = useState(false);
@@ -97,6 +98,34 @@ export const FormCategory = ({
               onChange("descripcion", e.target.value);
             }
           }}
+          disabled={isEdit ? false : readOnly}
+        />
+      </div>
+
+      {/* Tipo */}
+      <div className={styles.FormCategory__FormField}>
+        <Text size="xs" color="neutral-primary">
+          Tipo de categoría
+        </Text>
+        <ComboBox
+          size="xs"
+          variant="createSale"
+          value={isCreate ? (category as CreateCategoryPayload).tipo || 'producto' : categoryToUpdate.tipo}
+          onChange={(value) => {
+             const stringValue = String(value);
+             if (isEdit) {
+               setCategoryToUpdate({
+                 ...categoryToUpdate,
+                 tipo: stringValue as 'producto' | 'servicio',
+               });
+             } else {
+               onChange("tipo", stringValue);
+             }
+           }}
+          options={[
+            { value: 'producto', label: 'Producto' },
+            { value: 'servicio', label: 'Servicio' }
+          ]}
           disabled={isEdit ? false : readOnly}
         />
       </div>

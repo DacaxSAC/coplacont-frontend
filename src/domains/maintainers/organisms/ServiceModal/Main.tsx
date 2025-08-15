@@ -29,7 +29,14 @@ export const Main: React.FC<CreateServiceModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       CategoryService.getAll()
-        .then((data) => setCategories(Array.isArray(data) ? data : []))
+        .then((data) => {
+          const allCategories = Array.isArray(data) ? data : [];
+          // Filtrar categorías de tipo 'servicio'
+          const filteredCategories = allCategories.filter(category => 
+            category.tipo === 'servicio'
+          );
+          setCategories(filteredCategories);
+        })
         .catch(() => setCategories([]));
     }
   }, [isOpen]);

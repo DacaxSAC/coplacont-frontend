@@ -11,7 +11,7 @@ interface CreateProductModalProps {
     nombre: string
     descripcion: string;
     unidadMedida: string;
-    categoriaId: number;
+    idCategoria: number;
   }) => void | Promise<void>;
   title?: string;
   description?: string;
@@ -44,18 +44,34 @@ export const Main: React.FC<CreateProductModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       CategoryService.getAll()
-        .then((data) => setCategories(Array.isArray(data) ? data : []))
+        .then((data) => {
+          const allCategories = Array.isArray(data) ? data : [];
+          // Filtrar categorías según el tipo
+          let filteredCategories = allCategories.filter(category => 
+            isService ? category.tipo === 'servicio' : category.tipo === 'producto'
+          );
+          
+          // Si estamos editando y hay valores iniciales, asegurar que la categoría actual esté incluida
+          if (initialValues && initialValues.categoriaId) {
+            const currentCategory = allCategories.find(cat => cat.id === initialValues.categoriaId);
+            if (currentCategory && !filteredCategories.find(cat => cat.id === currentCategory.id)) {
+              filteredCategories = [...filteredCategories, currentCategory];
+            }
+          }
+          
+          setCategories(filteredCategories);
+        })
         .catch(() => setCategories([]));
     }
-  }, [isOpen]);
+  }, [isOpen, isService, initialValues]);
 
   // Cargar valores iniciales cuando cambian
   useEffect(() => {
     if (initialValues) {
-      setNombre(initialValues.nombre);
-      setDescripcion(initialValues.descripcion);
-      setUnidadMedida(initialValues.unidadMedida);
-      setCategoriaId(initialValues.categoriaId.toString());
+      setNombre(initialValues.nombre || "");
+      setDescripcion(initialValues.descripcion || "");
+      setUnidadMedida(initialValues.unidadMedida || "");
+      setCategoriaId(initialValues.categoriaId?.toString() || "");
     } else {
       // Reset form
       setNombre("")
@@ -77,27 +93,20 @@ export const Main: React.FC<CreateProductModalProps> = ({
   ]
 
   const handleSubmit = async () => {
-    // Para servicios, la unidad de medida es opcional
-    if (!nombre.trim() || !descripcion.trim() || (!isService && !unidadMedida) || !categoriaId)
+    if (!nombre?.trim() || !descripcion?.trim() || (!isService && !unidadMedida) || !categoriaId)
       return;
 
-    await onSubmit({
-      nombre: nombre.trim(),
-      descripcion: descripcion.trim(),
-      unidadMedida: isService ? (unidadMedida.trim() || 'servicio') : unidadMedida.trim(),
-      categoriaId: parseInt(categoriaId),
-    });
-
-    // Reset form
-    setNombre("");
-    setDescripcion("");
-    setUnidadMedida("");
-    setCategoriaId("");
-    onClose();
+    const dataToSubmit = {
+      nombre: nombre?.trim() || "",
+      descripcion: descripcion?.trim() || "",
+      unidadMedida: isService ? (unidadMedida?.trim() || 'servicio') : (unidadMedida?.trim() || ""),
+      idCategoria: parseInt(categoriaId),
+    };
+    
+    await onSubmit(dataToSubmit);
   };
 
   const handleClose = () => {
-    // Reset form
     setNombre("")
     setDescripcion("");
     setUnidadMedida("");
@@ -106,7 +115,7 @@ export const Main: React.FC<CreateProductModalProps> = ({
   };
 
   const isFormValid =
-    nombre.trim() && descripcion.trim() && (isService || unidadMedida) && categoriaId;
+    nombre?.trim() && descripcion?.trim() && (isService || unidadMedida) && categoriaId;
 
   return (
     <Modal

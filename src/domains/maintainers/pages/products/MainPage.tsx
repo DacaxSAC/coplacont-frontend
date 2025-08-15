@@ -44,12 +44,13 @@ export const MainPage: React.FC = () => {
     nombre: string;
     descripcion: string;
     unidadMedida: string;
-    categoriaId: number;
+    idCategoria: number;
   }) => {
     setLoading(true);
     try {
       const payload = { 
-        ...data, 
+        ...data,
+        categoriaId: data.idCategoria,
         tipo: productType, 
         estado: true 
       };
@@ -60,6 +61,33 @@ export const MainPage: React.FC = () => {
     } catch (error) {
       setError(`Error al crear el ${productType}`);
       console.error(`Error al crear ${productType}:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditProduct = async (data: {
+    nombre: string;
+    descripcion: string;
+    unidadMedida: string;
+    idCategoria: number;
+  }) => {
+    if (!selectedProduct) return;
+    
+    setLoading(true);
+    try {
+      const updated = await ProductService.update(selectedProduct.id, {
+        ...data,
+        categoriaId: data.idCategoria
+      });
+      setProducts((prev) =>
+        prev.map((p) => (p.id === selectedProduct.id ? updated : p))
+      );
+      setSelectedProduct(updated);
+      setIsOpen(false);
+    } catch (error) {
+      setError(`Error al actualizar el ${productType}`);
+      console.error(`Error al actualizar ${productType}:`, error);
     } finally {
       setLoading(false);
     }
@@ -82,19 +110,12 @@ export const MainPage: React.FC = () => {
     }
   };
 
-  const handleDeleteProduct = async (id: number) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
-      try {
-        await ProductService.delete(id);
-        fetchProducts();
-      } catch (error) {
-        console.error("Error al eliminar producto:", error);
-      }
-    }
-  };
-
   const handleModal = () => {
     setIsOpen(!isOpen);
+    if (isOpen) {
+      setIsView(false);
+      setSelectedProduct(null);
+    }
   };
 
   const fetchProducts = () => {
@@ -144,6 +165,7 @@ export const MainPage: React.FC = () => {
             variant="tableItemStyle"
             onClick={() => {
               setSelectedProduct(p);
+              setProductType(p.tipo as 'producto' | 'servicio');
               setIsView(true);
               setIsOpen(true);
             }}
@@ -179,6 +201,7 @@ export const MainPage: React.FC = () => {
                 setProductType('producto');
                 resetForm();
                 setIsView(false);
+                setSelectedProduct(null);
                 setIsOpen(true);
               },
             },
@@ -188,6 +211,7 @@ export const MainPage: React.FC = () => {
                 setProductType('servicio');
                 resetForm();
                 setIsView(false);
+                setSelectedProduct(null);
                 setIsOpen(true);
               },
             },
@@ -211,10 +235,10 @@ export const MainPage: React.FC = () => {
       <ProductModal
         isOpen={isOpen}
         onClose={handleModal}
-        onSubmit={isView ? async () => {} : handleCreateProduct}
+        onSubmit={isView ? handleEditProduct : handleCreateProduct}
         title={isView ? "Detalles del producto" : `Creación de nuevo ${productType}`}
         description={isView ? "Información del producto seleccionado." : `Ingresa los siguientes datos para registrar un ${productType}.`}
-        submitLabel={isView ? "Cerrar" : "Guardar"}
+        submitLabel={isView ? "Actualizar" : "Guardar"}
         isService={productType === 'servicio'}
         initialValues={isView && selectedProduct ? {
           nombre: selectedProduct.nombre,
