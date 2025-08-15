@@ -28,11 +28,6 @@ const TipoComprobanteEnum = {
   NOTA_DEBITO: "nd",
 } as const;
 
-const TipoCambioEnum = {
-  SUNAT: "sunat",
-  SBS: "sbs",
-} as const;
-
 const MonedaEnum = {
   SOL: "sol",
   DOLAR: "dol",
@@ -58,7 +53,6 @@ type TipoProductoCompraType =
   (typeof TipoProductoCompraEnum)[keyof typeof TipoProductoCompraEnum];
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
-type TipoCambioType = (typeof TipoCambioEnum)[keyof typeof TipoCambioEnum];
 type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
 type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum];
 type UnidadMedidaType =
@@ -109,11 +103,6 @@ const tipoComprobanteOptions = [
   { value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
 ];
 
-const tipoCambioOptions = [
-  { value: TipoCambioEnum.SUNAT, label: "SUNAT" },
-  { value: TipoCambioEnum.SBS, label: "SBS" },
-];
-
 const monedaOptions = [
   { value: MonedaEnum.SOL, label: "Sol" },
   { value: MonedaEnum.DOLAR, label: "Dólar" },
@@ -140,14 +129,6 @@ const productosOptions = [
     label: "Servicio B - Descripción del servicio B",
     unidadMedida: UnidadMedidaEnum.METRO,
   },
-];
-
-const unidadMedidaOptions = [
-  { value: UnidadMedidaEnum.UNIDAD, label: "Unidad" },
-  { value: UnidadMedidaEnum.KILOGRAMO, label: "Kilogramo" },
-  { value: UnidadMedidaEnum.METRO, label: "Metro" },
-  { value: UnidadMedidaEnum.LITRO, label: "Litro" },
-  { value: UnidadMedidaEnum.CAJA, label: "Caja" },
 ];
 
 export const CreatePurchaseForm = () => {
@@ -179,10 +160,13 @@ export const CreatePurchaseForm = () => {
   // Estados para datos de maintainers
   const [proveedores, setProveedores] = useState<Entidad[]>([]);
   const [productos, setProductos] = useState<Product[]>([]);
+  console.log(productos);
   const [almacenes, setAlmacenes] = useState<Warehouse[]>([]);
+  console.log(almacenes);
 
   // Estado para tipo de cambio automático
   const [tipoCambioAutomatico, setTipoCambioAutomatico] = useState<string>("");
+  console.log(tipoCambioAutomatico);
 
   // Obtener el correlativo al montar el componente
   useEffect(() => {
