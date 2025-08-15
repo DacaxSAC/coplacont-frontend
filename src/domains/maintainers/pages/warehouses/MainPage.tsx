@@ -15,7 +15,6 @@ import {
 
 import type { Warehouse, WarehouseParcial } from "@/domains/maintainers/types";
 import { WarehouseService } from "@/domains/maintainers/services";
-import { WarehouseModal } from "@/domains/maintainers/organisms";
 import { FormWarehouse } from "../../organisms/FormWarehouse/FormWarehouse";
 
 export const MainPage: React.FC = () => {
