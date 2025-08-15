@@ -11,16 +11,10 @@ import type { Product, Warehouse } from "@/domains/maintainers/types";
 import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import {
-  TipoVentaEnum,
-  TipoProductoVentaEnum,
   TipoComprobanteEnum,
   MonedaEnum,
-  ProductoEnum,
-  UnidadMedidaEnum,
 } from "./enums";
 import type {
-  TipoVentaType,
-  TipoProductoVentaType,
   TipoComprobanteType,
   MonedaType,
   ProductoType,
@@ -73,6 +67,7 @@ export const CreateSaleForm = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState<
     ProductoType | ""
   >("");
+  console.log(productoSeleccionado);
   const [unidadMedidaSeleccionada, setUnidadMedidaSeleccionada] = useState<
     UnidadMedidaType | ""
   >("");
@@ -314,11 +309,14 @@ export const CreateSaleForm = () => {
       ],
     };
   });
+  console.log(tableRows);
 
   // CLIENTES
   const [clients, setClients] = useState<Entidad[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  console.log(products);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  console.log(warehouses);
   useEffect(() => {
     EntitiesService.getClients().then((data) => {
       setClients(data);
