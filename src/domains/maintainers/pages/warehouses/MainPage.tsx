@@ -4,13 +4,15 @@ import styles from "./MainPage.module.scss";
 import {
   Button,
   PageLayout,
-  FormField,
   Table,
   type TableRow,
   StateTag,
   CloseIcon,
   CheckIcon,
   Modal,
+  Text,
+  Input,
+  ComboBox,
 } from "@/components";
 
 import type { Warehouse, WarehouseParcial } from "@/domains/maintainers/types";
@@ -124,7 +126,7 @@ export const MainPage: React.FC = () => {
       if (estado) {
         await WarehouseService.delete(id);
       } else {
-        await WarehouseService.restore(id, { estado:true });
+        await WarehouseService.restore(id, { estado: true });
       }
       fetchWarehouses();
     } catch (error) {
@@ -158,7 +160,9 @@ export const MainPage: React.FC = () => {
             <Button
               size="tableItemSize"
               variant="tableItemStyle"
-              onClick={() => {handleChangeState(w.id, w.estado)}}
+              onClick={() => {
+                handleChangeState(w.id, w.estado);
+              }}
             >
               {w.estado ? <CloseIcon /> : <CheckIcon />}
             </Button>
@@ -194,30 +198,35 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
-      <div className={styles.page}>
         <section className={styles.filtersRow}>
-          <FormField
-            type="text"
-            label="Código"
-            placeholder="Seleccionar"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <FormField
-            type="combobox"
-            label="Estado"
-            options={statusOptions}
-            value={status}
-            onChange={(v) => setStatus(v as string)}
-            placeholder="Seleccionar"
-          />
-          <div className={styles.alignEnd}>
-            <Button size="large">Filtrar búsqueda</Button>
+          <div className={styles.formField}>
+            <Text size="xs" color="neutral-primary">
+              Código
+            </Text>
+            <Input
+              size="xs"
+              variant="createSale"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+          <div className={styles.formField}>
+            <Text size="xs" color="neutral-primary">
+              Estado
+            </Text>
+            <ComboBox
+              options={statusOptions}
+              size="xs"
+              variant="createSale"
+              value={status}
+              onChange={(v) => setStatus(v as string)}
+              placeholder="Seleccionar"
+            />
           </div>
         </section>
 
         <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-      </div>
+
 
       <Modal
         isOpen={isOpen}
@@ -230,7 +239,9 @@ export const MainPage: React.FC = () => {
         <FormWarehouse
           setError={setError}
           setLoading={setLoading}
-          warehouse={isView && selectedWarehouse ? selectedWarehouse :  newWarehouse}
+          warehouse={
+            isView && selectedWarehouse ? selectedWarehouse : newWarehouse
+          }
           error={error}
           loading={loading}
           onChange={hanldeWarehouseChange}
@@ -239,36 +250,6 @@ export const MainPage: React.FC = () => {
         />
       </Modal>
 
-      {/*<WarehouseModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onSubmit={handleCreate}
-      />
-
-      {/* Editar */}
-      {/*<WarehouseModal
-        isOpen={isEditOpen}
-        onClose={() => {
-          setIsEditOpen(false);
-          setEditing(null);
-        }}
-        onSubmit={handleUpdate}
-        title="Editar almacén"
-        description="Actualiza los datos del almacén."
-        submitLabel="Actualizar"
-        initialValues={
-          editing
-            ? {
-                nombre: editing.nombre,
-                ubicacion: editing.ubicacion,
-                descripcion: editing.descripcion,
-                capacidadMaxima: editing.capacidadMaxima,
-                responsable: editing.responsable,
-                telefono: editing.telefono,
-              }
-            : undefined
-        }}
-      />*/}
     </PageLayout>
   );
 };
