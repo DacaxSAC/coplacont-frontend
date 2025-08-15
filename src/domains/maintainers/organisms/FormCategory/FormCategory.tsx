@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./FormCategory.module.scss";
-import { Text, Input, Button } from "@/components";
+import { Text, Input, Button, ComboBox } from "@/components";
 import type { Category, CreateCategoryPayload } from "../../types";
 import { CategoryService } from "../../services";
 
@@ -16,6 +16,12 @@ type FormCategoryProps = {
   isCreate?:boolean
 };
 
+    // Opciones para el ComboBox
+const tipoOptions = [
+    { label: "Producto", value: "producto" },
+    { label: "Servicio", value: "servicio" },
+  ];
+
 export const FormCategory = ({
   category,
   error,
@@ -30,6 +36,7 @@ export const FormCategory = ({
   const [categoryToUpdate, setCategoryToUpdate] = useState<CreateCategoryPayload>({
     nombre: category.nombre,
     descripcion: category.descripcion,
+    tipo: category.tipo,
   });
 
   const [isEdit, setIsEdit] = useState(false);
@@ -100,6 +107,29 @@ export const FormCategory = ({
           disabled={isEdit ? false : readOnly}
         />
       </div>
+      <div className={styles.FormCategory__FormField}>
+          <Text size="xs" color="neutral-primary">
+            Tipo
+          </Text>
+          <ComboBox
+            disabled={isEdit ? false : readOnly}
+            options={tipoOptions}
+            size="xs"
+            variant="createSale"
+            value={isCreate? category.tipo : categoryToUpdate.tipo ?? ""}
+            onChange={(v) => {
+              if (isEdit) {
+                setCategoryToUpdate({
+                  ...categoryToUpdate,
+                  tipo: v as "producto" | "servicio",
+                });
+              } else {
+                onChange("tipo", v as string);
+              }
+            }}
+            placeholder="Seleccionar"
+          />
+        </div>
 
       {!readOnly || isEdit ? (
         <Button

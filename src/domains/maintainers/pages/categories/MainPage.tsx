@@ -1,9 +1,22 @@
 import { useEffect, useState, useMemo } from "react";
-import styles from './MainPage.module.scss';
+import styles from "./MainPage.module.scss";
 import { PageLayout } from "@/components";
-import { Table, Button, StateTag, CloseIcon, CheckIcon, Modal, Text, Input, ComboBox } from "@/components";
+import {
+  Table,
+  Button,
+  StateTag,
+  CloseIcon,
+  CheckIcon,
+  Modal,
+  Text,
+  Input,
+  ComboBox,
+} from "@/components";
 import { CategoryService } from "@/domains/maintainers/services";
-import type { Category, CreateCategoryPayload } from "@/domains/maintainers/types";
+import type {
+  Category,
+  CreateCategoryPayload,
+} from "@/domains/maintainers/types";
 import { FormCategory } from "../../organisms/FormCategory";
 
 export const MainPage: React.FC = () => {
@@ -16,22 +29,31 @@ export const MainPage: React.FC = () => {
 
   const [newCategory, setNewCategory] = useState<CreateCategoryPayload>({
     nombre: "",
-    descripcion: ""
+    descripcion: "",
+    tipo: "" as "producto" | "servicio",
   });
 
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
 
-  // 🔹 Estados para filtros
+  // Estados para filtros
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [tipoFilter, setTipoFilter] = useState("");
 
-  // Opciones para el ComboBox
+  // Opciones para ComboBox
   const statusOptions = [
     { label: "Activo", value: "true" },
     { label: "Inactivo", value: "false" },
   ];
 
-  const hanldeCategoryChange = (
+  const tipoOptions = [
+    { label: "Producto", value: "producto" },
+    { label: "Servicio", value: "servicio" },
+  ];
+
+  const handleCategoryChange = (
     field: keyof CreateCategoryPayload,
     value: string
   ) => {
@@ -44,7 +66,8 @@ export const MainPage: React.FC = () => {
   const resetForm = () => {
     setNewCategory({
       nombre: "",
-      descripcion: ""
+      descripcion: "",
+      tipo: "" as "producto" | "servicio",
     });
   };
 
@@ -65,7 +88,9 @@ export const MainPage: React.FC = () => {
       const updatedData = { estado: !currentState };
       await CategoryService.update(id, updatedData as any);
       setCategories((prev) =>
-        prev.map((cat) => (cat.id === id ? { ...cat, estado: !currentState } : cat))
+        prev.map((cat) =>
+          cat.id === id ? { ...cat, estado: !currentState } : cat
+        )
       );
     } catch (error) {
       console.error("Error al cambiar estado de categoría:", error);
@@ -90,53 +115,61 @@ export const MainPage: React.FC = () => {
     }
   };
 
-  // 🔹 Filtrado con useMemo para evitar recalcular en cada render
+  // Filtrado
   const filteredCategories = useMemo(() => {
     return categories.filter((c) => {
-      const matchesSearch = c.nombre.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus =
-        status === "" || c.estado.toString() === status;
-      return matchesSearch && matchesStatus;
+      const matchesSearch = c.nombre
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesStatus = status === "" || c.estado.toString() === status;
+      const matchesTipo = tipoFilter === "" || c.tipo === tipoFilter;
+      return matchesSearch && matchesStatus && matchesTipo;
     });
-  }, [categories, search, status]);
+  }, [categories, search, status, tipoFilter]);
 
   const rows = filteredCategories.map((c) => ({
     id: c.id,
     cells: [
+      c.tipo === "producto" ? "Producto" : "Servicio",
       c.id,
       c.nombre,
       c.descripcion || "No especificado",
       <StateTag state={c.estado} />,
-      (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button
-            size="tableItemSize"
-            variant="tableItemStyle"
-            onClick={() => {
-              setSelectedCategory(c);
-              setIsView(true);
-              setIsOpen(true);
-            }}
-          >
-            Ver detalles
-          </Button>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {
+            setSelectedCategory(c);
+            setIsView(true);
+            setIsOpen(true);
+          }}
+        >
+          Ver detalles
+        </Button>
 
-          <Button
-            size="tableItemSize"
-            variant="tableItemStyle"
-            onClick={() => {
-              handleStateCategory(c.id, c.estado);
-            }}
-          >
-            {c.estado ? <CloseIcon /> : <CheckIcon />}
-          </Button>
-        </div>
-      ),
+        <Button
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => {
+            handleStateCategory(c.id, c.estado);
+          }}
+        >
+          {c.estado ? <CloseIcon /> : <CheckIcon />}
+        </Button>
+      </div>,
     ],
   }));
 
-  const headers = ["Código", "Nombre", "Descripción", "Estado", "Acciones"];
-  const gridTemplate = "0.6fr 1.2fr 2fr 0.8fr 1fr";
+  const headers = [
+    "Tipo",
+    "Código",
+    "Nombre",
+    "Descripción",
+    "Estado",
+    "Acciones",
+  ];
+  const gridTemplate = "0.8fr 0.6fr 1.2fr 2fr 0.8fr 1fr";
 
   return (
     <PageLayout
@@ -155,8 +188,21 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
-      {/* 🔹 Sección de filtros */}
+      {/* Filtros */}
       <section className={styles.MainPage}>
+        <div className={styles.MainPage__Filter}>
+          <Text size="xs" color="neutral-primary">
+            Tipo
+          </Text>
+          <ComboBox
+            options={tipoOptions}
+            size="xs"
+            variant="createSale"
+            value={tipoFilter}
+            onChange={(v) => setTipoFilter(v as string)}
+            placeholder="Seleccionar"
+          />
+        </div>
         <div className={styles.MainPage__Filter}>
           <Text size="xs" color="neutral-primary">
             Buscar nombre
@@ -190,18 +236,23 @@ export const MainPage: React.FC = () => {
         isOpen={isOpen}
         onClose={() => {
           fetchCategories();
-          setIsOpen(!isOpen);
+          setIsOpen(false);
           setIsCreate(false);
+          setIsView(false);
           resetForm();
         }}
-        title="Agregar nueva categoría"
-        description="Ingresa los siguientes datos para registrar una categoría."
+        title={isView ? "Detalles de categoría" : "Agregar nueva categoría"}
+        description={
+          isView
+            ? "Información de la categoría seleccionada."
+            : "Ingresa los siguientes datos para registrar una categoría."
+        }
         loading={isLoading}
-        buttonText={"Cerrar"}
+        buttonText="Cerrar"
       >
         <FormCategory
           category={isView && selectedCategory ? selectedCategory : newCategory}
-          onChange={hanldeCategoryChange}
+          onChange={handleCategoryChange}
           onSubmit={handleCreate}
           readOnly={isView}
           error={error}
