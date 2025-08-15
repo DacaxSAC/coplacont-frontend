@@ -107,29 +107,7 @@ export const FormCategory = ({
           disabled={isEdit ? false : readOnly}
         />
       </div>
-      <div className={styles.FormCategory__FormField}>
-          <Text size="xs" color="neutral-primary">
-            Tipo
-          </Text>
-          <ComboBox
-            disabled={isEdit ? false : readOnly}
-            options={tipoOptions}
-            size="xs"
-            variant="createSale"
-            value={isCreate? category.tipo : categoryToUpdate.tipo ?? ""}
-            onChange={(v) => {
-              if (isEdit) {
-                setCategoryToUpdate({
-                  ...categoryToUpdate,
-                  tipo: v as "producto" | "servicio",
-                });
-              } else {
-                onChange("tipo", v as string);
-              }
-            }}
-            placeholder="Seleccionar"
-          />
-        </div>
+
 
       {/* Tipo */}
       <div className={styles.FormCategory__FormField}>
