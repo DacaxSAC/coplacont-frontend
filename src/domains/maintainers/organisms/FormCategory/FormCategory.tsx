@@ -13,14 +13,14 @@ type FormCategoryProps = {
   readOnly?: boolean;
   onChange: (field: keyof CreateCategoryPayload, value: string) => void;
   onSubmit?: () => void;
-  isCreate?:boolean
+  isCreate?: boolean;
 };
 
-    // Opciones para el ComboBox
+// Opciones para el ComboBox
 const tipoOptions = [
-    { label: "Producto", value: "producto" },
-    { label: "Servicio", value: "servicio" },
-  ];
+  { label: "Producto", value: "producto" },
+  { label: "Servicio", value: "servicio" },
+];
 
 export const FormCategory = ({
   category,
@@ -31,13 +31,14 @@ export const FormCategory = ({
   readOnly = false,
   onChange,
   onSubmit,
-  isCreate
+  isCreate,
 }: FormCategoryProps) => {
-  const [categoryToUpdate, setCategoryToUpdate] = useState<CreateCategoryPayload>({
-    nombre: category.nombre,
-    descripcion: category.descripcion,
-    tipo: category.tipo,
-  });
+  const [categoryToUpdate, setCategoryToUpdate] =
+    useState<CreateCategoryPayload>({
+      nombre: category.nombre,
+      descripcion: category.descripcion,
+      tipo: category.tipo,
+    });
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -67,10 +68,10 @@ export const FormCategory = ({
           Nombre de la categoría
         </Text>
         <Input
-          disabled={isEdit? false : readOnly}
+          disabled={isEdit ? false : readOnly}
           size="xs"
           variant="createSale"
-          value={isCreate? category.nombre :  categoryToUpdate.nombre ?? ""}
+          value={isCreate ? category.nombre : categoryToUpdate.nombre ?? ""}
           onChange={(e) => {
             if (isEdit) {
               setCategoryToUpdate({
@@ -92,7 +93,8 @@ export const FormCategory = ({
         <Input
           size="xs"
           variant="createSale"
-          value={isCreate? category.descripcion : categoryToUpdate.descripcion ?? "" 
+          value={
+            isCreate ? category.descripcion : categoryToUpdate.descripcion ?? ""
           }
           onChange={(e) => {
             if (isEdit) {
@@ -108,7 +110,6 @@ export const FormCategory = ({
         />
       </div>
 
-
       {/* Tipo */}
       <div className={styles.FormCategory__FormField}>
         <Text size="xs" color="neutral-primary">
@@ -117,22 +118,23 @@ export const FormCategory = ({
         <ComboBox
           size="xs"
           variant="createSale"
-          value={isCreate ? (category as CreateCategoryPayload).tipo || 'producto' : categoryToUpdate.tipo}
+          value={
+            isCreate
+              ? (category as CreateCategoryPayload).tipo || "producto"
+              : categoryToUpdate.tipo
+          }
           onChange={(value) => {
-             const stringValue = String(value);
-             if (isEdit) {
-               setCategoryToUpdate({
-                 ...categoryToUpdate,
-                 tipo: stringValue as 'producto' | 'servicio',
-               });
-             } else {
-               onChange("tipo", stringValue);
-             }
-           }}
-          options={[
-            { value: 'producto', label: 'Producto' },
-            { value: 'servicio', label: 'Servicio' }
-          ]}
+            const stringValue = String(value);
+            if (isEdit) {
+              setCategoryToUpdate({
+                ...categoryToUpdate,
+                tipo: stringValue as "producto" | "servicio",
+              });
+            } else {
+              onChange("tipo", stringValue);
+            }
+          }}
+          options={tipoOptions}
           disabled={isEdit ? false : readOnly}
         />
       </div>
