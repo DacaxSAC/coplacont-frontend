@@ -54,9 +54,9 @@ type TipoProductoCompraType =
 type TipoComprobanteType =
   (typeof TipoComprobanteEnum)[keyof typeof TipoComprobanteEnum];
 type MonedaType = (typeof MonedaEnum)[keyof typeof MonedaEnum];
-type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum];
+type ProductoType = (typeof ProductoEnum)[keyof typeof ProductoEnum] | string;
 type UnidadMedidaType =
-  (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum];
+  (typeof UnidadMedidaEnum)[keyof typeof UnidadMedidaEnum] | string;
 
 interface DetalleCompraItem {
   id: string;
@@ -70,6 +70,8 @@ interface DetalleCompraItem {
   igv: number;
   isv: number;
   total: number;
+  almacen: string;
+  idInventario: number;
 }
 
 interface CreatePurchaseFormState {
@@ -108,28 +110,7 @@ const monedaOptions = [
   { value: MonedaEnum.DOLAR, label: "Dólar" },
 ];
 
-const productosOptions = [
-  {
-    value: ProductoEnum.PRODUCTO_A,
-    label: "Producto A - Descripción del producto A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD,
-  },
-  {
-    value: ProductoEnum.PRODUCTO_B,
-    label: "Producto B - Descripción del producto B",
-    unidadMedida: UnidadMedidaEnum.KILOGRAMO,
-  },
-  {
-    value: ProductoEnum.SERVICIO_A,
-    label: "Servicio A - Descripción del servicio A",
-    unidadMedida: UnidadMedidaEnum.UNIDAD,
-  },
-  {
-    value: ProductoEnum.SERVICIO_B,
-    label: "Servicio B - Descripción del servicio B",
-    unidadMedida: UnidadMedidaEnum.METRO,
-  },
-];
+// Las opciones de productos ahora se obtienen dinámicamente desde la API de inventario
 
 export const CreatePurchaseForm = () => {
   const navigate = useNavigate();
@@ -156,6 +137,8 @@ export const CreatePurchaseForm = () => {
     UnidadMedidaType | ""
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
+  const [precioUnitarioIngresado, setPrecioUnitarioIngresado] = useState<string>("");
+  const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
 
   // Estados para datos de maintainers
   const [proveedores, setProveedores] = useState<Entidad[]>([]);
@@ -163,6 +146,7 @@ export const CreatePurchaseForm = () => {
   console.log(productos);
   const [almacenes, setAlmacenes] = useState<Warehouse[]>([]);
   console.log(almacenes);
+  const [inventarioProductos, setInventarioProductos] = useState<any[]>([]);
 
   // Estado para tipo de cambio automático
   const [tipoCambioAutomatico, setTipoCambioAutomatico] = useState<string>("");
@@ -202,6 +186,25 @@ export const CreatePurchaseForm = () => {
 
     loadMaintainerData();
   }, []);
+
+  // Cargar productos del inventario cuando se selecciona un almacén
+  useEffect(() => {
+    const loadInventarioProductos = async () => {
+      if (almacenSeleccionado) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/inventario/almacen/${almacenSeleccionado}`);
+          const data = await response.json();
+          setInventarioProductos(data);
+        } catch (error) {
+          console.error("Error al cargar productos del inventario:", error);
+        }
+      } else {
+        setInventarioProductos([]);
+      }
+    };
+
+    loadInventarioProductos();
+  }, [almacenSeleccionado]);
 
   // Cargar proveedores al montar el componente
   useEffect(() => {
@@ -280,15 +283,15 @@ export const CreatePurchaseForm = () => {
 
   // Maneja el cambio de producto seleccionado
   const handleProductoChange = (value: string | number) => {
-    const productoValue = String(value) as ProductoType;
-    setProductoSeleccionado(productoValue);
+    const productoId = String(value);
+    setProductoSeleccionado(productoId as ProductoType);
 
-    // Buscar la unidad de medida correspondiente al producto seleccionado
-    const productoOption = productosOptions.find(
-      (option) => option.value === productoValue
+    // Buscar la unidad de medida correspondiente al producto seleccionado del inventario
+    const productoInventario = inventarioProductos.find(
+      (item) => item.producto.id.toString() === productoId
     );
-    if (productoOption) {
-      setUnidadMedidaSeleccionada(productoOption.unidadMedida);
+    if (productoInventario) {
+      setUnidadMedidaSeleccionada(productoInventario.producto.unidadMedida as UnidadMedidaType);
     }
   };
 
@@ -300,6 +303,16 @@ export const CreatePurchaseForm = () => {
   // Maneja el cambio de cantidad ingresada
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCantidadIngresada(e.target.value);
+  };
+
+  // Maneja el cambio de precio unitario ingresado
+  const handlePrecioUnitarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrecioUnitarioIngresado(e.target.value);
+  };
+
+  // Maneja el cambio de almacén seleccionado
+  const handleAlmacenChange = (value: string | number) => {
+    setAlmacenSeleccionado(String(value));
   };
 
   // Función para validar si todos los campos obligatorios del header están completos
@@ -363,19 +376,50 @@ export const CreatePurchaseForm = () => {
     return parseInt(formState.proveedor);
   };
 
+  // Función para obtener las opciones de almacenes
+  const getAlmacenesOptions = () => {
+    return almacenes.map((almacen) => ({
+      value: almacen.id.toString(),
+      label: `${almacen.nombre}`,
+    }));
+  };
+
+  // Función para obtener las opciones de productos del inventario
+  const getProductosInventarioOptions = () => {
+    return inventarioProductos.map((item) => ({
+      value: item.producto.id.toString(),
+      label: `${item.producto.codigo} - ${item.producto.nombre}`,
+      unidadMedida: item.producto.unidadMedida,
+      stockActual: item.stockActual,
+      precio: item.producto.precio
+    }));
+  };
+
   // Agrega un producto al detalle de la compra
   const handleAgregarProducto = () => {
     if (
       !productoSeleccionado ||
       !cantidadIngresada ||
-      !unidadMedidaSeleccionada
+      !precioUnitarioIngresado ||
+      !unidadMedidaSeleccionada ||
+      !almacenSeleccionado
     ) {
       console.warn("Faltan datos para agregar el producto");
       return;
     }
 
+    // Buscar el producto en el inventario
+    const productoInventario = inventarioProductos.find(
+      (item) => item.producto.id.toString() === productoSeleccionado
+    );
+
+    if (!productoInventario) {
+      console.warn("Producto no encontrado en el inventario");
+      return;
+    }
+
     const cantidad = parseFloat(cantidadIngresada);
-    const precioUnitario = 100; // Precio fake
+    const precioUnitario = parseFloat(precioUnitarioIngresado);
     const subtotal = cantidad * precioUnitario;
     const igv = subtotal * 0.18;
     const isv = 0; // ISV fake
@@ -384,9 +428,7 @@ export const CreatePurchaseForm = () => {
     const nuevoProducto: DetalleCompraItem = {
       id: `${Date.now()}`,
       producto: productoSeleccionado,
-      descripcion:
-        productosOptions.find((p) => p.value === productoSeleccionado)?.label ||
-        "",
+      descripcion: `${productoInventario.producto.codigo} - ${productoInventario.producto.nombre}`,
       unidadMedida: unidadMedidaSeleccionada,
       cantidad,
       precioUnitario,
@@ -395,6 +437,8 @@ export const CreatePurchaseForm = () => {
       igv,
       isv,
       total,
+      almacen: almacenes.find(a => a.id.toString() === almacenSeleccionado)?.nombre || almacenSeleccionado,
+      idInventario: productoInventario.id,
     };
 
     setDetalleCompra((prev) => [...prev, nuevoProducto]);
@@ -403,6 +447,8 @@ export const CreatePurchaseForm = () => {
     setProductoSeleccionado("");
     setUnidadMedidaSeleccionada("");
     setCantidadIngresada("");
+    setPrecioUnitarioIngresado("");
+    // No limpiar almacenSeleccionado para mantener la selección
   };
 
   // Elimina un producto del detalle de la compra
@@ -423,6 +469,7 @@ export const CreatePurchaseForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
+        idInventario: item.idInventario,
       }));
 
       const compraData = {
@@ -460,6 +507,7 @@ export const CreatePurchaseForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
+        idInventario: item.idInventario,
       }));
 
       const compraData = {
@@ -511,6 +559,7 @@ export const CreatePurchaseForm = () => {
     "Descripción",
     "U.M.",
     "Cantidad",
+    "Almacén",
     "P. Unitario",
     "Subtotal",
     "Base Gravado",
@@ -526,6 +575,7 @@ export const CreatePurchaseForm = () => {
       item.descripcion,
       item.unidadMedida,
       item.cantidad.toString(),
+      item.almacen,
       `S/ ${item.precioUnitario.toFixed(2)}`,
       `S/ ${item.subtotal.toFixed(2)}`,
       `S/ ${item.baseGravado.toFixed(2)}`,
@@ -734,6 +784,22 @@ export const CreatePurchaseForm = () => {
 
           <div className={styles.CreatePurchaseForm__AddItems}>
             <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--medium"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Almacén
+              </Text>
+              <ComboBox
+                size="xs"
+                options={getAlmacenesOptions()}
+                variant="createSale"
+                name="almacen"
+                value={almacenSeleccionado}
+                onChange={handleAlmacenChange}
+              />
+            </div>
+
+            <div
               className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--large"]}`}
             >
               <Text size="xs" color="neutral-primary">
@@ -741,11 +807,12 @@ export const CreatePurchaseForm = () => {
               </Text>
               <ComboBox
                 size="xs"
-                options={productosOptions}
+                options={getProductosInventarioOptions()}
                 variant="createSale"
                 name="producto"
                 value={productoSeleccionado}
                 onChange={handleProductoChange}
+                disabled={!almacenSeleccionado}
               />
             </div>
 
@@ -776,6 +843,21 @@ export const CreatePurchaseForm = () => {
                 variant="createSale"
                 value={cantidadIngresada}
                 onChange={handleCantidadChange}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Precio unitario
+              </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={precioUnitarioIngresado}
+                onChange={handlePrecioUnitarioChange}
               />
             </div>
 
