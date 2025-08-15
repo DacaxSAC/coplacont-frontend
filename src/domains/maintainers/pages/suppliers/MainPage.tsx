@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import styles from './MainPage.module.scss';
 import {
   PageLayout,
   Table,
@@ -7,6 +8,9 @@ import {
   CloseIcon,
   StateTag,
   CheckIcon,
+  Input,
+  Text,
+  ComboBox
 } from "@/components";
 import { EntitiesService } from "../../services";
 import { FormEntidad } from "../../organisms/FormEntidad";
@@ -14,13 +18,14 @@ import type { Entidad } from "../../services";
 
 export const MainPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Entidad[]>([]);
+  const [status, setStatus] = useState("all");
+  const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState<Entidad | null>(
-    null
-  );
+  const [selectedSupplier, setSelectedSupplier] = useState<Entidad | null>(null);
+
   const [newSupplier, setNewSupplier] = useState({
     esProveedor: true,
     esCliente: false,
@@ -62,18 +67,14 @@ export const MainPage: React.FC = () => {
   const hanldeCreateSupplier = async () => {
     setError("");
 
-    // Validar que el tipo esté seleccionado
     if (!newSupplier.tipo) {
       setError("Debe seleccionar el tipo de entidad.");
       return;
     }
 
-    // Validación según tipo
     if (newSupplier.tipo === "JURIDICA") {
       if (newSupplier.numeroDocumento.length !== 11) {
-        setError(
-          "El número de documento para JURIDICA debe tener 11 caracteres."
-        );
+        setError("El número de documento para JURIDICA debe tener 11 caracteres.");
         return;
       }
       if (!newSupplier.razonSocial.trim()) {
@@ -84,9 +85,7 @@ export const MainPage: React.FC = () => {
 
     if (newSupplier.tipo === "NATURAL") {
       if (newSupplier.numeroDocumento.length !== 8) {
-        setError(
-          "El número de documento para NATURAL debe tener 8 caracteres."
-        );
+        setError("El número de documento para NATURAL debe tener 8 caracteres.");
         return;
       }
       if (!newSupplier.nombre.trim()) {
@@ -146,6 +145,25 @@ export const MainPage: React.FC = () => {
     fetchSuppliers();
   }, []);
 
+  // 🔍 Filtro por texto y estado
+  const filteredSuppliers = useMemo(() => {
+    return suppliers.filter((s) => {
+      const bySearch = search
+        ? s.nombreCompleto?.toLowerCase().includes(search.toLowerCase()) ||
+          s.numeroDocumento.includes(search)
+        : true;
+
+      const byStatus =
+        status === "all"
+          ? true
+          : status === "active"
+          ? s.activo
+          : !s.activo;
+
+      return bySearch && byStatus;
+    });
+  }, [suppliers, search, status]);
+
   const headers = [
     "Tipo",
     "Número de Documento",
@@ -155,7 +173,8 @@ export const MainPage: React.FC = () => {
     "Estado",
     "Acciones",
   ];
-  const rows = suppliers.map((s) => ({
+
+  const rows = filteredSuppliers.map((s) => ({
     id: s.id,
     cells: [
       s.tipo,
@@ -189,6 +208,7 @@ export const MainPage: React.FC = () => {
       </div>,
     ],
   }));
+
   const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 1fr 2fr";
 
   return (
@@ -208,6 +228,34 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
+      <section className={styles.MainPage}>
+        <div className={styles.MainPage__Filter}>
+          <Text size="xs" color="neutral-primary">
+            Buscar por nombre o número de documento
+          </Text>
+          <Input
+            placeholder="Buscar..."
+            size="xs"
+            variant="createSale"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className={styles.MainPage__Filter}>
+          <Text size="xs" color="neutral-primary">
+            Estado
+          </Text>
+          <ComboBox
+            options={statusOptions}
+            size="xs"
+            variant="createSale"
+            value={status}
+            onChange={(v) => setStatus(v as string)}
+            placeholder="Seleccionar"
+          />
+        </div>
+      </section>
+
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <Modal
@@ -232,3 +280,9 @@ export const MainPage: React.FC = () => {
     </PageLayout>
   );
 };
+
+const statusOptions = [
+  { value: "all", label: "Todos" },
+  { value: "active", label: "Activos" },
+  { value: "inactive", label: "Inactivos" },
+];
