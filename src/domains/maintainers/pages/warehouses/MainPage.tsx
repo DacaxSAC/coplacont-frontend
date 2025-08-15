@@ -4,18 +4,19 @@ import styles from "./MainPage.module.scss";
 import {
   Button,
   PageLayout,
-  FormField,
   Table,
   type TableRow,
   StateTag,
   CloseIcon,
   CheckIcon,
   Modal,
+  Text,
+  Input,
+  ComboBox,
 } from "@/components";
 
 import type { Warehouse, WarehouseParcial } from "@/domains/maintainers/types";
 import { WarehouseService } from "@/domains/maintainers/services";
-import { WarehouseModal } from "@/domains/maintainers/organisms";
 import { FormWarehouse } from "../../organisms/FormWarehouse/FormWarehouse";
 
 export const MainPage: React.FC = () => {
@@ -25,6 +26,7 @@ export const MainPage: React.FC = () => {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
+  const [isCreate, setIsCreate] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -113,17 +115,27 @@ export const MainPage: React.FC = () => {
 
   const filtered = useMemo(() => {
     return warehouses.filter((w) => {
-      const byCode = code ? String(w.id).includes(code) : true;
+      const searchTerm = code.trim().toLowerCase();
+      const byCodeOrName = searchTerm
+        ? String(w.id).toLowerCase().includes(searchTerm) ||
+          w.nombre.toLowerCase().includes(searchTerm)
+        : true;
+
       const byStatus =
         status === "all" ? true : status === "active" ? w.estado : !w.estado;
-      return byCode && byStatus;
+
+      return byCodeOrName && byStatus;
     });
   }, [warehouses, code, status]);
 
-  const handleDelete = async (id: number) => {
+  const handleChangeState = async (id: number, estado: boolean) => {
     try {
-      await WarehouseService.delete(id);
-      setWarehouses((prev) => prev.filter((wh) => wh.id !== id));
+      if (estado) {
+        await WarehouseService.delete(id);
+      } else {
+        await WarehouseService.restore(id, { estado: true });
+      }
+      fetchWarehouses();
     } catch (error) {
       console.error("Error al eliminar almacén:", error);
     }
@@ -145,6 +157,7 @@ export const MainPage: React.FC = () => {
               variant="tableItemStyle"
               onClick={() => {
                 setSelectedWarehouse(w);
+                setIsCreate(false);
                 setIsView(true);
                 setIsOpen(true);
               }}
@@ -155,7 +168,9 @@ export const MainPage: React.FC = () => {
             <Button
               size="tableItemSize"
               variant="tableItemStyle"
-              onClick={() => {}}
+              onClick={() => {
+                handleChangeState(w.id, w.estado);
+              }}
             >
               {w.estado ? <CloseIcon /> : <CheckIcon />}
             </Button>
@@ -183,6 +198,7 @@ export const MainPage: React.FC = () => {
         <Button
           size="large"
           onClick={() => {
+            setIsCreate(true);
             setIsOpen(true);
             setIsView(false);
           }}
@@ -191,81 +207,64 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
-      <div className={styles.page}>
-        <section className={styles.filtersRow}>
-          <FormField
-            type="text"
-            label="Código"
-            placeholder="Seleccionar"
+      <section className={styles.filtersRow}>
+        <div className={styles.formField}>
+          <Text size="xs" color="neutral-primary">
+            Busca por código o nombre
+          </Text>
+          <Input
+            placeholder="Buscar..."
+            size="xs"
+            variant="createSale"
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <FormField
-            type="combobox"
-            label="Estado"
+        </div>
+        <div className={styles.formField}>
+          <Text size="xs" color="neutral-primary">
+            Estado
+          </Text>
+          <ComboBox
             options={statusOptions}
+            size="xs"
+            variant="createSale"
             value={status}
             onChange={(v) => setStatus(v as string)}
             placeholder="Seleccionar"
           />
-          <div className={styles.alignEnd}>
-            <Button size="large">Filtrar búsqueda</Button>
-          </div>
-        </section>
+        </div>
+      </section>
 
-        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-      </div>
+      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <Modal
         isOpen={isOpen}
-        onClose={() => setIsOpen(!isOpen)}
+        onClose={() => {
+          fetchWarehouses();
+          resetForm();
+          setIsCreate(false);
+          setIsView(false);
+          setIsOpen(!isOpen);
+        }}
         title="Agregar nuevo almacén"
         description="Ingresa los siguientes datos para registrar un almacén."
         loading={loading}
         buttonText={"Cerrar"}
       >
         <FormWarehouse
-          setError={setError}
-          setLoading={setLoading}
-          warehouse={isView && selectedWarehouse ? selectedWarehouse :  newWarehouse}
+          warehouse={
+            isView && selectedWarehouse ? selectedWarehouse : newWarehouse
+          }
           error={error}
           loading={loading}
+          setError={setError}
+          setLoading={setLoading}
           onChange={hanldeWarehouseChange}
           onSubmit={handleCreate}
           readOnly={isView}
+          isCreate={isCreate}
         />
       </Modal>
-
-      {/*<WarehouseModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onSubmit={handleCreate}
-      />
-
-      {/* Editar */}
-      {/*<WarehouseModal
-        isOpen={isEditOpen}
-        onClose={() => {
-          setIsEditOpen(false);
-          setEditing(null);
-        }}
-        onSubmit={handleUpdate}
-        title="Editar almacén"
-        description="Actualiza los datos del almacén."
-        submitLabel="Actualizar"
-        initialValues={
-          editing
-            ? {
-                nombre: editing.nombre,
-                ubicacion: editing.ubicacion,
-                descripcion: editing.descripcion,
-                capacidadMaxima: editing.capacidadMaxima,
-                responsable: editing.responsable,
-                telefono: editing.telefono,
-              }
-            : undefined
-        }}
-      />*/}
     </PageLayout>
   );
 };

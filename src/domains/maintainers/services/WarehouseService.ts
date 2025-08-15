@@ -8,11 +8,6 @@ export class WarehouseService {
         return response.data;
     }
         
-    static async getById(id: number): Promise<Warehouse> {
-        const response = await WarehouseApi.getWarehouse(id);
-        return response.data;
-    }
-
     static async create(warehouse: CreateWarehousePayload): Promise<Warehouse> {
         const response = await WarehouseApi.postWarehouse(warehouse);   
         return response.data;
@@ -27,23 +22,9 @@ export class WarehouseService {
         await WarehouseApi.deleteWarehouse(id);
     }
 
-    static async getByName(name: string): Promise<Warehouse[]> {
-        const response = await WarehouseApi.getWarehouseByName(name);
+    static async restore(id: number, {estado}: {estado: boolean}): Promise<Warehouse> {
+        const response = await WarehouseApi.patchWarehouse(id, {estado});
         return response.data;
     }
 
-    static async getByLocation(location: string): Promise<Warehouse[]> {
-        const response = await WarehouseApi.getWarehouseByLocation(location);
-        return response.data;
-    }
-    
-    static async getByResponsible(responsible: string): Promise<Warehouse[]> {  
-        const response = await WarehouseApi.getWarehouseByResponsible(responsible);
-        return response.data;
-    }
-
-    static async getByMinCapacity(minCapacity: number): Promise<Warehouse[]> {
-        const response = await WarehouseApi.getWarehouseByMinCapacity(minCapacity);
-        return response.data;
-    }
 }   

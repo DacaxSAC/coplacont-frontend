@@ -42,4 +42,5 @@ export interface UpdateWarehousePayload {
   capacidadMaxima?: number;
   responsable?: string;
   telefono?: string;
+  estado?: boolean;
 }

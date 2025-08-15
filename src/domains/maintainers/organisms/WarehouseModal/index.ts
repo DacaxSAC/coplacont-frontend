@@ -1,1 +1,0 @@
-export { Main as WarehouseModal } from './Main'

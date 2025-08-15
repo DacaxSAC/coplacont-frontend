@@ -1,26 +1,20 @@
-import { useState, useEffect } from "react";
-import { PageLayout } from "@/components";
-import {
-  Table,
-  Button,
-  Modal,
-  CloseIcon,
-  CheckIcon,
-  StateTag,
-} from "@/components";
+import { useState, useEffect, useMemo } from "react";
+import styles from './MainPage.module.scss';
+import { PageLayout, Table, Button, Modal, CloseIcon, CheckIcon, StateTag, Input, Text, ComboBox } from "@/components";
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
 import { FormEntidad } from "../../organisms/FormEntidad";
 
 export const MainPage: React.FC = () => {
   const [clients, setClients] = useState<Entidad[]>([]);
+  const [status, setStatus] = useState("all");
+  const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<Entidad | null>(
-    null
-  );
+  const [selectedClient, setSelectedClient] = useState<Entidad | null>(null);
+
   const [newClient, setNewClient] = useState({
     esProveedor: false,
     esCliente: true,
@@ -69,9 +63,7 @@ export const MainPage: React.FC = () => {
 
     if (newClient.tipo === "JURIDICA") {
       if (newClient.numeroDocumento.length !== 11) {
-        setError(
-          "El número de documento para JURIDICA debe tener 11 caracteres."
-        );
+        setError("El número de documento para JURIDICA debe tener 11 caracteres.");
         return;
       }
       if (!newClient.razonSocial.trim()) {
@@ -82,9 +74,7 @@ export const MainPage: React.FC = () => {
 
     if (newClient.tipo === "NATURAL") {
       if (newClient.numeroDocumento.length !== 8) {
-        setError(
-          "El número de documento para NATURAL debe tener 8 caracteres."
-        );
+        setError("El número de documento para NATURAL debe tener 8 caracteres.");
         return;
       }
       if (!newClient.nombre.trim()) {
@@ -137,13 +127,31 @@ export const MainPage: React.FC = () => {
   const fetchClients = () => {
     EntitiesService.getClients().then((res) => {
       setClients(res);
-      console.log(res);
     });
   };
 
   useEffect(() => {
     fetchClients();
   }, []);
+
+  // 🔍 Filtro combinado por texto y estado
+  const filteredClients = useMemo(() => {
+    return clients.filter((c) => {
+      const bySearch = search
+        ? c.nombreCompleto?.toLowerCase().includes(search.toLowerCase()) ||
+          c.numeroDocumento.includes(search)
+        : true;
+
+      const byStatus =
+        status === "all"
+          ? true
+          : status === "active"
+          ? c.activo
+          : !c.activo;
+
+      return bySearch && byStatus;
+    });
+  }, [clients, search, status]);
 
   const headers = [
     "Tipo",
@@ -154,7 +162,8 @@ export const MainPage: React.FC = () => {
     "Estado",
     "Acciones",
   ];
-  const rows = clients.map((c) => ({
+
+  const rows = filteredClients.map((c) => ({
     id: c.id,
     cells: [
       c.tipo,
@@ -187,6 +196,7 @@ export const MainPage: React.FC = () => {
       </div>,
     ],
   }));
+
   const gridTemplate = "1fr 1.5fr 2fr 2fr 1fr 1fr 2fr";
 
   return (
@@ -206,6 +216,35 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
+      {/* 🔍 Filtros */}
+      <section className={styles.MainPage}>
+        <div className={styles.MainPage__Filter}>
+          <Text size="xs" color="neutral-primary">
+            Buscar por nombre o número de documento
+          </Text>
+          <Input
+            placeholder="Buscar..."
+            size="xs"
+            variant="createSale"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className={styles.MainPage__Filter}>
+          <Text size="xs" color="neutral-primary">
+            Estado
+          </Text>
+          <ComboBox
+            options={statusOptions}
+            size="xs"
+            variant="createSale"
+            value={status}
+            onChange={(v) => setStatus(v as string)}
+            placeholder="Seleccionar"
+          />
+        </div>
+      </section>
+
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <Modal
@@ -230,3 +269,9 @@ export const MainPage: React.FC = () => {
     </PageLayout>
   );
 };
+
+const statusOptions = [
+  { value: "all", label: "Todos" },
+  { value: "active", label: "Activos" },
+  { value: "inactive", label: "Inactivos" },
+];
