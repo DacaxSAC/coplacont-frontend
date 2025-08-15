@@ -7,6 +7,7 @@ import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
@@ -192,8 +193,7 @@ export const CreatePurchaseForm = () => {
     const loadInventarioProductos = async () => {
       if (almacenSeleccionado) {
         try {
-          const response = await fetch(`http://localhost:3000/api/inventario/almacen/${almacenSeleccionado}`);
-          const data = await response.json();
+          const data = await InventoryService.getInventoryByWarehouse(Number(almacenSeleccionado));
           setInventarioProductos(data);
         } catch (error) {
           console.error("Error al cargar productos del inventario:", error);

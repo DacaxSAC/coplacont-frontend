@@ -37,6 +37,19 @@ export class InventoryService {
     }
   }
 
+  /**
+   * Obtiene el inventario por almacén
+   * @param idAlmacen - ID del almacén
+   * @returns Promise con la respuesta del servidor
+   */
+  static async getInventoryByWarehouse(idAlmacen: number): Promise<InventoryItem[]> {
+    try {
+      const response = await inventoryApi.getInventoryByWarehouse(idAlmacen);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
 
   
 }
