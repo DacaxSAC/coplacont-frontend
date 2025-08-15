@@ -1,3 +1,3 @@
-export { UsersRouter } from './users';
-export { ParamsRouter } from './params';
+export { UsersRouter } from './Users';
+export { ParamsRouter } from './Params';
 //export { AccountingPeriodRouter } from './AccountingPeriods';
