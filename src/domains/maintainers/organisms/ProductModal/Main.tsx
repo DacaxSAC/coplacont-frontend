@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Main.module.scss";
-import { Modal, Button, Text, Input, ComboBox } from "@/components";
+import { Modal, Button, Text, Input, ComboBox, TextArea } from "@/components";
 import { CategoryService } from "@/domains/maintainers/services";
 import type { Category } from "@/domains/maintainers/types";
 
@@ -8,22 +8,19 @@ interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: {
+    nombre: string
     descripcion: string;
     unidadMedida: string;
-    codigo: string;
-    precio: string;
-    stockMinimo: number;
     categoriaId: number;
   }) => void | Promise<void>;
   title?: string;
   description?: string;
   submitLabel?: string;
+  isService?: boolean;
   initialValues?: {
+    nombre: string
     descripcion: string;
     unidadMedida: string;
-    codigo: string;
-    precio: string;
-    stockMinimo: number;
     categoriaId: number;
   };
 }
@@ -35,13 +32,12 @@ export const Main: React.FC<CreateProductModalProps> = ({
   title = "Creación de nuevo producto",
   description = "Ingresa los siguientes datos para registrar un producto.",
   submitLabel = "Guardar",
+  isService = false,
   initialValues,
 }) => {
+  const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [unidadMedida, setUnidadMedida] = useState("");
-  const [codigo, setCodigo] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [stockMinimo, setStockMinimo] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -56,19 +52,15 @@ export const Main: React.FC<CreateProductModalProps> = ({
   // Cargar valores iniciales cuando cambian
   useEffect(() => {
     if (initialValues) {
+      setNombre(initialValues.nombre);
       setDescripcion(initialValues.descripcion);
       setUnidadMedida(initialValues.unidadMedida);
-      setCodigo(initialValues.codigo);
-      setPrecio(initialValues.precio);
-      setStockMinimo(initialValues.stockMinimo.toString());
       setCategoriaId(initialValues.categoriaId.toString());
     } else {
       // Reset form
+      setNombre("")
       setDescripcion("");
       setUnidadMedida("");
-      setCodigo("");
-      setPrecio("");
-      setStockMinimo("");
       setCategoriaId("");
     }
   }, [initialValues, isOpen]);
@@ -78,42 +70,43 @@ export const Main: React.FC<CreateProductModalProps> = ({
     label: cat.nombre,
   }));
 
+  const unitOptions = [
+    { label: 'Unidad', value: 'unidad' },
+    { label: 'Kilogramo', value: 'kg' },
+    { label: 'Litro', value: 'litro' },
+  ]
+
   const handleSubmit = async () => {
-    if (!descripcion.trim() || !codigo.trim() || !precio.trim() || !categoriaId)
+    // Para servicios, la unidad de medida es opcional
+    if (!nombre.trim() || !descripcion.trim() || (!isService && !unidadMedida) || !categoriaId)
       return;
 
     await onSubmit({
+      nombre: nombre.trim(),
       descripcion: descripcion.trim(),
-      unidadMedida: unidadMedida.trim(),
-      codigo: codigo.trim(),
-      precio: precio.trim(),
-      stockMinimo: parseInt(stockMinimo) || 0,
+      unidadMedida: isService ? (unidadMedida.trim() || 'servicio') : unidadMedida.trim(),
       categoriaId: parseInt(categoriaId),
     });
 
     // Reset form
+    setNombre("");
     setDescripcion("");
     setUnidadMedida("");
-    setCodigo("");
-    setPrecio("");
-    setStockMinimo("");
     setCategoriaId("");
     onClose();
   };
 
   const handleClose = () => {
     // Reset form
+    setNombre("")
     setDescripcion("");
     setUnidadMedida("");
-    setCodigo("");
-    setPrecio("");
-    setStockMinimo("");
     setCategoriaId("");
     onClose();
   };
 
   const isFormValid =
-    descripcion.trim() && codigo.trim() && precio.trim() && categoriaId;
+    nombre.trim() && descripcion.trim() && (isService || unidadMedida) && categoriaId;
 
   return (
     <Modal
@@ -125,81 +118,58 @@ export const Main: React.FC<CreateProductModalProps> = ({
       <div className={styles.form}>
         <div className={styles.formField}>
           <Text size="xs" color="neutral-primary">
-            Código
-          </Text>
-          <Input
-            size="xs"
-            variant="createSale"
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            placeholder="Ingresa el código del producto"
-          />
-        </div>
-
-        <div className={styles.formField}>
-          <Text size="xs" color="neutral-primary">
             Nombre del producto
           </Text>
           <Input
             size="xs"
             variant="createSale"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
             placeholder="Ingresa el nombre del producto"
           />
         </div>
 
         <div className={styles.formField}>
           <Text size="xs" color="neutral-primary">
-            Unidad de medida
+            Descripción
           </Text>
-          <Input
-            size="xs"
-            variant="createSale"
-            value={unidadMedida}
-            onChange={(e) => setUnidadMedida(e.target.value)}
-            placeholder="Ej: unidad, kg, litro"
+          <TextArea
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            placeholder="Ingresa la descripción"
           />
+        </div>
 
+        {!isService && (
           <div className={styles.formField}>
             <Text size="xs" color="neutral-primary">
-              Categoría
+              Unidad de medida
             </Text>
             <ComboBox
-              options={categoryOptions}
+              options={unitOptions}
               size="xs"
               variant="createSale"
-              value={categoriaId}
-              onChange={(v) => setCategoriaId(v as string)}
+              value={unidadMedida}
+              onChange={(v) => setUnidadMedida(v as string)}
               placeholder="Seleccionar"
             />
           </div>
-        </div>
+        )}
 
         <div className={styles.formField}>
           <Text size="xs" color="neutral-primary">
-            Precio
+            Categoría
           </Text>
-          <Input
+          <ComboBox
+            options={categoryOptions}
             size="xs"
             variant="createSale"
-            value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
-            placeholder="0.00"
+            value={categoriaId}
+            onChange={(v) => setCategoriaId(v as string)}
+            placeholder="Seleccionar"
           />
         </div>
-        <div className={styles.formField}>
-          <Text size="xs" color="neutral-primary">
-            Stock mínimo
-          </Text>
-          <Input
-            size="xs"
-            variant="createSale"
-            value={stockMinimo}
-            onChange={(e) => setStockMinimo(e.target.value)}
-            placeholder="0"
-          />
-        </div>
+
         <Button
           variant="primary"
           size="large"

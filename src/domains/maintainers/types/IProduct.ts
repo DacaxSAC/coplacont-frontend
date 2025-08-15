@@ -5,6 +5,7 @@ import type { Category } from './ICategory';
  */
 export interface Product {
   id: number;
+  nombre: string;
   descripcion: string;
   unidadMedida: string;
   codigo: string;
@@ -21,12 +22,10 @@ export interface Product {
  * Interface para crear un producto
  */
 export interface CreateProductPayload {
+  nombre: string;
+  tipo: 'producto' | 'servicio';
   descripcion: string;
   unidadMedida: string;
-  codigo: string;
-  precio: string;
-  tipo: 'producto' | 'servicio';
-  stockMinimo: number;
   estado: boolean;
   categoriaId: number;
 }

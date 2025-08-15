@@ -6,6 +6,7 @@ import {
   CloseIcon,
   CheckIcon,
   StateTag,
+  AddDropdownButton,
 } from "@/components";
 import { ProductService } from "@/domains/maintainers/services";
 import type { Product } from "@/domains/maintainers/types";
@@ -18,39 +19,36 @@ export const MainPage: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [productType, setProductType] = useState<'producto' | 'servicio'>('producto');
   const [newProduct, setNewProduct] = useState({
+    codigo: "",
+    nombre: "",
     descripcion: "",
     unidadMedida: "",
-    codigo: "",
-    precio: "",
-    stockMinimo: 0,
     categoriaId: 0,
   });
 
   const resetForm = () => {
     setNewProduct({
+      codigo: "",
+      nombre: "",
       descripcion: "",
       unidadMedida: "",
-      codigo: "",
-      precio: "",
-      stockMinimo: 0,
       categoriaId: 0,
     });
   };
 
   const handleCreateProduct = async (data: {
+    nombre: string;
     descripcion: string;
     unidadMedida: string;
-    codigo: string;
-    precio: string;
-    stockMinimo: number;
     categoriaId: number;
   }) => {
     setLoading(true);
     try {
       const payload = { 
         ...data, 
-        tipo: 'producto' as const, 
+        tipo: productType, 
         estado: true 
       };
       const created = await ProductService.create(payload);
@@ -58,8 +56,8 @@ export const MainPage: React.FC = () => {
       setIsOpen(false);
       resetForm();
     } catch (error) {
-      setError("Error al crear el producto");
-      console.error('Error al crear producto:', error);
+      setError(`Error al crear el ${productType}`);
+      console.error(`Error al crear ${productType}:`, error);
     } finally {
       setLoading(false);
     }
@@ -98,11 +96,10 @@ export const MainPage: React.FC = () => {
 
   const headers = [
     "Código",
+    "Nombre",
     "Descripción", 
     "Unidad",
     "Categoría",
-    "Precio",
-    "Stock Mín.",
     "Estado",
     "Acciones",
   ];
@@ -111,11 +108,10 @@ export const MainPage: React.FC = () => {
     id: p.id,
     cells: [
       p.codigo,
+      p.nombre,
       p.descripcion,
       p.unidadMedida || "No especificado",
       p.categoria?.nombre || "No especificado",
-      p.precio,
-      p.stockMinimo,
       <StateTag state={p.estado} />,
       <div style={{ display: "flex", gap: "8px" }}>
         <Button
@@ -129,7 +125,6 @@ export const MainPage: React.FC = () => {
         >
           Ver detalles
         </Button>
-
         <Button
           size="tableItemSize"
           variant="tableItemStyle"
@@ -150,16 +145,28 @@ export const MainPage: React.FC = () => {
       title="Productos"
       subtitle="Listado de productos registrados"
       header={
-        <Button
-          onClick={() => {
-            resetForm();
-            setIsView(false);
-            setIsOpen(true);
-          }}
-          size="large"
-        >
-          + Nuevo producto
-        </Button>
+        <AddDropdownButton
+          options={[
+            {
+              label: "Nuevo producto",
+              onClick: () => {
+                setProductType('producto');
+                resetForm();
+                setIsView(false);
+                setIsOpen(true);
+              },
+            },
+            {
+              label: "Nuevo servicio",
+              onClick: () => {
+                setProductType('servicio');
+                resetForm();
+                setIsView(false);
+                setIsOpen(true);
+              },
+            },
+          ]}
+        />
       }
     >
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
@@ -168,12 +175,14 @@ export const MainPage: React.FC = () => {
         isOpen={isOpen}
         onClose={handleModal}
         onSubmit={isView ? async () => {} : handleCreateProduct}
+        title={isView ? "Detalles del producto" : `Creación de nuevo ${productType}`}
+        description={isView ? "Información del producto seleccionado." : `Ingresa los siguientes datos para registrar un ${productType}.`}
+        submitLabel={isView ? "Cerrar" : "Guardar"}
+        isService={productType === 'servicio'}
         initialValues={isView && selectedProduct ? {
+          nombre: selectedProduct.nombre,
           descripcion: selectedProduct.descripcion,
           unidadMedida: selectedProduct.unidadMedida,
-          codigo: selectedProduct.codigo,
-          precio: selectedProduct.precio,
-          stockMinimo: selectedProduct.stockMinimo,
           categoriaId: selectedProduct.categoria?.id ?? 0,
         } : newProduct}
       />
