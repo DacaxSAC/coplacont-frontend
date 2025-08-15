@@ -1,4 +1,4 @@
-import type { Product, Warehouse } from "@/domains/maintainers/services";
+import type { Product, Warehouse } from "@/domains/maintainers/types";
 
 /**
  * Interface para un lote de inventario

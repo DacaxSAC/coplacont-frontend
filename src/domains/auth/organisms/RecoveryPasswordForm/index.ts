@@ -1,1 +1,1 @@
-export { RecoveryPasswordForm, type RecoveryPasswordFormData, type RecoveryPasswordFormProps } from './RecoveryPasswordForm';
+export { RecoveryPasswordForm} from './RecoveryPasswordForm';

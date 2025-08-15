@@ -1,1 +1,1 @@
-export { NewPasswordForm, type NewPasswordFormData, type NewPasswordFormProps } from './NewPasswordForm';
+export { NewPasswordForm } from './NewPasswordForm';

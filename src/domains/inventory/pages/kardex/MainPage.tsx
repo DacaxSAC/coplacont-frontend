@@ -6,7 +6,7 @@ import type { InventoryItem } from "../../services/types";
 export const MainPage: React.FC = () => {
 
   //Por ahora
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventory] = useState<InventoryItem[]>([]);
   const [almacenFilter, setAlmacenFilter] = useState(""); // filtro almacén
   const [productoFilter, setProductoFilter] = useState(""); // filtro producto
 
@@ -34,7 +34,7 @@ export const MainPage: React.FC = () => {
   ];
 
   // 🔹 Filtrar inventario por almacén y producto (código o nombre)
-  const filteredInventory = useMemo(() => {
+  {/**const filteredInventory = useMemo(() => {
     return inventory.filter((i) => {
       const matchAlmacen =
         almacenFilter === "" ||
@@ -48,7 +48,7 @@ export const MainPage: React.FC = () => {
 
       return matchAlmacen && matchProducto;
     });
-  }, [inventory, almacenFilter, productoFilter]);
+  }, [inventory, almacenFilter, productoFilter]);*/}
 
 
   const headers = [

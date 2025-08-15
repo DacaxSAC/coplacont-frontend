@@ -18,7 +18,9 @@ export const MainPage: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
+  console.log('error', error);
   const [loading, setLoading] = useState(false);
+  console.log('loading', loading);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productType, setProductType] = useState<'producto' | 'servicio'>('producto');
   const [isLoading, setIsLoading] = useState(true);

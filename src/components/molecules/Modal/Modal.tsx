@@ -20,7 +20,7 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   onClose,
   children,
-  footer,
+  //footer,
   loading,
   buttonText = "Cancelar",
 }) => {
