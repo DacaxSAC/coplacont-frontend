@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
 import { Text, Input, ComboBox, Divider, Button } from "@/components";
-import { Table, type TableRow } from "@/components/organisms/Table";
+import { type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
@@ -96,7 +96,7 @@ export const CreateSaleForm = () => {
     setFormState((prev) => ({
       ...prev,
       tipoComprobante: tipoComprobanteValue,
-      cliente: "", // Limpiar cliente al cambiar tipo de comprobante
+      cliente: "",
     }));
   };
 
