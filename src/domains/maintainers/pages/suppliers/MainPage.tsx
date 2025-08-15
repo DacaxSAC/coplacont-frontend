@@ -234,7 +234,7 @@ export const MainPage: React.FC = () => {
             Buscar por nombre o número de documento
           </Text>
           <Input
-            placeholder="Buscar por nombre o número de documento"
+            placeholder="Buscar..."
             size="xs"
             variant="createSale"
             value={search}

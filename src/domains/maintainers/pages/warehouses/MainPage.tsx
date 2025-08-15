@@ -115,10 +115,16 @@ export const MainPage: React.FC = () => {
 
   const filtered = useMemo(() => {
     return warehouses.filter((w) => {
-      const byCode = code ? String(w.id).includes(code) : true;
+      const searchTerm = code.trim().toLowerCase();
+      const byCodeOrName = searchTerm
+        ? String(w.id).toLowerCase().includes(searchTerm) ||
+          w.nombre.toLowerCase().includes(searchTerm)
+        : true;
+
       const byStatus =
         status === "all" ? true : status === "active" ? w.estado : !w.estado;
-      return byCode && byStatus;
+
+      return byCodeOrName && byStatus;
     });
   }, [warehouses, code, status]);
 
@@ -201,35 +207,35 @@ export const MainPage: React.FC = () => {
         </Button>
       }
     >
-        <section className={styles.filtersRow}>
-          <div className={styles.formField}>
-            <Text size="xs" color="neutral-primary">
-              Código
-            </Text>
-            <Input
-              size="xs"
-              variant="createSale"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-          </div>
-          <div className={styles.formField}>
-            <Text size="xs" color="neutral-primary">
-              Estado
-            </Text>
-            <ComboBox
-              options={statusOptions}
-              size="xs"
-              variant="createSale"
-              value={status}
-              onChange={(v) => setStatus(v as string)}
-              placeholder="Seleccionar"
-            />
-          </div>
-        </section>
+      <section className={styles.filtersRow}>
+        <div className={styles.formField}>
+          <Text size="xs" color="neutral-primary">
+            Busca por código o nombre
+          </Text>
+          <Input
+            placeholder="Buscar..."
+            size="xs"
+            variant="createSale"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+        </div>
+        <div className={styles.formField}>
+          <Text size="xs" color="neutral-primary">
+            Estado
+          </Text>
+          <ComboBox
+            options={statusOptions}
+            size="xs"
+            variant="createSale"
+            value={status}
+            onChange={(v) => setStatus(v as string)}
+            placeholder="Seleccionar"
+          />
+        </div>
+      </section>
 
-        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-
+      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <Modal
         isOpen={isOpen}
@@ -238,7 +244,8 @@ export const MainPage: React.FC = () => {
           resetForm();
           setIsCreate(false);
           setIsView(false);
-          setIsOpen(!isOpen)}}
+          setIsOpen(!isOpen);
+        }}
         title="Agregar nuevo almacén"
         description="Ingresa los siguientes datos para registrar un almacén."
         loading={loading}
@@ -255,10 +262,9 @@ export const MainPage: React.FC = () => {
           onChange={hanldeWarehouseChange}
           onSubmit={handleCreate}
           readOnly={isView}
-          isCreate= {isCreate}
+          isCreate={isCreate}
         />
       </Modal>
-
     </PageLayout>
   );
 };
