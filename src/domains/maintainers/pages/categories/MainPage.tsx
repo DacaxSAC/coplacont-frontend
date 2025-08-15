@@ -29,7 +29,8 @@ export const MainPage: React.FC = () => {
 
   const [newCategory, setNewCategory] = useState<CreateCategoryPayload>({
     nombre: "",
-    descripcion: ""
+    descripcion: "",
+    tipo: "" as "producto" | "servicio",
   });
 
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -65,7 +66,8 @@ export const MainPage: React.FC = () => {
   const resetForm = () => {
     setNewCategory({
       nombre: "",
-      descripcion: ""
+      descripcion: "",
+      tipo: "" as "producto" | "servicio",
     });
   };
 
