@@ -120,10 +120,14 @@ export const MainPage: React.FC = () => {
     });
   }, [warehouses, code, status]);
 
-  const handleDelete = async (id: number) => {
+  const handleChangeState = async (id: number, estado: boolean) => {
     try {
-      await WarehouseService.delete(id);
-      setWarehouses((prev) => prev.filter((wh) => wh.id !== id));
+      if (estado) {
+        await WarehouseService.delete(id);
+      } else {
+        await WarehouseService.restore(id, { estado:true });
+      }
+      fetchWarehouses();
     } catch (error) {
       console.error("Error al eliminar almacén:", error);
     }
@@ -155,7 +159,7 @@ export const MainPage: React.FC = () => {
             <Button
               size="tableItemSize"
               variant="tableItemStyle"
-              onClick={() => {}}
+              onClick={() => {handleChangeState(w.id, w.estado)}}
             >
               {w.estado ? <CloseIcon /> : <CheckIcon />}
             </Button>
