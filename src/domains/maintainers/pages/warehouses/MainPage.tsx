@@ -26,6 +26,7 @@ export const MainPage: React.FC = () => {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
+  const [isCreate, setIsCreate] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -150,6 +151,7 @@ export const MainPage: React.FC = () => {
               variant="tableItemStyle"
               onClick={() => {
                 setSelectedWarehouse(w);
+                setIsCreate(false);
                 setIsView(true);
                 setIsOpen(true);
               }}
@@ -190,6 +192,7 @@ export const MainPage: React.FC = () => {
         <Button
           size="large"
           onClick={() => {
+            setIsCreate(true);
             setIsOpen(true);
             setIsView(false);
           }}
@@ -230,23 +233,29 @@ export const MainPage: React.FC = () => {
 
       <Modal
         isOpen={isOpen}
-        onClose={() => setIsOpen(!isOpen)}
+        onClose={() => {
+          fetchWarehouses();
+          resetForm();
+          setIsCreate(false);
+          setIsView(false);
+          setIsOpen(!isOpen)}}
         title="Agregar nuevo almacén"
         description="Ingresa los siguientes datos para registrar un almacén."
         loading={loading}
         buttonText={"Cerrar"}
       >
         <FormWarehouse
-          setError={setError}
-          setLoading={setLoading}
           warehouse={
             isView && selectedWarehouse ? selectedWarehouse : newWarehouse
           }
           error={error}
           loading={loading}
+          setError={setError}
+          setLoading={setLoading}
           onChange={hanldeWarehouseChange}
           onSubmit={handleCreate}
           readOnly={isView}
+          isCreate= {isCreate}
         />
       </Modal>
 

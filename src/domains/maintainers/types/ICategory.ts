@@ -13,7 +13,9 @@ export interface Category {
 /**
  * Payload para crear una categoría
  */
-export type CreateCategoryPayload = Pick<Category, 'nombre' | 'descripcion'>;
+export type CreateCategoryPayload = Pick<Category, 'nombre' | 'descripcion'> & {
+  id?: number;
+};
 
 /**
  * Payload para actualizar una categoría

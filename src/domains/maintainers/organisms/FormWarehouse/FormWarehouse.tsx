@@ -11,8 +11,9 @@ type FormWarehouseProps = {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   readOnly?: boolean;
-  onChange: (field: keyof Warehouse, value: string | number | boolean) => void;
+  onChange: (field: keyof WarehouseParcial, value: string) => void;
   onSubmit?: () => void;
+  isCreate? : boolean
 };
 
 export const FormWarehouse = ({
@@ -24,6 +25,7 @@ export const FormWarehouse = ({
   readOnly = false,
   onChange,
   onSubmit,
+  isCreate = false,
 }: FormWarehouseProps) => {
   const [warehouseToUpdate, setWarehouseToUpdate] = useState<WarehouseParcial>({
     nombre: warehouse.nombre,
@@ -65,7 +67,7 @@ export const FormWarehouse = ({
           disabled={isEdit? false : readOnly}
           size="xs"
           variant="createSale"
-          value={warehouseToUpdate.nombre ?? ""}
+          value={isCreate ? warehouse.nombre : warehouseToUpdate.nombre ?? ""}
           onChange={(e) => {
             if (isEdit) {
               setWarehouseToUpdate({
@@ -88,7 +90,7 @@ export const FormWarehouse = ({
           disabled={isEdit? false : readOnly}
           size="xs"
           variant="createSale"
-          value={warehouseToUpdate.ubicacion}
+          value={isCreate ? warehouse.ubicacion : warehouseToUpdate.ubicacion}
           onChange={(e) =>{
             if(isEdit){
               setWarehouseToUpdate({
@@ -109,7 +111,7 @@ export const FormWarehouse = ({
         <Input
           size="xs"
           variant="createSale"
-          value={warehouseToUpdate.responsable ?? ""
+          value={isCreate ? warehouse.responsable : warehouseToUpdate.responsable ?? ""
           }
           onChange={(e) => {
             if (isEdit) {
@@ -133,7 +135,7 @@ export const FormWarehouse = ({
         <Input
           size="xs"
           variant="createSale"
-          value={ warehouseToUpdate.telefono ?? "" }
+          value={isCreate ? warehouse.telefono : warehouseToUpdate.telefono ?? "" }
           onChange={(e) => {
             if (isEdit) {
               setWarehouseToUpdate({
@@ -156,7 +158,7 @@ export const FormWarehouse = ({
         <Input
           size="xs"
           variant="createSale"
-          value={warehouseToUpdate.descripcion ?? "" 
+          value={isCreate ? warehouse.descripcion : warehouseToUpdate.descripcion ?? "" 
           }
           onChange={(e) => {
             if (isEdit) {
