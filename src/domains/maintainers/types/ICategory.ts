@@ -14,11 +14,11 @@ export interface Category {
 /**
  * Payload para crear una categoría
  */
-export type CreateCategoryPayload = Pick<Category, 'nombre' | 'descripcion' | 'tipo'> & {
+export type CreateCategoryPayload = Pick<Category, 'nombre' | 'descripcion'|'tipo'> & {
   id?: number;
 };
 
 /**
  * Payload para actualizar una categoría
  */
-export type UpdateCategoryPayload = Pick<Category, 'nombre' | 'descripcion' | 'tipo'>;
+export type UpdateCategoryPayload = Pick<Category, 'nombre' | 'descripcion'|'tipo'>;
