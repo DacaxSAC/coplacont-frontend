@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import styles from './MainPage.module.scss';
 import { PageLayout, Button, Table, ComboBox, Text } from "@/components";
 import type { InventoryItem } from "../../services/types";
