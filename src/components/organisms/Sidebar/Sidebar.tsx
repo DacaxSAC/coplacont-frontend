@@ -46,11 +46,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <h3 className={styles.sectionTitle__title}>Mantenedores</h3>
           </div>
           <ul className={styles.menuList}>
-            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CATEGORIES}`}>Categorías</Link></li>
-            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.PRODUCTS}`}>Productos</Link></li>
-            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.WAREHOUSES}`}>Almacenes</Link></li>
             <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CLIENTS}`}>Clientes</Link></li>
             <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.SUPPLIERS}`}>Proveedores</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.PRODUCTS}`}>Productos y servicios</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CATEGORIES}`}>Categorías</Link></li>
+            <li><Link to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.WAREHOUSES}`}>Almacenes</Link></li>
           </ul>
         </div>
 
