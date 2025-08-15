@@ -3,7 +3,7 @@ import styles from './MainPage.module.scss';
 import type { Transaction } from '../../services/types';
 import { TransactionsService } from '../../services/TransactionsService';
 
-import { Button, PageLayout, FormField, Text } from '@/components';
+import { Button, PageLayout, FormField } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
@@ -194,7 +194,7 @@ export const MainPage: React.FC = () => {
         show={isUploadOpen}
         setShow={setUploadOpen}
         onDownload={downloadSalesTemplate}
-        onUpload={(file) => handleBulkRegister()}
+        onUpload={(file) => {handleBulkRegister(); console.log(file)}}
       />
     </PageLayout>
   );
