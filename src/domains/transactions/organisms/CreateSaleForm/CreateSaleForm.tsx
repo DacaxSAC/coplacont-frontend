@@ -281,7 +281,7 @@ export const CreateSaleForm = () => {
     }
   };
 
-  const tableRows: TableRow[] = detalleVenta.map((item, index) => {
+  const tableRows: TableRow[] = detalleVenta.map((item) => {
     const unidad = unidadMedidaOptions.find(
       (option) => option.value === item.unidadMedida
     );
