@@ -10,6 +10,7 @@ import { ProductService, WarehouseService } from "@/domains/maintainers/services
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import type { Entidad } from "@/domains/maintainers/services/entitiesService";
+import type { Transaction } from "../../services/types";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 
 const TipoCompraEnum = {
@@ -87,6 +88,7 @@ interface CreatePurchaseFormState {
   serie: string;
   numero: string;
   fechaVencimiento: string;
+  idComprobanteAfecto: string | "";
 }
 
 const tipoCompraOptions = [
@@ -127,6 +129,7 @@ export const CreatePurchaseForm = () => {
     serie: "",
     numero: "",
     fechaVencimiento: "",
+    idComprobanteAfecto: "",
   });
 
   // Estados para el detalle de productos
@@ -152,6 +155,9 @@ export const CreatePurchaseForm = () => {
   // Estado para tipo de cambio automático
   const [tipoCambioAutomatico, setTipoCambioAutomatico] = useState<string>("");
   console.log(tipoCambioAutomatico);
+
+  // Estado para compras registradas (para comprobante afecto)
+  const [comprasRegistradas, setComprasRegistradas] = useState<Transaction[]>([]);
 
   // Obtener el correlativo al montar el componente
   useEffect(() => {
@@ -221,6 +227,20 @@ export const CreatePurchaseForm = () => {
     loadProveedores();
   }, []);
 
+  // Cargar compras registradas al montar el componente
+  useEffect(() => {
+    const loadComprasRegistradas = async () => {
+      try {
+        const comprasData = await TransactionsService.getPurchases();
+        setComprasRegistradas(comprasData);
+      } catch (error) {
+        console.error("Error al cargar compras registradas:", error);
+      }
+    };
+
+    loadComprasRegistradas();
+  }, []);
+
   // Obtener tipo de cambio automático cuando cambia la moneda
   useEffect(() => {
     const fetchTipoCambio = async () => {
@@ -278,6 +298,15 @@ export const CreatePurchaseForm = () => {
       ...prev,
       tipoComprobante: tipoComprobanteValue,
       proveedor: "", // Limpiar proveedor al cambiar tipo de comprobante
+      idComprobanteAfecto: "", // Limpiar comprobante afecto al cambiar tipo de comprobante
+    }));
+  };
+
+  // Maneja el cambio de comprobante afecto
+  const handleComprobanteAfectoChange = (value: string | number) => {
+    setFormState((prev) => ({
+      ...prev,
+      idComprobanteAfecto: String(value),
     }));
   };
 
@@ -384,6 +413,20 @@ export const CreatePurchaseForm = () => {
     }));
   };
 
+  // Función para determinar si debe mostrarse el combo de comprobante afecto
+  const shouldShowComprobanteAfecto = (): boolean => {
+    return formState.tipoComprobante === TipoComprobanteEnum.NOTA_CREDITO || 
+           formState.tipoComprobante === TipoComprobanteEnum.NOTA_DEBITO;
+  };
+
+  // Función para obtener las opciones de comprobantes afectos
+  const getComprobantesAfectosOptions = () => {
+    return comprasRegistradas.map((compra) => ({
+      value: compra.idComprobante.toString(),
+      label: `${compra.serie}-${compra.numero} - ${compra.fechaEmision}`,
+    }));
+  };
+
   // Función para obtener las opciones de productos del inventario
   const getProductosInventarioOptions = () => {
     return inventarioProductos.map((item) => ({
@@ -484,6 +527,7 @@ export const CreatePurchaseForm = () => {
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
+        ...(formState.idComprobanteAfecto && { idComprobanteAfecto: parseInt(formState.idComprobanteAfecto) }),
         detalles: detallesAPI,
       };
 
@@ -522,6 +566,7 @@ export const CreatePurchaseForm = () => {
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
+        ...(formState.idComprobanteAfecto && { idComprobanteAfecto: parseInt(formState.idComprobanteAfecto) }),
         detalles: detallesAPI,
       };
 
@@ -539,6 +584,7 @@ export const CreatePurchaseForm = () => {
         serie: "",
         numero: "",
         fechaVencimiento: "",
+        idComprobanteAfecto: "",
       });
       setDetalleCompra([]);
       setProductoSeleccionado("");
@@ -625,6 +671,25 @@ export const CreatePurchaseForm = () => {
               onChange={handleTipoComprobanteChange}
             />
           </div>
+
+          {/* Mostrar combo de Comprobante afecto solo para notas de crédito y débito */}
+          {shouldShowComprobanteAfecto() && (
+            <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--full"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Comprobante afecto
+              </Text>
+              <ComboBox
+                size="xs"
+                options={getComprobantesAfectosOptions()}
+                variant="createSale"
+                name="idComprobanteAfecto"
+                value={formState.idComprobanteAfecto}
+                onChange={handleComprobanteAfectoChange}
+              />
+            </div>
+          )}
 
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--proveedor"]}`}
