@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button } from "@/components";
-import { type TableRow } from "@/components/organisms/Table";
+import { Text, Input, ComboBox, Divider, Button, CloseIcon } from "@/components";
+import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
@@ -72,6 +73,7 @@ export const CreateSaleForm = () => {
     UnidadMedidaType | ""
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
+  const [precioUnitario, setPrecioUnitario] = useState<number>(0);
 
   const handleInputChange =
     (field: keyof CreateSaleFormState) =>
@@ -189,6 +191,68 @@ export const CreateSaleForm = () => {
     setCantidadIngresada(e.target.value);
   };
 
+  // Función para agregar producto al detalle
+  const handleAgregarProducto = () => {
+    // Validaciones
+    if (!productoSeleccionado) {
+      alert("Debe seleccionar un producto");
+      return;
+    }
+    if (!cantidadIngresada || parseFloat(cantidadIngresada) <= 0) {
+      alert("Debe ingresar una cantidad válida");
+      return;
+    }
+    if (!unidadMedidaSeleccionada) {
+      alert("Debe seleccionar una unidad de medida");
+      return;
+    }
+    if (precioUnitario <= 0) {
+      alert("El precio unitario debe ser mayor a 0");
+      return;
+    }
+
+    // Buscar el producto seleccionado en el inventario
+    const productoInventario = inventarioProductos.find(
+      (item) => item.producto.id.toString() === productoSeleccionado
+    );
+
+    if (!productoInventario) {
+      alert("Producto no encontrado en el inventario");
+      return;
+    }
+
+    const cantidad = parseFloat(cantidadIngresada);
+    const subtotal = cantidad * precioUnitario;
+    const baseGravado = subtotal / 1.18; // Base gravada (sin IGV)
+    const igv = subtotal - baseGravado; // IGV (18%)
+    const isv = 0; // ISV por defecto 0
+    const total = subtotal;
+
+    const nuevoItem: DetalleVentaItem = {
+      id: Date.now().toString(), // ID único temporal
+      producto: productoSeleccionado,
+      descripcion: productoInventario.producto.nombre,
+      unidadMedida: unidadMedidaSeleccionada,
+      cantidad,
+      precioUnitario,
+      subtotal,
+      baseGravado,
+      igv,
+      isv,
+      total,
+      idInventario: productoInventario.id,
+    };
+
+    // Agregar al detalle
+    setDetalleVenta((prev) => [...prev, nuevoItem]);
+
+    // Limpiar campos
+    setProductoSeleccionado("");
+    setUnidadMedidaSeleccionada("");
+    setCantidadIngresada("");
+    setPrecioUnitario(0);
+  };
+
   const handleAceptarVenta = async () => {
     try {
       const detallesAPI = detalleVenta.map((item) => ({
@@ -200,6 +264,7 @@ export const CreateSaleForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
+        idInventario: item.idInventario,
       }));
 
       const ventaData = {
@@ -236,6 +301,7 @@ export const CreateSaleForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
+        idInventario: item.idInventario,
       }));
 
       const ventaData = {
@@ -281,7 +347,24 @@ export const CreateSaleForm = () => {
     }
   };
 
-  const tableRows: TableRow[] = detalleVenta.map((item) => {
+  const tableHeaders = [
+    "Descripción",
+    "Cantidad",
+    "U.M.",
+    "P. Unitario",
+    "Subtotal",
+    "Base Gravado",
+    "IGV",
+    "ISV",
+    "Total",
+    "Acciones",
+  ];
+
+  const handleEliminarProducto = (item: DetalleVentaItem, index: number) => {
+    setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const tableRows: TableRow[] = detalleVenta.map((item, index) => {
     const unidad = unidadMedidaOptions.find(
       (option) => option.value === item.unidadMedida
     );
@@ -300,11 +383,11 @@ export const CreateSaleForm = () => {
         `S/ ${item.total.toFixed(2)}`,
         <Button
           key={`delete-${item.id}`}
-          size="small"
-          variant="danger"
-          onClick={() => {}}
+          size="tableItemSize"
+          variant="tableItemStyle"
+          onClick={() => handleEliminarProducto(item, index)}
         >
-          Eliminar
+          <CloseIcon />
         </Button>,
       ],
     };
@@ -317,6 +400,9 @@ export const CreateSaleForm = () => {
   console.log(products);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   console.log(warehouses);
+  const [inventarioProductos, setInventarioProductos] = useState<any[]>([]);
+  const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
+
   useEffect(() => {
     EntitiesService.getClients().then((data) => {
       setClients(data);
@@ -331,6 +417,24 @@ export const CreateSaleForm = () => {
       console.log(data);
     });
   }, []);
+
+  // Cargar productos del inventario cuando se selecciona un almacén
+  useEffect(() => {
+    const loadInventarioProductos = async () => {
+      if (almacenSeleccionado) {
+        try {
+          const data = await InventoryService.getInventoryByWarehouse(Number(almacenSeleccionado));
+          setInventarioProductos(data);
+        } catch (error) {
+          console.error("Error al cargar productos del inventario:", error);
+        }
+      } else {
+        setInventarioProductos([]);
+      }
+    };
+
+    loadInventarioProductos();
+  }, [almacenSeleccionado]);
 
   const getFilteredClientOptions = () => {
     let filteredClients = clients;
@@ -347,6 +451,48 @@ export const CreateSaleForm = () => {
         client.numeroDocumento
       }`,
     }));
+  };
+
+  const getAlmacenesOptions = () => {
+    return warehouses.map((warehouse) => ({
+      value: warehouse.id.toString(),
+      label: warehouse.nombre,
+    }));
+  };
+
+  const getProductosInventarioOptions = () => {
+    return inventarioProductos.map((item) => ({
+      value: item.producto.id.toString(),
+      label: `${item.producto.nombre} (Stock: ${item.stockActual})`,
+    }));
+  };
+
+  const handleAlmacenChange = (value: string | number) => {
+    const stringValue = String(value);
+    setAlmacenSeleccionado(stringValue);
+    // Limpiar campos relacionados cuando cambia el almacén
+    setProductoSeleccionado("");
+    setUnidadMedidaSeleccionada("");
+    setPrecioUnitario(0);
+  };
+
+  const handleProductoInventarioChange = (value: string | number) => {
+    const stringValue = String(value);
+    setProductoSeleccionado(stringValue as ProductoType);
+    const selectedItem = inventarioProductos.find(
+      (item) => item.producto.id.toString() === stringValue
+    );
+    if (selectedItem) {
+      // Establecer unidad de medida del producto
+      setUnidadMedidaSeleccionada(selectedItem.producto.unidadMedida || "");
+      debugger
+      // Establecer precio unitario del producto
+      setPrecioUnitario(selectedItem.producto.precioVenta || 0);
+    } else {
+      // Limpiar campos si no se encuentra el producto
+      setUnidadMedidaSeleccionada("");
+      setPrecioUnitario(0);
+    }
   };
 
   const clientesOptionsFromAPI = getFilteredClientOptions();
@@ -569,11 +715,12 @@ export const CreateSaleForm = () => {
               </Text>
               <ComboBox
                 size="xs"
-                options={tipoProductoVentaOptions}
+                options={getAlmacenesOptions()}
                 variant="createSale"
-                name="tipoProductoVenta"
-                value={formState.tipoProductoVenta}
-                onChange={handleComboBoxChange("tipoProductoVenta")}
+                name="almacen"
+                value={almacenSeleccionado}
+                onChange={handleAlmacenChange}
+                disabled={!isDetalleVentaEnabled()}
               />
             </div>
 
@@ -585,12 +732,12 @@ export const CreateSaleForm = () => {
               </Text>
               <ComboBox
                 size="xs"
-                options={tipoProductoVentaOptions}
+                options={getProductosInventarioOptions()}
                 variant="createSale"
-                name="tipoProductoVenta"
-                value={formState.tipoProductoVenta}
-                onChange={handleComboBoxChange("tipoProductoVenta")}
-                disabled={!isDetalleVentaEnabled()}
+                name="producto"
+                value={productoSeleccionado}
+                onChange={handleProductoInventarioChange}
+                disabled={!isDetalleVentaEnabled() || !almacenSeleccionado}
               />
             </div>
 
@@ -603,14 +750,8 @@ export const CreateSaleForm = () => {
               <Input
                 size="xs"
                 variant="createSale"
-                value={
-                  unidadMedidaSeleccionada
-                    ? unidadMedidaOptions.find(
-                        (option) => option.value === unidadMedidaSeleccionada
-                      )?.label || ""
-                    : ""
-                }
-                disabled={!isDetalleVentaEnabled()}
+                value={unidadMedidaSeleccionada}
+                disabled={true}
               />
             </div>
 
@@ -620,6 +761,14 @@ export const CreateSaleForm = () => {
               <Text size="xs" color="neutral-primary">
                 Precio unitario
               </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={precioUnitario.toString()}
+                onChange={(e) => setPrecioUnitario(Number(e.target.value))}
+                disabled={!isDetalleVentaEnabled()}
+              />
             </div>
 
             <div
@@ -643,7 +792,7 @@ export const CreateSaleForm = () => {
             >
               <Button
                 size="small"
-                onClick={() => {}}
+                onClick={handleAgregarProducto}
                 disabled={!isDetalleVentaEnabled()}
               >
                 Agregar
@@ -652,13 +801,13 @@ export const CreateSaleForm = () => {
           </div>
 
           {/** Table */}
-          {/**{detalleVenta.length > 0 && (
+          {detalleVenta.length > 0 && (
             <Table
               headers={tableHeaders}
               rows={tableRows}
               gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
             />
-          )}*/}
+          )}
        <Divider />
         </>
       )}

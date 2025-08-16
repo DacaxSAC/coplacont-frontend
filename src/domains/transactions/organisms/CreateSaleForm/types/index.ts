@@ -30,6 +30,7 @@ export interface DetalleVentaItem {
   igv: number;
   isv: number;
   total: number;
+  idInventario: number;
 }
 
 // Agregar estado para el tipo de cambio como string
