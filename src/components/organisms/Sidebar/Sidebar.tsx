@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Sidebar.module.scss";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Logo } from "@/components/atoms";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle/ThemeToggle";
 import {
@@ -33,7 +33,17 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
+
+  /**
+   * Determina si un enlace está activo basándose en la ruta actual
+   * @param path - La ruta del enlace a verificar
+   * @returns true si el enlace está activo
+   */
+  const isActiveLink = (path: string): boolean => {
+    return location.pathname === path;
+  };
 
   const handleLogout = () => {
     logout();
@@ -66,6 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`}
+                className={isActiveLink(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`) ? styles.active : ''}
               >
                 Compras
               </Link>
@@ -73,6 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}`}
+                className={isActiveLink(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}`) ? styles.active : ''}
               >
                 Ventas
               </Link>
@@ -92,12 +104,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.INVENTORY}`}
+                className={isActiveLink(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.INVENTORY}`) ? styles.active : ''}
               >
                 Inventario
               </Link>
             </li>
             <li>
-              <Link to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`}>
+              <Link 
+                to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`}
+                className={isActiveLink(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`) ? styles.active : ''}
+              >
                 Kardex
               </Link>
             </li>
@@ -120,6 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CLIENTS}`}
+                className={isActiveLink(`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CLIENTS}`) ? styles.active : ''}
               >
                 Clientes
               </Link>
@@ -127,6 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.SUPPLIERS}`}
+                className={isActiveLink(`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.SUPPLIERS}`) ? styles.active : ''}
               >
                 Proveedores
               </Link>
@@ -134,6 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.PRODUCTS}`}
+                className={isActiveLink(`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.PRODUCTS}`) ? styles.active : ''}
               >
                 Productos y servicios
               </Link>
@@ -141,6 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CATEGORIES}`}
+                className={isActiveLink(`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.CATEGORIES}`) ? styles.active : ''}
               >
                 Categorías
               </Link>
@@ -148,6 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.WAREHOUSES}`}
+                className={isActiveLink(`${MAIN_ROUTES.MAINTAINERS}${MAINTAINERS_ROUTES.WAREHOUSES}`) ? styles.active : ''}
               >
                 Almacenes
               </Link>
@@ -164,6 +185,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             <li>
               <Link
                 to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`}
+                className={isActiveLink(`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`) ? styles.active : ''}
               >
                 Estado de costo de venta
               </Link>
@@ -207,17 +229,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
               <li>
                 <Link
                   to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`}
+                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`) ? styles.active : ''}
                 >
                   Periodos Contables
                 </Link>
               </li>
               <li>
-                <Link to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}>
+                <Link 
+                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
+                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`) ? styles.active : ''}
+                >
                   Usuarios y Roles
                 </Link>
               </li>
               <li>
-                <Link to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}>
+                <Link 
+                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}
+                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`) ? styles.active : ''}
+                >
                   Parámetros
                 </Link>
               </li>
