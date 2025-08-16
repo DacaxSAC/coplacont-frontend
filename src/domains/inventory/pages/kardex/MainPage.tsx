@@ -1,55 +1,74 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from './MainPage.module.scss';
 import { PageLayout, Button, Table, ComboBox, Text } from "@/components";
-import type { InventoryItem } from "../../services/types";
+import { InventoryService } from "../../services/InventoryService";
+import { ProductService } from "@/domains/maintainers/services";
+import type { KardexMovement } from "../../services/types";
+import type { Product } from "@/domains/maintainers/types";
 
 export const MainPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [kardexMovements, setKardexMovements] = useState<KardexMovement[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  //Por ahora
-  const [inventory] = useState<InventoryItem[]>([]);
-  const [almacenFilter, setAlmacenFilter] = useState(""); // filtro almacén
-  const [productoFilter, setProductoFilter] = useState(""); // filtro producto
-
+  // Cargar productos al montar el componente
   useEffect(() => {
-    //Logica para cargar kardex
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        const response = await ProductService.getAll();
+        setProducts(response);
+        
+        // Si hay un productId en la URL, seleccionarlo automáticamente
+        const productIdFromUrl = searchParams.get('productId');
+        if (productIdFromUrl) {
+          setSelectedProductId(productIdFromUrl);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setError("Error al cargar los productos");
+      }
+    };
 
-  // 🔹 Opciones para los ComboBox
-  const almacenOptions = [
-    { label: "Todos", value: "" },
-    ...Array.from(
-      new Map(
-        inventory.map((i) => [i.almacen.id, { label: `${i.almacen.id} - ${i.almacen.nombre}`, value: String(i.almacen.id) }])
-      ).values()
-    )
-  ];
+    fetchProducts();
+  }, [searchParams]);
 
+  // Cargar movimientos de kardex cuando se selecciona un producto
+  useEffect(() => {
+    const fetchKardexMovements = async () => {
+      if (!selectedProductId) {
+        setKardexMovements([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+        const movements = await InventoryService.getKardexMovements(parseInt(selectedProductId));
+        setKardexMovements(movements);
+      } catch (error) {
+        console.error("Error fetching kardex movements:", error);
+        setError("Error al cargar los movimientos de kardex");
+        setKardexMovements([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKardexMovements();
+  }, [selectedProductId]);
+
+  // Opciones para el ComboBox de productos
   const productOptions = [
-    { label: "Todos", value: "" },
-    ...Array.from(
-      new Map(
-        inventory.map((i) => [i.producto.codigo, { label: `${i.producto.codigo} - ${i.producto.descripcion}`, value: i.producto.codigo }])
-      ).values()
-    )
+    { label: "Seleccionar producto", value: "" },
+    ...products.map((product) => ({
+      label: `${product.codigo} - ${product.descripcion}`,
+      value: product.id.toString()
+    }))
   ];
-
-  // 🔹 Filtrar inventario por almacén y producto (código o nombre)
-  {/**const filteredInventory = useMemo(() => {
-    return inventory.filter((i) => {
-      const matchAlmacen =
-        almacenFilter === "" ||
-        String(i.almacen.id).toLowerCase().includes(almacenFilter.toLowerCase()) ||
-        i.almacen.nombre.toLowerCase().includes(almacenFilter.toLowerCase());
-
-      const matchProducto =
-        productoFilter === "" ||
-        i.producto.codigo.toLowerCase().includes(productoFilter.toLowerCase()) ||
-        i.producto.descripcion.toLowerCase().includes(productoFilter.toLowerCase());
-
-      return matchAlmacen && matchProducto;
-    });
-  }, [inventory, almacenFilter, productoFilter]);*/}
-
 
   const headers = [
     "Fecha",
@@ -62,47 +81,28 @@ export const MainPage: React.FC = () => {
     "Costo Total",
   ];
 
-  //Actualizar cuando se consuma el endpoint dekardex
-  const rows = inventory.map((i) => ({
-    id: i.id,
+  const rows = kardexMovements.map((movement) => ({
+    id: movement.id,
     cells: [
-      i.almacen.id,
-      i.almacen.nombre,
-      i.producto.codigo,
-      i.producto.descripcion,
-      i.stockActual,
-        <Button
-          size="tableItemSize"
-          variant="tableItemStyle"
-          onClick={() => {}}
-        >
-          Ver KARDEX
-        </Button>
-
+      movement.fecha,
+      movement.tipo,
+      movement.tipoComprobante,
+      movement.codigoComprobante,
+      movement.cantidad,
+      movement.saldo,
+      movement.costoUnitario,
+      movement.costoTotal,
     ],
   }));
+
   const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
 
-
   return (
-     <PageLayout
+    <PageLayout
       title="Kardex"
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
-        <div className={styles.MainPage__Filter}>
-          <Text size="xs" color="neutral-primary">
-            Almacén
-          </Text>
-          <ComboBox
-            options={almacenOptions}
-            size="xs"
-            variant="createSale"
-            value={almacenFilter}
-            onChange={(v) => setAlmacenFilter(v as string)}
-            placeholder="Seleccionar"
-          />
-        </div>
         <div className={styles.MainPage__Filter}>
           <Text size="xs" color="neutral-primary">
             Producto
@@ -111,13 +111,41 @@ export const MainPage: React.FC = () => {
             options={productOptions}
             size="xs"
             variant="createSale"
-            value={productoFilter}
-            onChange={(v) => setProductoFilter(v as string)}
-            placeholder="Seleccionar"
+            value={selectedProductId}
+            onChange={(v) => setSelectedProductId(v as string)}
+            placeholder="Seleccionar producto"
           />
         </div>
+        {error && (
+          <div className={styles.MainPage__Error}>
+            <Text size="xs" color="danger">
+              {error}
+            </Text>
+          </div>
+        )}
       </section>
-      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+      
+      {loading ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <Text size="sm" color="neutral-primary">
+            Cargando movimientos de kardex...
+          </Text>
+        </div>
+      ) : selectedProductId && kardexMovements.length === 0 && !error ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <Text size="sm" color="neutral-secondary">
+            No hay movimientos de kardex para este producto.
+          </Text>
+        </div>
+      ) : selectedProductId ? (
+        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+      ) : (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <Text size="sm" color="neutral-secondary">
+            Selecciona un producto para ver sus movimientos de kardex.
+          </Text>
+        </div>
+      )}
     </PageLayout>
   );
 };

@@ -33,3 +33,18 @@ export interface InventoryResponse {
   message: string;
   data: InventoryItem[];
 }
+
+/**
+ * Interface para un movimiento de kardex
+ */
+export interface KardexMovement {
+  id: string;
+  fecha: string;
+  tipo: string;
+  tipoComprobante: string;
+  codigoComprobante: string;
+  cantidad: number;
+  saldo: number;
+  costoUnitario: number;
+  costoTotal: number;
+}

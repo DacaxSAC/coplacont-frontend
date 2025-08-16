@@ -1,6 +1,6 @@
 import { handleApiError } from "@/shared";
 import { inventoryApi } from "../api/inventoryApi";
-import type { InventoryItem } from "./types";
+import type { InventoryItem, KardexMovement } from "./types";
 
 /**
  * Servicio de transacciones
@@ -59,6 +59,20 @@ export class InventoryService {
   static async createInventory(payload: { idAlmacen: number; idProducto: number; stockActual: number }): Promise<InventoryItem> {
     try {
       const response = await inventoryApi.createInventory(payload);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Obtiene los movimientos de kardex de un producto
+   * @param productId - ID del producto
+   * @returns Promise con la respuesta del servidor
+   */
+  static async getKardexMovements(productId: number): Promise<KardexMovement[]> {
+    try {
+      const response = await inventoryApi.getKardexMovements(productId);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

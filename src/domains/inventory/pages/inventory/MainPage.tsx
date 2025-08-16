@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from './MainPage.module.scss';
 import { PageLayout, Button, Table, Text, ComboBox, Modal } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import { MAIN_ROUTES, INVENTORY_ROUTES } from "@/router";
 import type { InventoryItem } from "../../services/types";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 
 export const MainPage: React.FC = () => {
+  const navigate = useNavigate();
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [almacenFilter, setAlmacenFilter] = useState(""); // filtro almacén
   const [productoFilter, setProductoFilter] = useState(""); // filtro producto
@@ -120,7 +123,9 @@ export const MainPage: React.FC = () => {
       <Button
         size="tableItemSize"
         variant="tableItemStyle"
-        onClick={() => {}}
+        onClick={() => {
+          navigate(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}?productId=${i.producto.id}`);
+        }}
       >
         Ver KARDEX
       </Button>
