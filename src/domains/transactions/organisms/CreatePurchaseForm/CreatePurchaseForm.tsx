@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreatePurchaseForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button } from "@/components";
+import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
@@ -131,6 +131,9 @@ export const CreatePurchaseForm = () => {
     fechaVencimiento: "",
     idComprobanteAfecto: "",
   });
+
+  // Estado de carga
+  const [isLoading, setIsLoading] = useState(false);
 
   // Estados para el detalle de productos
   const [detalleCompra, setDetalleCompra] = useState<DetalleCompraItem[]>([]);
@@ -503,6 +506,7 @@ export const CreatePurchaseForm = () => {
   // Maneja el envío del formulario de compra
   const handleAceptarCompra = async () => {
     try {
+      setIsLoading(true);
       const detallesAPI = detalleCompra.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -536,12 +540,15 @@ export const CreatePurchaseForm = () => {
       navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`);
     } catch (error) {
       console.error("Error al registrar la compra:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Maneja el envío del formulario de compra y navegación para nueva compra
   const handleAceptarYNuevaCompra = async () => {
     try {
+      setIsLoading(true);
       const detallesAPI = detalleCompra.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
@@ -596,40 +603,46 @@ export const CreatePurchaseForm = () => {
       );
     } catch (error) {
       console.error("Error al registrar la compra:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Configuración de la tabla
   const tableHeaders = [
-    "Producto",
     "Descripción",
-    "U.M.",
     "Cantidad",
-    "Almacén",
+    "U.M.",
     "P. Unitario",
     "Subtotal",
     "Base Gravado",
     "IGV",
     "ISV",
     "Total",
+    "Acciones",
   ];
 
   const tableRows: TableRow[] = detalleCompra.map((item, index) => ({
     id: item.id,
     cells: [
-      item.producto,
       item.descripcion,
+      item.cantidad.toFixed(2),
       item.unidadMedida,
-      item.cantidad.toString(),
-      item.almacen,
       `S/ ${item.precioUnitario.toFixed(2)}`,
       `S/ ${item.subtotal.toFixed(2)}`,
       `S/ ${item.baseGravado.toFixed(2)}`,
       `S/ ${item.igv.toFixed(2)}`,
       `S/ ${item.isv.toFixed(2)}`,
       `S/ ${item.total.toFixed(2)}`,
+      <Button
+        key={`delete-${item.id}`}
+        size="tableItemSize"
+        variant="tableItemStyle"
+        onClick={() => handleEliminarProducto(item, index)}
+      >
+        <CloseIcon />
+      </Button>,
     ],
-    onDelete: () => handleEliminarProducto(item, index),
   }));
 
   const proveedoresOptionsFromAPI = getFilteredProviderOptions();
@@ -937,11 +950,41 @@ export const CreatePurchaseForm = () => {
 
           {/** Table */}
           {detalleCompra.length > 0 && (
-            <Table
-              headers={tableHeaders}
-              rows={tableRows}
-              gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
-            />
+            <>
+              <Table
+                headers={tableHeaders}
+                rows={tableRows}
+                gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
+              />
+              
+              {/* Totales */}
+              <div className={styles.CreatePurchaseForm__Totals}>
+                <div className={styles.CreatePurchaseForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">Subtotal:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleCompra.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={styles.CreatePurchaseForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">IGV:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleCompra.reduce((sum, item) => sum + item.igv, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={styles.CreatePurchaseForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">ISV:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleCompra.reduce((sum, item) => sum + item.isv, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={`${styles.CreatePurchaseForm__TotalsRow} ${styles['CreatePurchaseForm__TotalsRow--total']}`}>
+                  <Text size="sm" color="neutral-primary">Total:</Text>
+                  <Text size="sm" color="neutral-primary">
+                    S/ {detalleCompra.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+                  </Text>
+                </div>
+              </div>
+            </>
           )}
         </>
       )}
@@ -951,17 +994,19 @@ export const CreatePurchaseForm = () => {
       <div className={styles.CreatePurchaseForm__Actions}>
         <Button
           onClick={handleAceptarCompra}
-          disabled={!areRequiredHeadersComplete()}
+          disabled={!areRequiredHeadersComplete() || isLoading}
         >
           Aceptar
         </Button>
         <Button
           onClick={handleAceptarYNuevaCompra}
-          disabled={!areRequiredHeadersComplete()}
+          disabled={!areRequiredHeadersComplete() || isLoading}
         >
           Aceptar y nueva compra
         </Button>
       </div>
+
+      {isLoading && <Loader text="Procesando compra..." />}
     </div>
   );
 };

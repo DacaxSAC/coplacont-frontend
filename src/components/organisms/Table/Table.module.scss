@@ -8,13 +8,35 @@
   overflow: hidden;
   box-shadow: $box-shadow-sm;
   max-height: 600px;
-  overflow-y: auto;
+  display: flex;
 }
 
 .table {
   width: 100%;
   display: grid;
-  grid-auto-rows: minmax(48px, auto);
+  grid-auto-rows: 48px;
+}
+
+.scrollableContent {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.actionsColumn {
+  width: 80px;
+  flex-shrink: 0;
+  border-left: 1px solid $border-color;
+  background: $bg-color;
+  overflow-y: auto;
+  
+  .table {
+    grid-template-columns: 1fr;
+  }
+  
+  .headerCell {
+    background: $bg-color-secondary;
+  }
 }
 
 .row {
@@ -37,9 +59,13 @@
   white-space: nowrap;
   padding: $spacing-xs $spacing-lg;
   overflow-x: auto;
+  overflow-y: hidden;
   font-size: $font-size-xs;
   color: $text-color;
   border-right: 1px solid $border-color;
+  height: 48px;
+  display: flex;
+  align-items: center;
   
   //Para ocultar scrollbar
   &::-webkit-scrollbar {

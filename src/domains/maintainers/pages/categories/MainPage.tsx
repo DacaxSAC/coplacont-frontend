@@ -11,6 +11,7 @@ import {
   Text,
   Input,
   ComboBox,
+  Loader,
 } from "@/components";
 import { CategoryService } from "@/domains/maintainers/services";
 import type {
@@ -85,6 +86,7 @@ export const MainPage: React.FC = () => {
 
   const handleStateCategory = async (id: number, currentState: boolean) => {
     try {
+      setIsLoading(true);
       const updatedData = { estado: !currentState };
       await CategoryService.update(id, updatedData as any);
       setCategories((prev) =>
@@ -94,6 +96,8 @@ export const MainPage: React.FC = () => {
       );
     } catch (error) {
       console.error("Error al cambiar estado de categoría:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,6 +116,8 @@ export const MainPage: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error("Error al crear categoría:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -262,6 +268,8 @@ export const MainPage: React.FC = () => {
           isCreate={isCreate}
         />
       </Modal>
+      
+      {isLoading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

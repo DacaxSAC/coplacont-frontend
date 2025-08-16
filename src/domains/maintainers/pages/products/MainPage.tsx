@@ -8,6 +8,7 @@ import {
   CheckIcon,
   StateTag,
   AddDropdownButton,
+  Loader,
 } from "@/components";
 import { ProductService } from "@/domains/maintainers/services";
 import type { Product } from "@/domains/maintainers/types";
@@ -249,6 +250,8 @@ export const MainPage: React.FC = () => {
           categoriaId: selectedProduct.categoria?.id ?? 0,
         } : newProduct}
       />
+      
+      {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

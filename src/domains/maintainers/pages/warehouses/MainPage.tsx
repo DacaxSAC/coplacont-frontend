@@ -13,6 +13,7 @@ import {
   Text,
   Input,
   ComboBox,
+  Loader,
 } from "@/components";
 
 import type { Warehouse, WarehouseParcial } from "@/domains/maintainers/types";
@@ -130,6 +131,7 @@ export const MainPage: React.FC = () => {
 
   const handleChangeState = async (id: number, estado: boolean) => {
     try {
+      setLoading(true);
       if (estado) {
         await WarehouseService.delete(id);
       } else {
@@ -138,6 +140,8 @@ export const MainPage: React.FC = () => {
       fetchWarehouses();
     } catch (error) {
       console.error("Error al eliminar almacén:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -235,6 +239,7 @@ export const MainPage: React.FC = () => {
         </div>
       </section>
 
+      {loading && <Loader text="Procesando..." />}
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <Modal

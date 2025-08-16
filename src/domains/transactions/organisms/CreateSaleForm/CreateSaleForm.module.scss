@@ -87,10 +87,34 @@
     }
   }
 
+  &__Totals {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: $bg-color-secondary;
+    border-radius: $border-radius-md;
+    max-width: 300px;
+    margin-left: auto;
+  }
+
+  &__TotalsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    &--total {
+      border-top: 1px solid $border-color;
+      padding-top: $spacing-xs;
+      margin-top: $spacing-xs;
+    }
+  }
+
   &__Actions {
     width: 100%;
     display: flex;
-    justify-content: center;
+
     align-items: center;
     gap: $spacing-2xl;
     

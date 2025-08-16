@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button, CloseIcon } from "@/components";
+import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
@@ -48,6 +48,7 @@ export const CreateSaleForm = () => {
 
   // Estados para el detalle de productos
   const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Obtener el correlativo al montar el componente
   useEffect(() => {
@@ -254,6 +255,7 @@ export const CreateSaleForm = () => {
   };
 
   const handleAceptarVenta = async () => {
+    setIsLoading(true);
     try {
       const detallesAPI = detalleVenta.map((item) => ({
         cantidad: item.cantidad,
@@ -287,10 +289,13 @@ export const CreateSaleForm = () => {
       navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}`);
     } catch (error) {
       console.error("Error al registrar la venta:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAceptarYNuevaVenta = async () => {
+    setIsLoading(true);
     try {
       const detallesAPI = detalleVenta.map((item) => ({
         cantidad: item.cantidad,
@@ -344,6 +349,8 @@ export const CreateSaleForm = () => {
       );
     } catch (error) {
       console.error("Error al registrar la venta:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -802,11 +809,41 @@ export const CreateSaleForm = () => {
 
           {/** Table */}
           {detalleVenta.length > 0 && (
-            <Table
-              headers={tableHeaders}
-              rows={tableRows}
-              gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
-            />
+            <>
+              <Table
+                headers={tableHeaders}
+                rows={tableRows}
+                gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
+              />
+              
+              {/* Totales */}
+              <div className={styles.CreateSaleForm__Totals}>
+                <div className={styles.CreateSaleForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">Subtotal:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleVenta.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={styles.CreateSaleForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">IGV:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleVenta.reduce((sum, item) => sum + item.igv, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={styles.CreateSaleForm__TotalsRow}>
+                  <Text size="xs" color="neutral-primary">ISV:</Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/ {detalleVenta.reduce((sum, item) => sum + item.isv, 0).toFixed(2)}
+                  </Text>
+                </div>
+                <div className={`${styles.CreateSaleForm__TotalsRow} ${styles['CreateSaleForm__TotalsRow--total']}`}>
+                   <Text size="sm" color="neutral-primary">Total:</Text>
+                   <Text size="sm" color="neutral-primary">
+                     S/ {detalleVenta.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
+                   </Text>
+                 </div>
+              </div>
+            </>
           )}
        <Divider />
         </>
@@ -814,16 +851,18 @@ export const CreateSaleForm = () => {
 
 
 
+      {isLoading && <Loader text="Procesando venta..." />}
+      
       <div className={styles.CreateSaleForm__Actions}>
         <Button 
           onClick={handleAceptarVenta}
-          disabled={!areRequiredHeadersComplete()}
+          disabled={!areRequiredHeadersComplete() || isLoading}
         >
           Aceptar
         </Button>
         <Button 
           onClick={handleAceptarYNuevaVenta}
-          disabled={!areRequiredHeadersComplete()}
+          disabled={!areRequiredHeadersComplete() || isLoading}
         >
           Aceptar y nueva venta
         </Button>
