@@ -38,13 +38,24 @@ export interface InventoryResponse {
  * Interface para un movimiento de kardex
  */
 export interface KardexMovement {
-  id: string;
   fecha: string;
   tipo: string;
-  tipoComprobante: string;
-  codigoComprobante: string;
+  tComprob: string;
+  nComprobante: string;
   cantidad: number;
   saldo: number;
   costoUnitario: number;
   costoTotal: number;
+}
+
+/**
+ * Interface para la respuesta completa del kardex
+ */
+export interface KardexResponse {
+  producto: string;
+  almacen: string;
+  movimientos: KardexMovement[];
+  cantidadActual: string;
+  saldoActual: string;
+  costoFinal: string;
 }

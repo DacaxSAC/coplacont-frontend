@@ -1,6 +1,6 @@
 import { handleApiError } from "@/shared";
 import { inventoryApi } from "../api/inventoryApi";
-import type { InventoryItem, KardexMovement } from "./types";
+import type { InventoryItem, KardexResponse } from "./types";
 
 /**
  * Servicio de transacciones
@@ -11,9 +11,9 @@ export class InventoryService {
    * Obtiene el inventario por almacen y producto
    * @param idAlmacen - ID del almacen
    * @param idProducto - ID del producto
-   * @returns Promise con la respuesta del servidor
+   * @returns Promise con el item de inventario específico
    */
-  static async getInventoryByWarehouseAndProduct(idAlmacen: number, idProducto: number): Promise<InventoryItem[]> {
+  static async getInventoryByWarehouseAndProduct(idAlmacen: number, idProducto: number): Promise<InventoryItem> {
     try {
       const response = await inventoryApi.getInventoryByWarehouseAndProduct(idAlmacen, idProducto);
       return response.data;
@@ -66,13 +66,15 @@ export class InventoryService {
   }
 
   /**
-   * Obtiene los movimientos de kardex de un producto
-   * @param productId - ID del producto
-   * @returns Promise con la respuesta del servidor
+   * Obtiene los movimientos del kardex para un inventario específico en un rango de fechas
+   * @param idInventario - ID del inventario
+   * @param fechaInicio - Fecha de inicio en formato YYYY-MM-DD
+   * @param fechaFin - Fecha de fin en formato YYYY-MM-DD
+   * @returns Promise con la respuesta completa del kardex
    */
-  static async getKardexMovements(productId: number): Promise<KardexMovement[]> {
+  static async getKardexMovements(idInventario: number, fechaInicio: string, fechaFin: string): Promise<KardexResponse> {
     try {
-      const response = await inventoryApi.getKardexMovements(productId);
+      const response = await inventoryApi.getKardexMovements(idInventario, fechaInicio, fechaFin);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from './MainPage.module.scss';
-import { PageLayout, Button, Table, ComboBox, Text } from "@/components";
+import { PageLayout, Table, ComboBox, Text } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService } from "@/domains/maintainers/services";
 import type { KardexMovement } from "../../services/types";
@@ -11,7 +11,7 @@ export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [kardexMovements, setKardexMovements] = useState<KardexMovement[]>([]);
+  const [kardexData, setKardexData] = useState<KardexMovement[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -36,30 +36,27 @@ export const MainPage: React.FC = () => {
     fetchProducts();
   }, [searchParams]);
 
-  // Cargar movimientos de kardex cuando se selecciona un producto
+  // Cargar movimientos de kardex automáticamente al montar el componente
   useEffect(() => {
     const fetchKardexMovements = async () => {
-      if (!selectedProductId) {
-        setKardexMovements([]);
-        return;
-      }
-
       try {
         setLoading(true);
         setError("");
-        const movements = await InventoryService.getKardexMovements(parseInt(selectedProductId));
-        setKardexMovements(movements);
+        const inventario = await InventoryService.getInventoryByWarehouseAndProduct(1,10);
+        const kardexResponse = await InventoryService.getKardexMovements(parseInt(inventario.id), '2025-01-01', '2025-12-31');
+        setKardexData(kardexResponse.movimientos);
+        console.log(kardexResponse.movimientos);
       } catch (error) {
         console.error("Error fetching kardex movements:", error);
         setError("Error al cargar los movimientos de kardex");
-        setKardexMovements([]);
+        setKardexData([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchKardexMovements();
-  }, [selectedProductId]);
+  }, []);
 
   // Opciones para el ComboBox de productos
   const productOptions = [
@@ -81,19 +78,19 @@ export const MainPage: React.FC = () => {
     "Costo Total",
   ];
 
-  const rows = kardexMovements.map((movement) => ({
-    id: movement.id,
+  const rows = kardexData.map((movement, index) => ({
+    id: index.toString(),
     cells: [
       movement.fecha,
       movement.tipo,
-      movement.tipoComprobante,
-      movement.codigoComprobante,
+      movement.tComprob,
+      movement.nComprobante,
       movement.cantidad,
       movement.saldo,
       movement.costoUnitario,
       movement.costoTotal,
     ],
-  }));
+  })) || [];
 
   const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
 
@@ -131,20 +128,14 @@ export const MainPage: React.FC = () => {
             Cargando movimientos de kardex...
           </Text>
         </div>
-      ) : selectedProductId && kardexMovements.length === 0 && !error ? (
+      ) : (!kardexData || kardexData.length === 0) && !error ? (
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <Text size="sm" color="neutral-secondary">
-            No hay movimientos de kardex para este producto.
+            No hay movimientos de kardex disponibles.
           </Text>
         </div>
-      ) : selectedProductId ? (
-        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
       ) : (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <Text size="sm" color="neutral-secondary">
-            Selecciona un producto para ver sus movimientos de kardex.
-          </Text>
-        </div>
+        <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
       )}
     </PageLayout>
   );
