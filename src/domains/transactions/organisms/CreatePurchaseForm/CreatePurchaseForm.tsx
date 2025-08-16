@@ -663,6 +663,7 @@ export const CreatePurchaseForm = () => {
               Correlativo
             </Text>
             <Input
+              disabled={true}
               size="xs"
               variant="createSale"
               value={formState.correlativo}
