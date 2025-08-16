@@ -145,7 +145,6 @@ export const Main: React.FC<CreateProductModalProps> = ({
           <TextArea
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            placeholder="Ingresa la descripción"
           />
         </div>
 
