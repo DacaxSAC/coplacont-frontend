@@ -119,8 +119,8 @@ export const CreateSaleForm = () => {
   };
 
   /**
-   * Valida si todas las cabeceras obligatorias están completas
-   * @returns {boolean} true si todas las cabeceras obligatorias están completas
+   * Valida si todas las cabeceras obligatorias están completas y hay productos en el detalle
+   * @returns {boolean} true si todas las cabeceras obligatorias están completas y hay al menos un producto en el detalle
    */
   const areRequiredHeadersComplete = (): boolean => {
     return (
@@ -131,7 +131,8 @@ export const CreateSaleForm = () => {
       formState.tipoProductoVenta !== "" &&
       formState.serie !== "" &&
       formState.numero !== "" &&
-      formState.fechaVencimiento !== ""
+      formState.fechaVencimiento !== "" &&
+      detalleVenta.length > 0
     );
   };
 
@@ -367,7 +368,7 @@ export const CreateSaleForm = () => {
     "Acciones",
   ];
 
-  const handleEliminarProducto = (item: DetalleVentaItem, index: number) => {
+  const handleEliminarProducto = ( index: number) => {
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -392,14 +393,13 @@ export const CreateSaleForm = () => {
           key={`delete-${item.id}`}
           size="tableItemSize"
           variant="tableItemStyle"
-          onClick={() => handleEliminarProducto(item, index)}
+          onClick={() => handleEliminarProducto(index)}
         >
           <CloseIcon />
         </Button>,
       ],
     };
   });
-  console.log(tableRows);
 
   // CLIENTES
   const [clients, setClients] = useState<Entidad[]>([]);
@@ -413,15 +413,12 @@ export const CreateSaleForm = () => {
   useEffect(() => {
     EntitiesService.getClients().then((data) => {
       setClients(data);
-      console.log(data);
     });
     ProductService.getAll().then((data) => {
       setProducts(data);
-      console.log(data);
     });
     WarehouseService.getAll().then((data) => {
       setWarehouses(data);
-      console.log(data);
     });
   }, []);
 

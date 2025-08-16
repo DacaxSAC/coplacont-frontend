@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import styles from './MainPage.module.scss';
+import styles from "./MainPage.module.scss";
 import { PageLayout, Table, ComboBox, Text } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService } from "@/domains/maintainers/services";
@@ -21,9 +21,9 @@ export const MainPage: React.FC = () => {
       try {
         const response = await ProductService.getAll();
         setProducts(response);
-        
+
         // Si hay un productId en la URL, seleccionarlo automáticamente
-        const productIdFromUrl = searchParams.get('productId');
+        const productIdFromUrl = searchParams.get("productId");
         if (productIdFromUrl) {
           setSelectedProductId(productIdFromUrl);
         }
@@ -42,8 +42,13 @@ export const MainPage: React.FC = () => {
       try {
         setLoading(true);
         setError("");
-        const inventario = await InventoryService.getInventoryByWarehouseAndProduct(1,10);
-        const kardexResponse = await InventoryService.getKardexMovements(parseInt(inventario.id), '2025-01-01', '2025-12-31');
+        const inventario =
+          await InventoryService.getInventoryByWarehouseAndProduct(2, 4);
+        const kardexResponse = await InventoryService.getKardexMovements(
+          parseInt(inventario.id),
+          "2025-01-01",
+          "2025-12-31"
+        );
         setKardexData(kardexResponse.movimientos);
         console.log(kardexResponse.movimientos);
       } catch (error) {
@@ -63,8 +68,8 @@ export const MainPage: React.FC = () => {
     { label: "Seleccionar producto", value: "" },
     ...products.map((product) => ({
       label: `${product.codigo} - ${product.descripcion}`,
-      value: product.id.toString()
-    }))
+      value: product.id.toString(),
+    })),
   ];
 
   const headers = [
@@ -73,24 +78,26 @@ export const MainPage: React.FC = () => {
     "Tipo de comprobante",
     "Cod de comprobante",
     "Cantidad",
-    "Saldo",
     "Costo Unitario",
+    "Saldo",
     "Costo Total",
   ];
 
-  const rows = kardexData.map((movement, index) => ({
-    id: index.toString(),
-    cells: [
-      movement.fecha,
-      movement.tipo,
-      movement.tComprob,
-      movement.nComprobante,
-      movement.cantidad,
-      movement.saldo,
-      movement.costoUnitario,
-      movement.costoTotal,
-    ],
-  })) || [];
+  const rows =
+    kardexData.map((movement, index) => ({
+      id: index.toString(),
+      cells: [
+        movement.fecha,
+        movement.tipo,
+        movement.tComprob,
+        movement.nComprobante,
+        movement.cantidad,
+
+        movement.costoUnitario,
+        movement.saldo,
+        movement.costoTotal,
+      ],
+    })) || [];
 
   const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
 
@@ -121,15 +128,15 @@ export const MainPage: React.FC = () => {
           </div>
         )}
       </section>
-      
+
       {loading ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: "20px", textAlign: "center" }}>
           <Text size="sm" color="neutral-primary">
             Cargando movimientos de kardex...
           </Text>
         </div>
       ) : (!kardexData || kardexData.length === 0) && !error ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: "20px", textAlign: "center" }}>
           <Text size="sm" color="neutral-secondary">
             No hay movimientos de kardex disponibles.
           </Text>
