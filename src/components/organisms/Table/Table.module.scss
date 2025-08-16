@@ -29,6 +29,7 @@
   border-left: 1px solid $border-color;
   background: $bg-color;
   overflow-y: auto;
+  box-sizing: border-box;
   
   .table {
     grid-template-columns: 1fr;
