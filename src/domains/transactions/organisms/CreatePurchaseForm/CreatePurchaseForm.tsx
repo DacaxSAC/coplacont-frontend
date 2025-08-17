@@ -98,19 +98,19 @@ const tipoCompraOptions = [
 
 const tipoProductoCompraOptions = [
   { value: TipoProductoCompraEnum.MERCADERIA, label: "Mercadería" },
-  { value: TipoProductoCompraEnum.SERVICIO, label: "Servicio" },
+  //{ value: TipoProductoCompraEnum.SERVICIO, label: "Servicio" },
 ];
 
 const tipoComprobanteOptions = [
   { value: TipoComprobanteEnum.FACTURA, label: "Factura" },
   { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
-  { value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
-  { value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
+  //{ value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
+  //{ value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
 ];
 
 const monedaOptions = [
   { value: MonedaEnum.SOL, label: "Sol" },
-  { value: MonedaEnum.DOLAR, label: "Dólar" },
+  //{ value: MonedaEnum.DOLAR, label: "Dólar" },
 ];
 
 // Las opciones de productos ahora se obtienen dinámicamente desde la API de inventario
