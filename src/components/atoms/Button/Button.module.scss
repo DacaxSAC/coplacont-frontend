@@ -80,11 +80,11 @@
   }
 
   &--secondary {
-    background-color: $secondary-blue;
+    background-color: $table-head;
     color: $neutral-5;
 
     &:hover:not(:disabled) {
-      background-color: color.scale($secondary-blue, $lightness: 10%);
+      background-color: $border-color;
       transform: translateY(-1px);
       box-shadow: $box-shadow-md;
     }
