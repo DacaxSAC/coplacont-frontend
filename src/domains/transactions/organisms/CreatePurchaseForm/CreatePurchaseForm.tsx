@@ -145,6 +145,7 @@ export const CreatePurchaseForm = () => {
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
   const [precioUnitarioIngresado, setPrecioUnitarioIngresado] = useState<string>("");
+  const [precioTotalIngresado, setPrecioTotalIngresado] = useState<string>("");
   const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
 
   // Estados para datos de maintainers
@@ -334,12 +335,60 @@ export const CreatePurchaseForm = () => {
 
   // Maneja el cambio de cantidad ingresada
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCantidadIngresada(e.target.value);
+    const nuevaCantidad = e.target.value;
+    setCantidadIngresada(nuevaCantidad);
+    
+    // Recalcular precio total si hay precio unitario
+    if (precioUnitarioIngresado && nuevaCantidad) {
+      const cantidad = parseFloat(nuevaCantidad);
+      const precioUnitario = parseFloat(precioUnitarioIngresado);
+      if (!isNaN(cantidad) && !isNaN(precioUnitario)) {
+        setPrecioTotalIngresado((cantidad * precioUnitario).toString());
+      }
+    }
+    
+    // Recalcular precio unitario si hay precio total
+    if (precioTotalIngresado && nuevaCantidad) {
+      const cantidad = parseFloat(nuevaCantidad);
+      const precioTotal = parseFloat(precioTotalIngresado);
+      if (!isNaN(cantidad) && !isNaN(precioTotal) && cantidad > 0) {
+        setPrecioUnitarioIngresado((precioTotal / cantidad).toString());
+      }
+    }
   };
 
   // Maneja el cambio de precio unitario ingresado
   const handlePrecioUnitarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrecioUnitarioIngresado(e.target.value);
+    const nuevoPrecioUnitario = e.target.value;
+    setPrecioUnitarioIngresado(nuevoPrecioUnitario);
+    
+    // Calcular precio total automáticamente si hay cantidad
+    if (cantidadIngresada && nuevoPrecioUnitario) {
+      const cantidad = parseFloat(cantidadIngresada);
+      const precioUnitario = parseFloat(nuevoPrecioUnitario);
+      if (!isNaN(cantidad) && !isNaN(precioUnitario)) {
+        setPrecioTotalIngresado((cantidad * precioUnitario).toString());
+      }
+    } else {
+      setPrecioTotalIngresado("");
+    }
+  };
+
+  // Maneja el cambio de precio total ingresado
+  const handlePrecioTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nuevoPrecioTotal = e.target.value;
+    setPrecioTotalIngresado(nuevoPrecioTotal);
+    
+    // Calcular precio unitario automáticamente si hay cantidad
+    if (cantidadIngresada && nuevoPrecioTotal) {
+      const cantidad = parseFloat(cantidadIngresada);
+      const precioTotal = parseFloat(nuevoPrecioTotal);
+      if (!isNaN(cantidad) && !isNaN(precioTotal) && cantidad > 0) {
+        setPrecioUnitarioIngresado((precioTotal / cantidad).toString());
+      }
+    } else {
+      setPrecioUnitarioIngresado("");
+    }
   };
 
   // Maneja el cambio de almacén seleccionado
@@ -494,6 +543,7 @@ export const CreatePurchaseForm = () => {
     setUnidadMedidaSeleccionada("");
     setCantidadIngresada("");
     setPrecioUnitarioIngresado("");
+    setPrecioTotalIngresado("");
     // No limpiar almacenSeleccionado para mantener la selección
   };
 
@@ -597,6 +647,8 @@ export const CreatePurchaseForm = () => {
       setProductoSeleccionado("");
       setUnidadMedidaSeleccionada("");
       setCantidadIngresada("");
+      setPrecioUnitarioIngresado("");
+      setPrecioTotalIngresado("");
 
       navigate(
         `${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}${COMMON_ROUTES.REGISTER}`
@@ -929,7 +981,7 @@ export const CreatePurchaseForm = () => {
               className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
             >
               <Text size="xs" color="neutral-primary">
-                Precio unitario
+                Costo unitario
               </Text>
               <Input
                 size="xs"
@@ -937,6 +989,20 @@ export const CreatePurchaseForm = () => {
                 variant="createSale"
                 value={precioUnitarioIngresado}
                 onChange={handlePrecioUnitarioChange}
+              />
+            </div>
+             <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--small"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Costo Total
+              </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={precioTotalIngresado}
+                onChange={handlePrecioTotalChange}
               />
             </div>
 

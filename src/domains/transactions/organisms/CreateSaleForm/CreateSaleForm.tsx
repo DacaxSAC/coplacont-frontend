@@ -2,19 +2,27 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateSaleForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader } from "@/components";
+import {
+  Text,
+  Input,
+  ComboBox,
+  Divider,
+  Button,
+  CloseIcon,
+  Loader,
+} from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
-import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import {
+  ProductService,
+  WarehouseService,
+} from "@/domains/maintainers/services";
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import type { Entidad } from "@/domains/maintainers/services/entitiesService";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
-import {
-  TipoComprobanteEnum,
-  MonedaEnum,
-} from "./enums";
+import { TipoComprobanteEnum, MonedaEnum } from "./enums";
 import type {
   TipoComprobanteType,
   MonedaType,
@@ -75,6 +83,7 @@ export const CreateSaleForm = () => {
   >("");
   const [cantidadIngresada, setCantidadIngresada] = useState<string>("");
   const [precioUnitario, setPrecioUnitario] = useState<number>(0);
+  const [precioTotalIngresado, setPrecioTotalIngresado] = useState<string>("");
 
   const handleInputChange =
     (field: keyof CreateSaleFormState) =>
@@ -188,9 +197,75 @@ export const CreateSaleForm = () => {
   //  }
   //};
 
-  // Maneja el cambio de cantidad ingresada
+  /**
+   * Maneja el cambio de cantidad y recalcula precios automáticamente
+   */
   const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCantidadIngresada(e.target.value);
+    const nuevaCantidad = e.target.value;
+    setCantidadIngresada(nuevaCantidad);
+
+    const cantidad = parseFloat(nuevaCantidad);
+    if (!isNaN(cantidad) && cantidad > 0) {
+      // Si hay precio unitario, recalcular precio total
+      if (precioUnitario > 0) {
+        const nuevoTotal = cantidad * precioUnitario;
+        setPrecioTotalIngresado(nuevoTotal.toString());
+      }
+      // Si hay precio total, recalcular precio unitario
+      else if (precioTotalIngresado && parseFloat(precioTotalIngresado) > 0) {
+        const nuevoPrecioUnitario = parseFloat(precioTotalIngresado) / cantidad;
+        setPrecioUnitario(nuevoPrecioUnitario);
+      }
+    }
+  };
+
+  /**
+   * Maneja el cambio de precio unitario y calcula automáticamente el precio total
+   */
+  const handlePrecioUnitarioChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const nuevoPrecioUnitario = e.target.value;
+    const precioNumerico = parseFloat(nuevoPrecioUnitario);
+
+    if (!isNaN(precioNumerico) && precioNumerico >= 0) {
+      setPrecioUnitario(precioNumerico);
+
+      // Calcular precio total automáticamente si hay cantidad
+      const cantidad = parseFloat(cantidadIngresada);
+      if (!isNaN(cantidad) && cantidad > 0) {
+        const nuevoTotal = cantidad * precioNumerico;
+        setPrecioTotalIngresado(nuevoTotal.toString());
+      } else {
+        setPrecioTotalIngresado("");
+      }
+    } else {
+      setPrecioUnitario(0);
+      setPrecioTotalIngresado("");
+    }
+  };
+
+  /**
+   * Maneja el cambio de precio total y calcula automáticamente el precio unitario
+   */
+  const handlePrecioTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nuevoPrecioTotal = e.target.value;
+    setPrecioTotalIngresado(nuevoPrecioTotal);
+
+    const totalNumerico = parseFloat(nuevoPrecioTotal);
+    const cantidad = parseFloat(cantidadIngresada);
+
+    if (
+      !isNaN(totalNumerico) &&
+      totalNumerico >= 0 &&
+      !isNaN(cantidad) &&
+      cantidad > 0
+    ) {
+      const nuevoPrecioUnitario = totalNumerico / cantidad;
+      setPrecioUnitario(nuevoPrecioUnitario);
+    } else if (!nuevoPrecioTotal) {
+      setPrecioUnitario(0);
+    }
   };
 
   // Función para agregar producto al detalle
@@ -253,6 +328,7 @@ export const CreateSaleForm = () => {
     setUnidadMedidaSeleccionada("");
     setCantidadIngresada("");
     setPrecioUnitario(0);
+    setPrecioTotalIngresado("");
   };
 
   const handleAceptarVenta = async () => {
@@ -271,14 +347,14 @@ export const CreateSaleForm = () => {
       }));
 
       const ventaData = {
-        correlativo: formState.correlativo || "CORR-12345",
-        idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
-        tipoOperacion: "venta", // Valor fijo
-        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", // Tipo de producto/venta
-        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
-        moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
-        tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
+        correlativo: formState.correlativo,
+        idPersona: getSelectedClientId() || 1,
+        tipoOperacion: "venta",
+        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", 
+        tipoComprobante: formState.tipoComprobante || "FACTURA",
+        fechaEmision: formState.fechaEmision || "2025-08-10",
+        moneda: formState.moneda === "sol" ? "PEN" : "USD",
+        tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio),
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
@@ -318,7 +394,7 @@ export const CreateSaleForm = () => {
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
         fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
-        tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
+        tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio), // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
         fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
@@ -368,7 +444,7 @@ export const CreateSaleForm = () => {
     "Acciones",
   ];
 
-  const handleEliminarProducto = ( index: number) => {
+  const handleEliminarProducto = (index: number) => {
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -427,7 +503,9 @@ export const CreateSaleForm = () => {
     const loadInventarioProductos = async () => {
       if (almacenSeleccionado) {
         try {
-          const data = await InventoryService.getInventoryByWarehouse(Number(almacenSeleccionado));
+          const data = await InventoryService.getInventoryByWarehouse(
+            Number(almacenSeleccionado)
+          );
           setInventarioProductos(data);
         } catch (error) {
           console.error("Error al cargar productos del inventario:", error);
@@ -489,7 +567,7 @@ export const CreateSaleForm = () => {
     if (selectedItem) {
       // Establecer unidad de medida del producto
       setUnidadMedidaSeleccionada(selectedItem.producto.unidadMedida || "");
-      debugger
+      debugger;
       // Establecer precio unitario del producto
       setPrecioUnitario(selectedItem.producto.precioVenta || 0);
     } else {
@@ -698,7 +776,6 @@ export const CreateSaleForm = () => {
             />
           </div>
         </div>
-
       </div>
 
       <Divider />
@@ -760,22 +837,6 @@ export const CreateSaleForm = () => {
             </div>
 
             <div
-              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
-            >
-              <Text size="xs" color="neutral-primary">
-                Precio unitario
-              </Text>
-              <Input
-                size="xs"
-                type="number"
-                variant="createSale"
-                value={precioUnitario.toString()}
-                onChange={(e) => setPrecioUnitario(Number(e.target.value))}
-                disabled={!isDetalleVentaEnabled()}
-              />
-            </div>
-
-            <div
               className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
             >
               <Text size="xs" color="neutral-primary">
@@ -787,6 +848,38 @@ export const CreateSaleForm = () => {
                 variant="createSale"
                 value={cantidadIngresada}
                 onChange={handleCantidadChange}
+                disabled={!isDetalleVentaEnabled()}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Precio unitario
+              </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={precioUnitario.toString()}
+                onChange={handlePrecioUnitarioChange}
+                disabled={!isDetalleVentaEnabled()}
+              />
+            </div>
+
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--small"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Precio Total
+              </Text>
+              <Input
+                size="xs"
+                type="number"
+                variant="createSale"
+                value={precioTotalIngresado}
+                onChange={handlePrecioTotalChange}
                 disabled={!isDetalleVentaEnabled()}
               />
             </div>
@@ -812,52 +905,72 @@ export const CreateSaleForm = () => {
                 rows={tableRows}
                 gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
               />
-              
+
               {/* Totales */}
               <div className={styles.CreateSaleForm__Totals}>
                 <div className={styles.CreateSaleForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">Subtotal:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleVenta.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)}
+                    Subtotal:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleVenta
+                      .reduce((sum, item) => sum + item.subtotal, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
                 <div className={styles.CreateSaleForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">IGV:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleVenta.reduce((sum, item) => sum + item.igv, 0).toFixed(2)}
+                    IGV:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleVenta
+                      .reduce((sum, item) => sum + item.igv, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
                 <div className={styles.CreateSaleForm__TotalsRow}>
-                  <Text size="xs" color="neutral-primary">ISV:</Text>
                   <Text size="xs" color="neutral-primary">
-                    S/ {detalleVenta.reduce((sum, item) => sum + item.isv, 0).toFixed(2)}
+                    ISV:
+                  </Text>
+                  <Text size="xs" color="neutral-primary">
+                    S/{" "}
+                    {detalleVenta
+                      .reduce((sum, item) => sum + item.isv, 0)
+                      .toFixed(2)}
                   </Text>
                 </div>
-                <div className={`${styles.CreateSaleForm__TotalsRow} ${styles['CreateSaleForm__TotalsRow--total']}`}>
-                   <Text size="sm" color="neutral-primary">Total:</Text>
-                   <Text size="sm" color="neutral-primary">
-                     S/ {detalleVenta.reduce((sum, item) => sum + item.total, 0).toFixed(2)}
-                   </Text>
-                 </div>
+                <div
+                  className={`${styles.CreateSaleForm__TotalsRow} ${styles["CreateSaleForm__TotalsRow--total"]}`}
+                >
+                  <Text size="sm" color="neutral-primary">
+                    Total:
+                  </Text>
+                  <Text size="sm" color="neutral-primary">
+                    S/{" "}
+                    {detalleVenta
+                      .reduce((sum, item) => sum + item.total, 0)
+                      .toFixed(2)}
+                  </Text>
+                </div>
               </div>
             </>
           )}
-       <Divider />
+          <Divider />
         </>
       )}
 
-
-
       {isLoading && <Loader text="Procesando venta..." />}
-      
+
       <div className={styles.CreateSaleForm__Actions}>
-        <Button 
+        <Button
           onClick={handleAceptarVenta}
           disabled={!areRequiredHeadersComplete() || isLoading}
         >
           Aceptar
         </Button>
-        <Button 
+        <Button
           onClick={handleAceptarYNuevaVenta}
           disabled={!areRequiredHeadersComplete() || isLoading}
         >
