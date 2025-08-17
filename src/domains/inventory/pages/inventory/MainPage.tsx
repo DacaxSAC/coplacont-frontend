@@ -40,7 +40,7 @@ export const MainPage: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await ProductService.getAll();
+      const response = await ProductService.getAll(true);
       setProducts(response);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -49,7 +49,7 @@ export const MainPage: React.FC = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const response = await WarehouseService.getAll();
+      const response = await WarehouseService.getAll(true);
       setWarehouses(response);
     } catch (error) {
       console.error("Error fetching warehouses:", error);

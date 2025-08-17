@@ -30,11 +30,11 @@ export const MainPage: React.FC = () => {
     const fetchData = async () => {
       try {
         // Cargar productos
-        const productsResponse = await ProductService.getAll();
+        const productsResponse = await ProductService.getAll(true);
         setProducts(productsResponse);
 
         // Cargar almacenes
-        const warehousesResponse = await WarehouseService.getAll();
+        const warehousesResponse = await WarehouseService.getAll(true);
         setWarehouses(warehousesResponse);
 
         // Si hay un productId en la URL, seleccionarlo automáticamente
