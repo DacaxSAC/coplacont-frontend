@@ -11,3 +11,4 @@ export * from './CloseIcon';
 export * from './InfoIcon';
 export * from './CheckIcon';
 export * from './NoDataIcon';
+export * from './MantenedoresIcon';

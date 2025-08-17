@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/atoms/ThemeToggle/ThemeToggle";
 import {
   TransaccionesIcon,
   InventarioIcon,
+  MantenedoresIcon,
   //ContabilidadIcon,
   //CierreContableIcon,
   CerrarSesionIcon,
@@ -129,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
 
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
-            <TransaccionesIcon />
+            <MantenedoresIcon />
             <h3 className={styles.sectionTitle__title}>Mantenedores</h3>
           </div>
           <ul className={styles.menuList}>
@@ -220,7 +221,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
             </li>*/}
           </ul>
 
-          <div className={styles.section}>
+          
+        </div>
+        <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <ConfiguracionIcon />
               <h3 className={styles.sectionTitle__title}>Configuración</h3>
@@ -264,7 +267,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
               </Link>
             </div>
           </div>
-        </div>
 
         {/*<div className={styles.section}>
           <div className={styles.sectionTitle}>

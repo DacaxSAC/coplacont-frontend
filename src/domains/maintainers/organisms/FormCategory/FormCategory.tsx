@@ -44,6 +44,7 @@ export const FormCategory = ({
 
   const handleUpdateCategory = async () => {
     setLoading(true);
+    console.log(categoryToUpdate);
     const response = await CategoryService.update(
       category.id!,
       categoryToUpdate
@@ -120,7 +121,7 @@ export const FormCategory = ({
           variant="createSale"
           value={
             isCreate
-              ? (category as CreateCategoryPayload).tipo || "producto"
+              ? (category as CreateCategoryPayload).tipo || ""
               : categoryToUpdate.tipo
           }
           onChange={(value) => {

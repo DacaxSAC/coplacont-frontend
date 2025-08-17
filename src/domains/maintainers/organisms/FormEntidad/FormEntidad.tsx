@@ -199,14 +199,20 @@ export const FormEntidad = ({
           variant="createSale"
           value={isEdit ? entidadToUpdate.telefono ?? "" : entidad.telefono ?? ""}
           onChange={(e) =>{
-            if(isEdit){
-              setEntidadToUpdate({
-                ...entidadToUpdate,
-                telefono: e.target.value
-              })
-            }else{
-              onChange("telefono", e.target.value)
-            } 
+            // Validar que solo contenga dígitos (0-9) y el símbolo +
+            const phoneRegex = /^[+0-9]*$/;
+            const value = e.target.value;
+            
+            if (phoneRegex.test(value)) {
+              if(isEdit){
+                setEntidadToUpdate({
+                  ...entidadToUpdate,
+                  telefono: value
+                })
+              }else{
+                onChange("telefono", value)
+              }
+            }
           }}
           disabled={isEdit? false : readOnly}
         />

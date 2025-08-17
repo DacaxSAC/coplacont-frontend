@@ -36,16 +36,11 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   return (
     <div
       className={styles.backdrop}
       role="dialog"
       aria-modal="true"
-      onClick={handleBackdropClick}
     >
       <div className={styles.modal}>
         {(title || description) && (

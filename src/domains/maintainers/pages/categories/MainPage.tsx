@@ -106,6 +106,12 @@ export const MainPage: React.FC = () => {
       setError("El nombre de la categoría es obligatorio.");
       return;
     }
+
+    if (!newCategory.tipo) {
+      setError("El tipo de categoría es obligatorio.");
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError("");
@@ -245,6 +251,7 @@ export const MainPage: React.FC = () => {
           setIsOpen(false);
           setIsCreate(false);
           setIsView(false);
+          setError("");
           resetForm();
         }}
         title={isView ? "Detalles de categoría" : "Agregar nueva categoría"}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Main.module.scss";
-import { Modal, Button, Text, Input, ComboBox, TextArea } from "@/components";
+import { Modal, Button, Text, Input, ComboBox } from "@/components";
 import { CategoryService } from "@/domains/maintainers/services";
 import type { Category } from "@/domains/maintainers/types";
 
@@ -142,7 +142,9 @@ export const Main: React.FC<CreateProductModalProps> = ({
           <Text size="xs" color="neutral-primary">
             Descripción
           </Text>
-          <TextArea
+          <Input
+            size="xs"
+            variant="createSale"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
           />
