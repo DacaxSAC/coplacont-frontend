@@ -29,18 +29,25 @@ export const MainPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Cargar productos
-        const productsResponse = await ProductService.getAll(true);
-        setProducts(productsResponse);
+        // Verificar si hay un inventoryId en la URL para carga directa
+        const inventoryIdFromUrl = searchParams.get("inventoryId");
+        
+        if (inventoryIdFromUrl) {
+          // Si hay inventoryId, cargar directamente el kardex
+          await fetchKardexByInventoryId(parseInt(inventoryIdFromUrl));
+        } else {
+          // Flujo normal: cargar productos y almacenes
+          const productsResponse = await ProductService.getAll(true);
+          setProducts(productsResponse);
 
-        // Cargar almacenes
-        const warehousesResponse = await WarehouseService.getAll(true);
-        setWarehouses(warehousesResponse);
+          const warehousesResponse = await WarehouseService.getAll(true);
+          setWarehouses(warehousesResponse);
 
-        // Si hay un productId en la URL, seleccionarlo automáticamente
-        const productIdFromUrl = searchParams.get("productId");
-        if (productIdFromUrl) {
-          setSelectedProductId(productIdFromUrl);
+          // Si hay un productId en la URL, seleccionarlo automáticamente
+          const productIdFromUrl = searchParams.get("productId");
+          if (productIdFromUrl) {
+            setSelectedProductId(productIdFromUrl);
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -51,6 +58,9 @@ export const MainPage: React.FC = () => {
     fetchData();
   }, [searchParams]);
 
+  /**
+   * Calcula el costo total de ventas sumando todos los movimientos de salida
+   */
   const getCostoVentasTotal = (kardexData: KardexMovement[]) =>{
     let costoTotal = 0;
     kardexData.forEach((movement) => {
@@ -60,6 +70,38 @@ export const MainPage: React.FC = () => {
       }
     });
     return costoTotal;
+  }
+
+  /**
+   * Carga el kardex directamente usando un ID de inventario
+   */
+  const fetchKardexByInventoryId = async (inventoryId: number) => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      const kardexResponse = await InventoryService.getKardexMovements(
+        inventoryId,
+        "2025-01-01",
+        "2025-12-31"
+      );
+      
+      setKardexData(kardexResponse.movimientos);
+      setReportes({
+        cantidadActual: parseFloat(kardexResponse.saldoActual),
+        costoUnitarioFinal: (parseFloat(kardexResponse.costoFinal) / parseFloat(kardexResponse.saldoActual)),
+        costoTotalFinal: parseFloat(kardexResponse.costoFinal),
+        costoVentasTotal: getCostoVentasTotal(kardexResponse.movimientos),
+      });
+      
+      console.log(kardexResponse.movimientos);
+    } catch (error) {
+      console.error("Error fetching kardex by inventory ID:", error);
+      setError("Error al cargar los movimientos de kardex");
+      setKardexData([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Cargar movimientos de kardex cuando se seleccionen producto y almacén
@@ -179,40 +221,46 @@ export const MainPage: React.FC = () => {
   const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
   const reporterGridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr";
 
+  // Verificar si hay inventoryId en la URL para ocultar filtros
+  const inventoryIdFromUrl = searchParams.get("inventoryId");
+  const isDirectLoad = !!inventoryIdFromUrl;
+
   return (
     <PageLayout
       title="Kardex"
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
-        <div className={styles.MainPage__FilterContainer}>
-          <div className={styles.MainPage__Filter}>
-            <Text size="xs" color="neutral-primary">
-              Almacen
-            </Text>
-            <ComboBox
-              options={warehouseOptions}
-              size="xs"
-              variant="createSale"
-              value={selectedWarehouseId}
-              onChange={(v) => setSelectedWarehouseId(v as string)}
-              placeholder="Seleccionar almacen"
-            />
+        {!isDirectLoad && (
+          <div className={styles.MainPage__FilterContainer}>
+            <div className={styles.MainPage__Filter}>
+              <Text size="xs" color="neutral-primary">
+                Almacen
+              </Text>
+              <ComboBox
+                options={warehouseOptions}
+                size="xs"
+                variant="createSale"
+                value={selectedWarehouseId}
+                onChange={(v) => setSelectedWarehouseId(v as string)}
+                placeholder="Seleccionar almacen"
+              />
+            </div>
+            <div className={styles.MainPage__Filter}>
+              <Text size="xs" color="neutral-primary">
+                Producto
+              </Text>
+              <ComboBox
+                options={productOptions}
+                size="xs"
+                variant="createSale"
+                value={selectedProductId}
+                onChange={(v) => setSelectedProductId(v as string)}
+                placeholder="Seleccionar producto"
+              />
+            </div>
           </div>
-          <div className={styles.MainPage__Filter}>
-            <Text size="xs" color="neutral-primary">
-              Producto
-            </Text>
-            <ComboBox
-              options={productOptions}
-              size="xs"
-              variant="createSale"
-              value={selectedProductId}
-              onChange={(v) => setSelectedProductId(v as string)}
-              placeholder="Seleccionar producto"
-            />
-          </div>
-        </div>
+        )}
 
         {error && (
           <div className={styles.MainPage__Error}>

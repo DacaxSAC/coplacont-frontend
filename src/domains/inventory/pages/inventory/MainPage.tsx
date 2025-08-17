@@ -127,7 +127,7 @@ export const MainPage: React.FC = () => {
         size="tableItemSize"
         variant="tableItemStyle"
         onClick={() => {
-          navigate(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}?productId=${i.producto.id}`);
+          navigate(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}?inventoryId=${i.id}`);
         }}
       >
         Ver KARDEX
