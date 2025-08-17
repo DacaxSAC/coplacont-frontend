@@ -27,15 +27,38 @@ import {
 } from "@/router/routes";
 import { useAuth } from "@/domains/auth";
 
-interface SidebarProps {
-  userName: string;
-  userRole: string;
-}
+/**
+ * Tipos de roles de usuario
+ */
+const UserRoleType = {
+  ADMIN: 'ADMIN',
+  CONTADOR: 'CONTADOR'
+} as const;
 
-export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
+/**
+ * Mapeo de roles a nombres descriptivos
+ */
+const ROLE_DISPLAY_NAMES: Record<string, string> = {
+  [UserRoleType.ADMIN]: 'Administrador del sistema',
+  [UserRoleType.CONTADOR]: 'Contador'
+};
+
+interface SidebarProps {}
+
+export const Sidebar: React.FC<SidebarProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  // Construir el nombre completo del usuario
+  const userName = user?.persona 
+    ? `${user.persona.primerNombre} ${user.persona.primerApellido}`
+    : user?.email || 'Usuario';
+
+  // Obtener el rol principal del usuario con nombre descriptivo
+  const userRole = user?.roles && user.roles.length > 0 
+    ? ROLE_DISPLAY_NAMES[user.roles[0].nombre] || user.roles[0].nombre
+    : 'Sin rol';
 
   /**
    * Determina si un enlace está activo basándose en la ruta actual

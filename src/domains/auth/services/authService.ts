@@ -1,5 +1,5 @@
 import { handleApiError } from '@/shared';
-import { type ILoginRequest, type ILoginResponse, type IAuthUser, authApi } from '@/domains/auth';
+import { type ILoginRequest, type ILoginResponse, type IAuthUser, type IPersona, type IRole, authApi } from '@/domains/auth';
 
 /**
  * Servicio de autenticación
@@ -20,6 +20,8 @@ export class AuthService {
   static logout(): void {
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
+    localStorage.removeItem('persona');
+    localStorage.removeItem('roles');
   }
 
   static async recoverPassword(email: string): Promise<{ success: boolean, message: string }> {
@@ -50,6 +52,36 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  static getPersona(): IPersona | null {
+    const personaStr = localStorage.getItem('persona');
+    if (!personaStr) return null;
+
+    try {
+      return JSON.parse(personaStr);
+    } catch {
+      return null;
+    }
+  }
+
+  static savePersona(persona: IPersona): void {
+    localStorage.setItem('persona', JSON.stringify(persona));
+  }
+
+  static getRoles(): IRole[] | null {
+    const rolesStr = localStorage.getItem('roles');
+    if (!rolesStr) return null;
+
+    try {
+      return JSON.parse(rolesStr);
+    } catch {
+      return null;
+    }
+  }
+
+  static saveRoles(roles: IRole[]): void {
+    localStorage.setItem('roles', JSON.stringify(roles));
   }
 
   static isAuthenticated(): boolean {

@@ -1,3 +1,5 @@
+import type { Entidad } from "@/domains/maintainers/services";
+
 export interface SaleDetail {
   cantidad: number;
   unidadMedida: string;
@@ -45,6 +47,20 @@ export interface Transaction {
   numero: string;
   fechaVencimiento: string;
   totales: TransactionTotals;
+  detalles: Detail[];
+  persona: Entidad;
+}
+
+export interface Detail{
+  cantidad: string;
+  descripcion: string;
+  idDetalle: number;
+  igv: string;
+  isc: string;
+  precioUnitario: string;
+  total: string;
+  subtotal: string;
+  unidadMedida: string;
 }
 
 export interface SalesApiResponse {

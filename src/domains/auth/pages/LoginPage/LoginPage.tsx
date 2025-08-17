@@ -38,9 +38,9 @@ export const LoginPage: React.FC = () => {
       // Llamada al servicio de autenticación
       const response = await AuthService.login(loginRequest);
 
-      if (response.success && response.email && response.jwt) {
+      if (response.success && response.email && response.jwt && response.persona && response.roles) {
         // Usar el contexto para manejar el login
-        login(response.email, response.jwt);
+        login(response.email, response.jwt, response.persona, response.roles);
         // Redirigir a la página principal después del login exitoso
         navigate(MAIN_ROUTES.HOME);
       } else {
