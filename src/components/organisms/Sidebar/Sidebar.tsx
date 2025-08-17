@@ -167,8 +167,8 @@ export const Sidebar: React.FC<SidebarProps> = () => {
             </li>
             <li>
               <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT}`}
-                className={isActiveLink(`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT}`) ? styles.active : ''}
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT_BY_INVENTORY}`}
+                className={isActiveLink(`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT_BY_INVENTORY}`) ? styles.active : ''}
               >
                 Estado consolidado de costo de venta
               </Link>

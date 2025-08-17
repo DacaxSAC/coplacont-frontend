@@ -235,7 +235,7 @@ export const MainPage: React.FC = () => {
 
   return (
     <PageLayout
-      title="Estado de Costo de Ventas por Inventario"
+      title="Estado consolidado de costo de venta"
       subtitle="Reporte detallado del costo de ventas por inventario, producto, almacén y año."
     >
       <section className={styles.MainPage}>
