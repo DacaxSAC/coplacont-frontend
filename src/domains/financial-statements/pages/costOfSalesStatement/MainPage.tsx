@@ -14,6 +14,7 @@ import { ProductService } from "@/domains/maintainers/services";
 import { WarehouseService } from "@/domains/maintainers/services";
 import type { CostOfSalesStatement } from "../../services/CostOfSalesStatement";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
+import { downloadFile } from "@/shared/utils/downloadUtils";
 
 export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -66,8 +67,8 @@ export const MainPage: React.FC = () => {
    * Carga el reporte de costo de ventas
    */
   const fetchCostOfSalesStatement = async () => {
-    if (!selectedProductId || !selectedWarehouseId || !selectedYear) {
-      setCostOfSalesData(null);
+    if (!selectedYear) {
+      setError("Debe seleccionar al menos un año");
       return;
     }
 
@@ -75,12 +76,20 @@ export const MainPage: React.FC = () => {
       setLoading(true);
       setError("");
 
+      const requestParams: any = {
+        año: parseInt(selectedYear),
+      };
+
+      // Agregar parámetros opcionales si están seleccionados
+      if (selectedWarehouseId) {
+        requestParams.idAlmacen = parseInt(selectedWarehouseId);
+      }
+      if (selectedProductId) {
+        requestParams.idProducto = parseInt(selectedProductId);
+      }
+
       const response =
-        await CostOfSalesStatementService.getCostOfSalesStatement({
-          año: parseInt(selectedYear),
-          idAlmacen: parseInt(selectedWarehouseId),
-          idProducto: parseInt(selectedProductId),
-        });
+        await CostOfSalesStatementService.getCostOfSalesStatement(requestParams);
 
       setCostOfSalesData(response);
       console.log("Cost of sales data:", response);
@@ -93,10 +102,12 @@ export const MainPage: React.FC = () => {
     }
   };
 
-  // Cargar reporte cuando se seleccionen producto, almacén y año
-  useEffect(() => {
+  /**
+   * Maneja la generación del reporte al presionar el botón
+   */
+  const handleGenerateReport = () => {
     fetchCostOfSalesStatement();
-  }, [selectedProductId, selectedWarehouseId, selectedYear]);
+  };
 
   // Opciones para el ComboBox de productos
   const productOptions = [
@@ -171,6 +182,59 @@ export const MainPage: React.FC = () => {
   const summaryGridTemplate = "1fr 1fr 1fr";
   const monthlyGridTemplate = "1fr 1fr 1fr 1fr";
 
+  /**
+   * Exporta los datos del estado de costo de ventas a Excel
+   */
+  const handleExportToExcel = () => {
+    if (!costOfSalesData) {
+      return;
+    }
+
+    // Crear contenido CSV
+    const csvContent = generateCostOfSalesCSV(costOfSalesData);
+    
+    // Agregar BOM para UTF-8 para mejor compatibilidad con Excel
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Generar nombre del archivo
+    const filename = `estado_costo_ventas_${costOfSalesData.producto.replace(/\s+/g, '_')}_${costOfSalesData.almacen.replace(/\s+/g, '_')}_${costOfSalesData.año}.csv`;
+    
+    downloadFile(blob, filename);
+  };
+
+  /**
+   * Genera el contenido CSV para el estado de costo de ventas
+   */
+  const generateCostOfSalesCSV = (data: CostOfSalesStatement): string => {
+    const lines: string[] = [];
+    
+    // Información del reporte
+    lines.push('ESTADO DE COSTO DE VENTAS');
+    lines.push('');
+    lines.push(`Producto:,${data.producto}`);
+    lines.push(`Almacén:,${data.almacen}`);
+    lines.push(`Año:,${data.año}`);
+    lines.push(`Fecha de Generación:,${new Date(data.fechaGeneracion).toLocaleDateString()}`);
+    lines.push('');
+    
+    // Resumen anual
+    lines.push('RESUMEN ANUAL');
+    lines.push('Total Compras Anual,Total Salidas Anual,Inventario Final Anual');
+    lines.push(`S/ ${data.sumatorias.totalComprasAnual},S/ ${data.sumatorias.totalSalidasAnual},S/ ${data.sumatorias.inventarioFinalAnual}`);
+    lines.push('');
+    
+    // Datos mensuales
+    lines.push('DATOS MENSUALES');
+    lines.push('Mes,Compras Totales,Salidas Totales,Inventario Final');
+    
+    data.datosMensuales.forEach(dato => {
+      lines.push(`${dato.nombreMes},S/ ${dato.comprasTotales},S/ ${dato.salidasTotales},S/ ${dato.inventarioFinal}`);
+    });
+    
+    return lines.join('\n');
+  };
+
   return (
     <PageLayout
       title="Estado de Costo de Ventas"
@@ -217,6 +281,14 @@ export const MainPage: React.FC = () => {
               placeholder="Seleccionar producto"
             />
           </div>
+          <Button 
+            size="small" 
+            variant="primary"
+            onClick={handleGenerateReport}
+            disabled={!selectedYear}
+          >
+            Generar Reporte
+          </Button>
         </div>
 
         {error && (
@@ -242,7 +314,14 @@ export const MainPage: React.FC = () => {
               </Text>
             </div>
 
-            <Button size="small" variant="primary">Exportar como Excel</Button>
+            <Button 
+              size="small" 
+              variant="primary"
+              onClick={handleExportToExcel}
+              disabled={!costOfSalesData}
+            >
+              Exportar como Excel
+            </Button>
           </div>
         )}
 
@@ -280,17 +359,18 @@ export const MainPage: React.FC = () => {
             gridTemplate={monthlyGridTemplate}
           />
         </div>
+      ) : !costOfSalesData ? (
+        <div style={{ padding: "20px", textAlign: "center" }}>
+          <Text size="sm" color="neutral-secondary">
+            Seleccione un año y presione "Generar Reporte" para ver los datos.
+          </Text>
+        </div>
       ) : (
-        !loading &&
-        selectedProductId &&
-        selectedWarehouseId &&
-        selectedYear && (
-          <div style={{ padding: "20px", textAlign: "center" }}>
-            <Text size="sm" color="neutral-secondary">
-              No se encontraron datos para los filtros seleccionados.
-            </Text>
-          </div>
-        )
+        <div style={{ padding: "20px", textAlign: "center" }}>
+          <Text size="sm" color="neutral-secondary">
+            No se encontraron datos para los filtros seleccionados.
+          </Text>
+        </div>
       )}
     </PageLayout>
   );
