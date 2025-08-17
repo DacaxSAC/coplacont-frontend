@@ -25,8 +25,8 @@ export const yearOptions: ComboBoxOption[] = Array.from({ length: 7 }, (_, i) =>
 export const documentTypeOptions: ComboBoxOption[] = [
   { value: 'factura', label: 'Factura' },
   { value: 'boleta', label: 'Boleta' },
-  { value: 'nota-credito', label: 'Nota de crédito' },
-  { value: 'nota-debito', label: 'Nota de débito' },
+  //{ value: 'nota-credito', label: 'Nota de crédito' },
+  //{ value: 'nota-debito', label: 'Nota de débito' },
 ];
 
 export const sunatStatusOptions: ComboBoxOption[] = [
