@@ -19,12 +19,14 @@ export const MainPage: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
   const [error, setError] = useState("");
-  console.log('error', error);
+  console.log("error", error);
   const [loading, setLoading] = useState(false);
-  console.log('loading', loading);
+  console.log("loading", loading);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [productType, setProductType] = useState<'producto' | 'servicio'>('producto');
-  const [isLoading, setIsLoading] = useState(true);
+  const [productType, setProductType] = useState<"producto" | "servicio">(
+    "producto"
+  );
+  //const [isLoading, setIsLoading] = useState(true);
   const [newProduct, setNewProduct] = useState({
     codigo: "",
     nombre: "",
@@ -51,11 +53,11 @@ export const MainPage: React.FC = () => {
   }) => {
     setLoading(true);
     try {
-      const payload = { 
+      const payload = {
         ...data,
         categoriaId: data.idCategoria,
-        tipo: productType, 
-        estado: true 
+        tipo: productType,
+        estado: true,
       };
       const created = await ProductService.create(payload);
       setProducts((prev) => [created, ...prev]);
@@ -76,12 +78,12 @@ export const MainPage: React.FC = () => {
     idCategoria: number;
   }) => {
     if (!selectedProduct) return;
-    
+
     setLoading(true);
     try {
       const updated = await ProductService.update(selectedProduct.id, {
         ...data,
-        categoriaId: data.idCategoria
+        categoriaId: data.idCategoria,
       });
       setProducts((prev) =>
         prev.map((p) => (p.id === selectedProduct.id ? updated : p))
@@ -101,13 +103,11 @@ export const MainPage: React.FC = () => {
     try {
       await ProductService.update(id, { estado: !currentState });
       setProducts((prev) =>
-        prev.map((p) =>
-          p.id === id ? { ...p, estado: !currentState } : p
-        )
+        prev.map((p) => (p.id === id ? { ...p, estado: !currentState } : p))
       );
     } catch (error) {
       setError("Error al cambiar estado del producto");
-      console.error('Error al cambiar estado:', error);
+      console.error("Error al cambiar estado:", error);
     } finally {
       setLoading(false);
     }
@@ -122,18 +122,18 @@ export const MainPage: React.FC = () => {
   };
 
   const fetchProducts = () => {
-    setIsLoading(true);
+    setLoading(true);
     ProductService.getAll(true)
       .then((res: Product[]) => {
-        console.log('Productos cargados:', res);
+        console.log("Productos cargados:", res);
         setProducts(res);
       })
       .catch((error) => {
-        console.error('Error al cargar productos:', error);
+        console.error("Error al cargar productos:", error);
         setProducts([]);
       })
       .finally(() => {
-        setIsLoading(false);
+        setLoading(false);
       });
   };
 
@@ -144,15 +144,15 @@ export const MainPage: React.FC = () => {
   const headers = [
     "Código",
     "Nombre",
-    "Descripción", 
+    "Descripción",
     "Unidad",
     "Categoría",
     "Estado",
     "Acciones",
   ];
-  
+
   const rows: TableRow[] = products.map((p) => {
-    console.log('Producto individual:', p);
+    console.log("Producto individual:", p);
     return {
       id: p.id,
       cells: [
@@ -168,7 +168,7 @@ export const MainPage: React.FC = () => {
             variant="tableItemStyle"
             onClick={() => {
               setSelectedProduct(p);
-              setProductType(p.tipo as 'producto' | 'servicio');
+              setProductType(p.tipo as "producto" | "servicio");
               setIsView(true);
               setIsOpen(true);
             }}
@@ -188,7 +188,7 @@ export const MainPage: React.FC = () => {
       ],
     };
   });
-  
+
   const gridTemplate = "1.5fr 2fr 1.5fr 1fr 1.5fr 1fr 2.5fr";
 
   return (
@@ -201,7 +201,7 @@ export const MainPage: React.FC = () => {
             {
               label: "Nuevo producto",
               onClick: () => {
-                setProductType('producto');
+                setProductType("producto");
                 resetForm();
                 setIsView(false);
                 setSelectedProduct(null);
@@ -211,7 +211,7 @@ export const MainPage: React.FC = () => {
             {
               label: "Nuevo servicio",
               onClick: () => {
-                setProductType('servicio');
+                setProductType("servicio");
                 resetForm();
                 setIsView(false);
                 setSelectedProduct(null);
@@ -222,35 +222,34 @@ export const MainPage: React.FC = () => {
         />
       }
     >
-      {isLoading ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>Cargando productos...</div>
-      ) : products.length === 0 ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>No hay productos disponibles</div>
-      ) : (
-        <>
-          <div style={{ padding: '10px', fontSize: '12px', color: '#666' }}>
-            Total de productos: {products.length}
-          </div>
-          <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-        </>
-      )}
+      <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       <ProductModal
         isOpen={isOpen}
         onClose={handleModal}
         onSubmit={isView ? handleEditProduct : handleCreateProduct}
-        title={isView ? "Detalles del producto" : `Creación de nuevo ${productType}`}
-        description={isView ? "Información del producto seleccionado." : `Ingresa los siguientes datos para registrar un ${productType}.`}
+        title={
+          isView ? "Detalles del producto" : `Creación de nuevo ${productType}`
+        }
+        description={
+          isView
+            ? "Información del producto seleccionado."
+            : `Ingresa los siguientes datos para registrar un ${productType}.`
+        }
         submitLabel={isView ? "Actualizar" : "Guardar"}
-        isService={productType === 'servicio'}
-        initialValues={isView && selectedProduct ? {
-          nombre: selectedProduct.nombre,
-          descripcion: selectedProduct.descripcion,
-          unidadMedida: selectedProduct.unidadMedida,
-          categoriaId: selectedProduct.categoria?.id ?? 0,
-        } : newProduct}
+        isService={productType === "servicio"}
+        initialValues={
+          isView && selectedProduct
+            ? {
+                nombre: selectedProduct.nombre,
+                descripcion: selectedProduct.descripcion,
+                unidadMedida: selectedProduct.unidadMedida,
+                categoriaId: selectedProduct.categoria?.id ?? 0,
+              }
+            : newProduct
+        }
       />
-      
+
       {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );

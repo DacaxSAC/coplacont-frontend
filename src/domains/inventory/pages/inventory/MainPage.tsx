@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './MainPage.module.scss';
-import { PageLayout, Button, Table, Text, ComboBox, Modal } from "@/components";
+import { PageLayout, Button, Table, Text, ComboBox, Modal, Loader } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
 import { MAIN_ROUTES, INVENTORY_ROUTES } from "@/router";
@@ -25,12 +25,15 @@ export const MainPage: React.FC = () => {
 
   const fetchInventory = async () => {
     try {
+      setLoading(true);
       const response = await InventoryService.getInventory();
       setInventory(response);
     } catch (error) {
       console.error("Error fetching inventory:", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     fetchInventory();
@@ -271,6 +274,7 @@ export const MainPage: React.FC = () => {
           </Button>
         </div>
       </Modal>
+                  {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

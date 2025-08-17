@@ -4,6 +4,7 @@ import { PageLayout, Table, Button, Modal, CloseIcon, CheckIcon, StateTag, Input
 import { EntitiesService } from "../../services";
 import type { Entidad } from "../../services";
 import { FormEntidad } from "../../organisms/FormEntidad";
+import {Loader} from "@/components";
 
 export const MainPage: React.FC = () => {
   const [clients, setClients] = useState<Entidad[]>([]);
@@ -125,8 +126,11 @@ export const MainPage: React.FC = () => {
   };
 
   const fetchClients = () => {
+    setLoading(true);
     EntitiesService.getClients(true).then((res) => {
       setClients(res);
+    }).finally(() => {
+      setLoading(false);
     });
   };
 
@@ -266,6 +270,7 @@ export const MainPage: React.FC = () => {
           readOnly={isView}
         />
       </Modal>
+      {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

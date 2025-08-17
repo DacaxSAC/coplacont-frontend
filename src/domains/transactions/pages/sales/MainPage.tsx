@@ -3,7 +3,7 @@ import styles from './MainPage.module.scss';
 import type { Transaction } from '../../services/types';
 import { TransactionsService } from '../../services/TransactionsService';
 
-import { Button, PageLayout, FormField } from '@/components';
+import { Button, PageLayout, FormField, Loader } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
@@ -18,6 +18,8 @@ import { useSalesTemplateDownload } from '../../hooks/useSalesTemplateDownload';
 import { BulkUploadModal } from '../../organisms/BulkUpdateModal';
 
 export const MainPage: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { downloadSalesTemplate } = useSalesTemplateDownload();
 
@@ -26,7 +28,8 @@ export const MainPage: React.FC = () => {
 
   // Effect to fetch sales data on component mount
   useEffect(() => {
-    TransactionsService.getSales().then((response) => setSales(response));
+    setLoading(true);
+    TransactionsService.getSales().then((response) => setSales(response)).finally(() => setLoading(false));
   }, []);
 
   // Top filters
@@ -57,8 +60,6 @@ export const MainPage: React.FC = () => {
     // Por ahora, solo mostramos en consola
     console.log({ filterType, month, year, startDate, endDate });
   };
-
-  // Nota: La lógica de búsqueda secundaria se conectará con el servicio cuando esté disponible.
 
   // Transformar datos de ventas reales en filas de tabla
   const rows = useMemo(() => sales.map((sale, idx) => ({
@@ -196,6 +197,7 @@ export const MainPage: React.FC = () => {
         onDownload={downloadSalesTemplate}
         onUpload={(file) => {handleBulkRegister(); console.log(file)}}
       />
+      {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

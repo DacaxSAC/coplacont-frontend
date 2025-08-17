@@ -10,7 +10,7 @@ import {
   CheckIcon,
   Input,
   Text,
-  ComboBox
+  ComboBox, Loader
 } from "@/components";
 import { EntitiesService } from "../../services";
 import { FormEntidad } from "../../organisms/FormEntidad";
@@ -136,8 +136,11 @@ export const MainPage: React.FC = () => {
   };
 
   const fetchSuppliers = () => {
+    setLoading(true);
     EntitiesService.getSuppliers(true).then((res) => {
       setSuppliers(res);
+    }).finally(() => {
+      setLoading(false);
     });
   };
 
@@ -277,6 +280,7 @@ export const MainPage: React.FC = () => {
           readOnly={isView}
         />
       </Modal>
+            {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

@@ -3,7 +3,7 @@ import styles from './HomePurchasePage.module.scss';
 import type { Transaction } from '../../services/types';
 import { TransactionsService } from '../../services/TransactionsService';
 
-import { Button, PageLayout, FormField, Text, Modal } from '@/components';
+import { Button, PageLayout, FormField, Text, Modal, Loader } from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
@@ -17,15 +17,18 @@ import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
 import { usePurchasesTemplateDownload } from '../../hooks/usePurchasesTemplateDownload';
 
 export const MainPage: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { downloadPurchasesTemplate } = usePurchasesTemplateDownload();
 
   // State for purchases
   const [purchases, setPurchases] = useState<Transaction[]>([]);
 
-  // Fetch purchases on mount
+  // Fetch purchases on component mount
   useEffect(() => {
-    TransactionsService.getPurchases().then((response) => {setPurchases(response);console.log(response)});
+    setLoading(true);
+    TransactionsService.getPurchases().then((response) => {setPurchases(response);console.log(response)}).finally(() => setLoading(false));
   }, []);
 
   // Top filters
@@ -224,6 +227,7 @@ export const MainPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+      {loading && <Loader text='Procesando...'/>}
     </PageLayout>
   );
 };
