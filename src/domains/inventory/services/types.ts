@@ -58,4 +58,6 @@ export interface KardexResponse {
   cantidadActual: string;
   saldoActual: string;
   costoFinal: string;
+  inventarioInicialCantidad: string;
+  inventarioInicialCostoTotal:string;
 }

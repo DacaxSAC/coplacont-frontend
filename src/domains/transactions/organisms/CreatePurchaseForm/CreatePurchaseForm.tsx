@@ -396,7 +396,7 @@ export const CreatePurchaseForm = () => {
     setAlmacenSeleccionado(String(value));
   };
 
-  // Función para validar si todos los campos obligatorios del header están completos
+  // Función para validar si todos los campos obligatorios del header están completos y hay items en el detalle
   const areRequiredHeadersComplete = (): boolean => {
     const baseFieldsComplete = !!(
       formState.correlativo &&
@@ -411,13 +411,16 @@ export const CreatePurchaseForm = () => {
       formState.fechaVencimiento
     );
 
+    // Validar que haya al menos un item en el detalle
+    const hasDetailItems = detalleCompra.length > 0;
+
     // Si la moneda es dólar, también se requiere tipo de cambio
     if (formState.moneda === MonedaEnum.DOLAR) {
-      return baseFieldsComplete && !!formState.tipoCambio;
+      return baseFieldsComplete && !!formState.tipoCambio && hasDetailItems;
     }
 
     // Si la moneda es sol, no se requiere tipo de cambio
-    return baseFieldsComplete;
+    return baseFieldsComplete && hasDetailItems;
   };
 
   // Función para filtrar proveedores según el tipo de comprobante
@@ -555,6 +558,13 @@ export const CreatePurchaseForm = () => {
 
   // Maneja el envío del formulario de compra
   const handleAceptarCompra = async () => {
+    // Validar que haya al menos un item en el detalle
+    if (detalleCompra.length === 0) {
+      console.warn("No se puede guardar la compra sin items en el detalle");
+      alert("Debe agregar al menos un producto al detalle de la compra");
+      return;
+    }
+
     try {
       setIsLoading(true);
       const detallesAPI = detalleCompra.map((item) => ({
@@ -597,6 +607,13 @@ export const CreatePurchaseForm = () => {
 
   // Maneja el envío del formulario de compra y navegación para nueva compra
   const handleAceptarYNuevaCompra = async () => {
+    // Validar que haya al menos un item en el detalle
+    if (detalleCompra.length === 0) {
+      console.warn("No se puede guardar la compra sin items en el detalle");
+      alert("Debe agregar al menos un producto al detalle de la compra");
+      return;
+    }
+
     try {
       setIsLoading(true);
       const detallesAPI = detalleCompra.map((item) => ({

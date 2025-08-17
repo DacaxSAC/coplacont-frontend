@@ -23,6 +23,8 @@ export const MainPage: React.FC = () => {
     costoUnitarioFinal:0,
     costoTotalFinal:0,
     costoVentasTotal:0,
+    inventarioInicialCantidad:0,
+    inventarioInicialCostoTotal:0,
   })
 
   // Cargar productos y almacenes al montar el componente
@@ -92,8 +94,9 @@ export const MainPage: React.FC = () => {
         costoUnitarioFinal: (parseFloat(kardexResponse.costoFinal) / parseFloat(kardexResponse.saldoActual)),
         costoTotalFinal: parseFloat(kardexResponse.costoFinal),
         costoVentasTotal: getCostoVentasTotal(kardexResponse.movimientos),
-      });
-      
+        inventarioInicialCantidad:(parseFloat(kardexResponse.inventarioInicialCantidad)),
+        inventarioInicialCostoTotal:parseFloat(kardexResponse.inventarioInicialCostoTotal),
+      })
       console.log(kardexResponse.movimientos);
     } catch (error) {
       console.error("Error fetching kardex by inventory ID:", error);
@@ -115,7 +118,9 @@ export const MainPage: React.FC = () => {
           costoUnitarioFinal: 0,
           costoTotalFinal: 0,
           costoVentasTotal: 0,
-        });
+          inventarioInicialCantidad: 0,
+          inventarioInicialCostoTotal: 0,
+        })
         return;
       }
 
@@ -139,6 +144,8 @@ export const MainPage: React.FC = () => {
             costoUnitarioFinal:(parseFloat(kardexResponse.costoFinal)/parseFloat(kardexResponse.saldoActual)),
             costoTotalFinal:parseFloat(kardexResponse.costoFinal),
             costoVentasTotal:getCostoVentasTotal(kardexResponse.movimientos),
+            inventarioInicialCantidad:(parseFloat(kardexResponse.inventarioInicialCantidad)),
+            inventarioInicialCostoTotal:parseFloat(kardexResponse.inventarioInicialCostoTotal),
           }
         )
         console.log(kardexResponse.movimientos);
@@ -179,25 +186,38 @@ export const MainPage: React.FC = () => {
     "Cod de comprobante",
     "Cantidad",
     "Costo Unitario",
-    "Saldo",
     "Costo Total",
+    "Saldo",
   ];
 
-  const rows =
-    kardexData.map((movement, index) => ({
-      id: index.toString(),
-      cells: [
-        movement.fecha,
-        movement.tipo,
-        movement.tComprob,
-        movement.nComprobante,
-        movement.cantidad,
-
-        movement.costoUnitario,
-        movement.saldo,
-        movement.costoTotal,
-      ],
-    })) || [];
+const rows = [
+  {
+    id: "manual-header",
+    cells: [
+      "-",
+      "Saldo inicial",
+      "-",
+      "-",
+      reportes.inventarioInicialCantidad,
+      (reportes.inventarioInicialCostoTotal/reportes.inventarioInicialCantidad),
+      reportes.inventarioInicialCostoTotal,
+      "-",
+    ],
+  },
+  ...kardexData.map((movement, index) => ({
+    id: index.toString(),
+    cells: [
+      movement.fecha,
+      movement.tipo,
+      movement.tComprob,
+      movement.nComprobante,
+      movement.cantidad,
+      movement.costoUnitario,
+      movement.costoTotal,
+      movement.saldo,
+    ],
+  })),
+];
 
   const reporterHeaders = [
     "Existencias finales",
