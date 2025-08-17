@@ -35,6 +35,21 @@
     }
   }
 
+  // Link de recuperación de contraseña
+  .recoveryLink {
+    text-align: center;
+    margin: $spacing-sm 0;
+    
+    a {
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+      
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
   // Mensaje de error general
   .generalError {
     padding: $spacing-md;

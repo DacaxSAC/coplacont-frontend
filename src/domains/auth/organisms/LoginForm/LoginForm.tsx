@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './LoginForm.module.scss';
 
 import { FormField, Button, Text } from '@/components';
@@ -109,7 +110,16 @@ export const LoginForm: React.FC<ILoginFormProps> = ({
         placeholder="Ingresa tu contraseña"
         disabled={isLoading}
       />
-
+      
+      {/* Link hacia recuperación de contraseña */}
+      <div className={styles.recoveryLink}>
+        <Link to="/recovery-password">
+          <Text size="sm" color="primary">
+            ¿Olvidaste tu contraseña?
+          </Text>
+        </Link>
+      </div>
+      
       {/* Mensaje de error general */}
       {error && (
         <div className={styles.generalError}>
