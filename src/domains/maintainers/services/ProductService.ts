@@ -3,8 +3,8 @@ import type { CreateProductPayload, Product, UpdateProductPayload } from '../typ
 
 
 export class ProductService {
-    static async getAll(): Promise<Product[]> {
-        const response = await ProductApi.getProducts();
+    static async getAll(includeInactive?: boolean): Promise<Product[]> {
+        const response = await ProductApi.getProducts(includeInactive);
         return response.data;
     }
     

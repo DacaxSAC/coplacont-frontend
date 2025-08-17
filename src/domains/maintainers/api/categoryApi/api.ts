@@ -3,7 +3,7 @@ import { ENDPOINTS } from './endpoints';
 import type { Category, CreateCategoryPayload } from '../../types';
 
 export const Api = {
-    getCategories: () => apiClient.get<Category[]>(ENDPOINTS.GET_CATEGORIES),
+    getCategories: (includeInactive?: boolean) => apiClient.get<Category[]>(ENDPOINTS.GET_CATEGORIES, { params: { includeInactive } }),
     postCategory: (payload: CreateCategoryPayload) => apiClient.post<Category>(ENDPOINTS.POST_CATEGORY, payload),
     getCategory: (id: number) => apiClient.get<Category>(ENDPOINTS.GET_CATEGORY.replace(':id', String(id))),
     patchCategory: (id: number, payload: Partial<CreateCategoryPayload>) => apiClient.patch<Category>(ENDPOINTS.PATCH_CATEGORY.replace(':id', String(id)), payload),

@@ -3,8 +3,8 @@ import type { Warehouse, CreateWarehousePayload, UpdateWarehousePayload } from '
 
 
 export class WarehouseService {
-    static async getAll(): Promise<Warehouse[]> {
-        const response = await WarehouseApi.getWarehouses();
+    static async getAll(includeInactive?: boolean): Promise<Warehouse[]> {
+        const response = await WarehouseApi.getWarehouses(includeInactive);
         return response.data;
     }
         

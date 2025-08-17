@@ -4,8 +4,8 @@ import type { EntidadesApiResponse } from "../../services/entitiesService";
 import type { EntidadParcial, EntidadToUpdate } from "../../services/entitiesService";
 
 export const entitiesApi = {
-    getClients: () => apiClient.get<EntidadesApiResponse>(ENTITIES_ENDPOINTS.GET_CLIENTS),
-    getSuppliers: () => apiClient.get<EntidadesApiResponse>(ENTITIES_ENDPOINTS.GET_SUPPLIERS),
+    getClients: (includeInactive?: boolean) => apiClient.get<EntidadesApiResponse>(ENTITIES_ENDPOINTS.GET_CLIENTS, { params: { includeInactive } }),
+    getSuppliers: (includeInactive?: boolean) => apiClient.get<EntidadesApiResponse>(ENTITIES_ENDPOINTS.GET_SUPPLIERS, { params: { includeInactive } }),
     postEntidad: (data: EntidadParcial) => apiClient.post(ENTITIES_ENDPOINTS.POST_ENTIDAD, data),
     deleteEntidad: (id: number) => apiClient.delete(`${ENTITIES_ENDPOINTS.DELETE_ENTIDAD}/${id}`),
     restoreEntidad: (id: number) => apiClient.patch(`${ENTITIES_ENDPOINTS.RESTORE_ENTIDAD}/${id}/restore`),

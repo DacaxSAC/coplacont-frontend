@@ -136,7 +136,7 @@ export const MainPage: React.FC = () => {
   };
 
   const fetchSuppliers = () => {
-    EntitiesService.getSuppliers().then((res) => {
+    EntitiesService.getSuppliers(true).then((res) => {
       setSuppliers(res);
     });
   };

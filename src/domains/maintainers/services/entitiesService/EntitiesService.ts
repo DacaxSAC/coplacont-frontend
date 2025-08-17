@@ -2,12 +2,12 @@ import { entitiesApi } from '../../api/entitiesApi';
 import type { Entidad, EntidadParcial, EntidadToUpdate } from './types';
 
 export class EntitiesService {
-    static async getClients(): Promise<Entidad[]> {
-        const response = await entitiesApi.getClients();
+    static async getClients(includeInactive?: boolean): Promise<Entidad[]> {
+        const response = await entitiesApi.getClients(includeInactive);
         return response.data.data;
     }
-    static async getSuppliers(): Promise<Entidad[]> {
-        const response = await entitiesApi.getSuppliers();
+    static async getSuppliers(includeInactive?: boolean): Promise<Entidad[]> {
+        const response = await entitiesApi.getSuppliers(includeInactive);
         return response.data.data;
     }
     static async postEntidad(data: EntidadParcial): Promise<{success:boolean; message:string; data?:Entidad}> {

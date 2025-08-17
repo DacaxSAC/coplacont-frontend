@@ -74,7 +74,7 @@ export const MainPage: React.FC = () => {
 
   const fetchCategories = () => {
     setIsLoading(true);
-    CategoryService.getAll()
+    CategoryService.getAll(true)
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]))
       .finally(() => setIsLoading(false));

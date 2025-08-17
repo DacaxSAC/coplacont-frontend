@@ -102,7 +102,7 @@ export const MainPage: React.FC = () => {
   const fetchWarehouses = async () => {
     try {
       setLoading(true);
-      const data = await WarehouseService.getAll();
+      const data = await WarehouseService.getAll(true);
       setWarehouses(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (error) {

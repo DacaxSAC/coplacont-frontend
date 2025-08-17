@@ -3,8 +3,8 @@ import type { Category, CreateCategoryPayload, UpdateCategoryPayload } from '../
 
 
 export class CategoryService {
-    static async getAll(): Promise<Category[]> {
-        const response = await CategoryApi.getCategories();
+    static async getAll(includeInactive?: boolean): Promise<Category[]> {
+        const response = await CategoryApi.getCategories(includeInactive);
         return response.data;
     }
     

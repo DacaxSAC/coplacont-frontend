@@ -125,7 +125,7 @@ export const MainPage: React.FC = () => {
   };
 
   const fetchClients = () => {
-    EntitiesService.getClients().then((res) => {
+    EntitiesService.getClients(true).then((res) => {
       setClients(res);
     });
   };
