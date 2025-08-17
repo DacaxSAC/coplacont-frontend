@@ -8,6 +8,7 @@ import {
   Text,
   Divider,
   Button,
+  MovimientoTag
 } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService } from "@/domains/maintainers/services";
@@ -255,7 +256,7 @@ export const MainPage: React.FC = () => {
       id: index.toString(),
       cells: [
         movement.fecha,
-        movement.tipo,
+        <MovimientoTag movimiento={movement.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
         movement.tComprob,
         movement.nComprobante,
         movement.cantidad,
