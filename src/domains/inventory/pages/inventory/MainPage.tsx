@@ -118,7 +118,7 @@ export const MainPage: React.FC = () => {
       i.almacen.id,
       i.almacen.nombre,
       i.producto.codigo,
-      i.producto.descripcion,
+      i.producto.nombre,
       i.stockActual,
       <Button
         size="tableItemSize"

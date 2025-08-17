@@ -4,23 +4,38 @@ import styles from "./MainPage.module.scss";
 import { PageLayout, Table, ComboBox, Text } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService } from "@/domains/maintainers/services";
+import { WarehouseService } from "@/domains/maintainers/services";
 import type { KardexMovement } from "../../services/types";
-import type { Product } from "@/domains/maintainers/types";
+import type { Product, Warehouse } from "@/domains/maintainers/types";
 
 export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>("");
   const [kardexData, setKardexData] = useState<KardexMovement[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // Cargar productos al montar el componente
+  const [reportes,setReportes]= useState({
+    cantidadActual:0,
+    costoUnitarioFinal:0,
+    costoTotalFinal:0,
+    costoVentasTotal:0,
+  })
+
+  // Cargar productos y almacenes al montar el componente
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const response = await ProductService.getAll();
-        setProducts(response);
+        // Cargar productos
+        const productsResponse = await ProductService.getAll();
+        setProducts(productsResponse);
+
+        // Cargar almacenes
+        const warehousesResponse = await WarehouseService.getAll();
+        setWarehouses(warehousesResponse);
 
         // Si hay un productId en la URL, seleccionarlo automáticamente
         const productIdFromUrl = searchParams.get("productId");
@@ -28,28 +43,62 @@ export const MainPage: React.FC = () => {
           setSelectedProductId(productIdFromUrl);
         }
       } catch (error) {
-        console.error("Error fetching products:", error);
-        setError("Error al cargar los productos");
+        console.error("Error fetching data:", error);
+        setError("Error al cargar los datos");
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, [searchParams]);
 
-  // Cargar movimientos de kardex automáticamente al montar el componente
+  const getCostoVentasTotal = (kardexData: KardexMovement[]) =>{
+    let costoTotal = 0;
+    kardexData.forEach((movement) => {
+      if (movement.tipo === "Salida") {
+        costoTotal +=movement.costoTotal;
+        console.log(costoTotal);
+      }
+    });
+    return costoTotal;
+  }
+
+  // Cargar movimientos de kardex cuando se seleccionen producto y almacén
   useEffect(() => {
     const fetchKardexMovements = async () => {
+      // Solo cargar si ambos están seleccionados
+      if (!selectedProductId || !selectedWarehouseId) {
+        setKardexData([]);
+        setReportes({
+          cantidadActual: 0,
+          costoUnitarioFinal: 0,
+          costoTotalFinal: 0,
+          costoVentasTotal: 0,
+        });
+        return;
+      }
+
       try {
         setLoading(true);
         setError("");
         const inventario =
-          await InventoryService.getInventoryByWarehouseAndProduct(2, 4);
+          await InventoryService.getInventoryByWarehouseAndProduct(
+            parseInt(selectedWarehouseId),
+            parseInt(selectedProductId)
+          );
         const kardexResponse = await InventoryService.getKardexMovements(
           parseInt(inventario.id),
           "2025-01-01",
           "2025-12-31"
         );
         setKardexData(kardexResponse.movimientos);
+        setReportes(
+          {
+            cantidadActual:parseFloat(kardexResponse.saldoActual),
+            costoUnitarioFinal:(parseFloat(kardexResponse.costoFinal)/parseFloat(kardexResponse.saldoActual)),
+            costoTotalFinal:parseFloat(kardexResponse.costoFinal),
+            costoVentasTotal:getCostoVentasTotal(kardexResponse.movimientos),
+          }
+        )
         console.log(kardexResponse.movimientos);
       } catch (error) {
         console.error("Error fetching kardex movements:", error);
@@ -61,14 +110,23 @@ export const MainPage: React.FC = () => {
     };
 
     fetchKardexMovements();
-  }, []);
+  }, [selectedProductId, selectedWarehouseId]);
 
   // Opciones para el ComboBox de productos
   const productOptions = [
     { label: "Seleccionar producto", value: "" },
     ...products.map((product) => ({
-      label: `${product.codigo} - ${product.descripcion}`,
+      label: `${product.codigo} - ${product.nombre}`,
       value: product.id.toString(),
+    })),
+  ];
+
+  // Opciones para el ComboBox de almacenes
+  const warehouseOptions = [
+    { label: "Seleccionar almacén", value: "" },
+    ...warehouses.map((warehouse) => ({
+      label: `${warehouse.id} - ${warehouse.nombre}`,
+      value: warehouse.id.toString(),
     })),
   ];
 
@@ -99,7 +157,27 @@ export const MainPage: React.FC = () => {
       ],
     })) || [];
 
+  const reporterHeaders = [
+    "Existencias finales",
+    "Costo unitario final",
+    "Costo total final",
+    "Costo de ventas total",
+  ]
+
+  const reporterRows = [
+    {
+      id: "reporter-row",
+      cells: [
+        reportes.cantidadActual,
+        reportes.costoUnitarioFinal,
+        reportes.costoTotalFinal,
+        reportes.costoVentasTotal,
+      ]
+    }
+  ]
+
   const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
+  const reporterGridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr";
 
   return (
     <PageLayout
@@ -107,19 +185,35 @@ export const MainPage: React.FC = () => {
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
-        <div className={styles.MainPage__Filter}>
-          <Text size="xs" color="neutral-primary">
-            Producto
-          </Text>
-          <ComboBox
-            options={productOptions}
-            size="xs"
-            variant="createSale"
-            value={selectedProductId}
-            onChange={(v) => setSelectedProductId(v as string)}
-            placeholder="Seleccionar producto"
-          />
+        <div className={styles.MainPage__FilterContainer}>
+          <div className={styles.MainPage__Filter}>
+            <Text size="xs" color="neutral-primary">
+              Almacen
+            </Text>
+            <ComboBox
+              options={warehouseOptions}
+              size="xs"
+              variant="createSale"
+              value={selectedWarehouseId}
+              onChange={(v) => setSelectedWarehouseId(v as string)}
+              placeholder="Seleccionar almacen"
+            />
+          </div>
+          <div className={styles.MainPage__Filter}>
+            <Text size="xs" color="neutral-primary">
+              Producto
+            </Text>
+            <ComboBox
+              options={productOptions}
+              size="xs"
+              variant="createSale"
+              value={selectedProductId}
+              onChange={(v) => setSelectedProductId(v as string)}
+              placeholder="Seleccionar producto"
+            />
+          </div>
         </div>
+
         {error && (
           <div className={styles.MainPage__Error}>
             <Text size="xs" color="danger">
@@ -127,6 +221,13 @@ export const MainPage: React.FC = () => {
             </Text>
           </div>
         )}
+        <div>
+          <Table
+            headers={reporterHeaders}
+            rows={reporterRows}
+            gridTemplate={reporterGridTemplate}
+          />
+        </div>
       </section>
 
       {loading ? (
@@ -135,13 +236,7 @@ export const MainPage: React.FC = () => {
             Cargando movimientos de kardex...
           </Text>
         </div>
-      ) : (!kardexData || kardexData.length === 0) && !error ? (
-        <div style={{ padding: "20px", textAlign: "center" }}>
-          <Text size="sm" color="neutral-secondary">
-            No hay movimientos de kardex disponibles.
-          </Text>
-        </div>
-      ) : (
+      )  : (
         <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
       )}
     </PageLayout>
