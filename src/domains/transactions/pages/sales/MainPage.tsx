@@ -3,33 +3,45 @@ import styles from './MainPage.module.scss';
 import type { Transaction } from '../../services/types';
 import { TransactionsService } from '../../services/TransactionsService';
 
-import { Button, PageLayout, FormField, Loader } from '@/components';
+import {
+  Button,
+  PageLayout,
+  Text,
+  Modal,
+  Loader,
+  ComboBox,
+  Input,
+  Divider,
+} from '@/components';
 import { Table, type TableRow } from '@/components/organisms/Table';
 import {
   documentTypeOptions,
   filterTypeOptions,
   monthOptions,
-  sunatStatusOptions,
   yearOptions,
 } from './MainFilterData';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from '@/router';
-import { useSalesTemplateDownload } from '../../hooks/useSalesTemplateDownload';
-import { BulkUploadModal } from '../../organisms/BulkUpdateModal';
 
 export const MainPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { downloadSalesTemplate } = useSalesTemplateDownload();
 
   // State for sales data
   const [sales, setSales] = useState<Transaction[]>([]);
+  const [filteredSales, setFilteredSales] = useState<Transaction[]>([]);
 
   // Effect to fetch sales data on component mount
   useEffect(() => {
     setLoading(true);
-    TransactionsService.getSales().then((response) => setSales(response)).finally(() => setLoading(false));
+    TransactionsService.getSales()
+      .then((response) => {
+        setSales(response);
+        setFilteredSales(response); // Inicializar con todas las ventas
+        console.log(response);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   // Top filters
@@ -42,7 +54,6 @@ export const MainPage: React.FC = () => {
   // Secondary filters
   const [entity, setEntity] = useState('');
   const [documentType, setDocumentType] = useState('');
-  const [sunatStatus, setSunatStatus] = useState('');
 
   // Modal state for upload sales
   const [isUploadOpen, setUploadOpen] = useState(false);
@@ -51,31 +62,101 @@ export const MainPage: React.FC = () => {
     navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.REGISTER}`);
   }
 
-  const handleBulkRegister = () => {
-    navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.BULK_REGISTER}`);
-  }
+  //const handleBulkRegister = () => {
+  //  navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.SALES}${COMMON_ROUTES.BULK_REGISTER}`);
+  //}
 
-  const handleTopFilter = () => {
-    // TODO: conectar con servicio de ventas
-    // Por ahora, solo mostramos en consola
-    console.log({ filterType, month, year, startDate, endDate });
+  /**
+   * Aplica todos los filtros disponibles (fecha, entidad, tipo de documento)
+   */
+  const applyAllFilters = () => {
+    let filtered = [...sales];
+
+    // Aplicar filtros de fecha
+    if (filterType === "mes-anio") {
+      if (month && year) {
+        filtered = filtered.filter((sale) => {
+          const emissionDate = new Date(sale.fechaEmision);
+          const saleMonth = String(emissionDate.getMonth() + 1).padStart(
+            2,
+            "0"
+          );
+          const saleYear = String(emissionDate.getFullYear());
+          return saleMonth === month && saleYear === year;
+        });
+      }
+    } else if (filterType === "rango-fechas") {
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        filtered = filtered.filter((sale) => {
+          const emissionDate = new Date(sale.fechaEmision);
+          return emissionDate >= start && emissionDate <= end;
+        });
+      }
+    }
+
+    // Aplicar filtro de entidad (búsqueda en correlativo como aproximación)
+    if (entity) {
+      filtered = filtered.filter((sale) =>
+        sale.correlativo?.toLowerCase().includes(entity.toLowerCase()) ||
+        sale.serie?.toLowerCase().includes(entity.toLowerCase())
+      );
+    }
+
+    // Aplicar filtro de tipo de documento
+    if (documentType) {
+      filtered = filtered.filter((sale) => {
+        const docTypeMap: { [key: string]: string } = {
+          'factura': 'FACTURA',
+          'boleta': 'BOLETA',
+          'nota-credito': 'NOTA DE CREDITO',
+          'nota-debito': 'NOTA DE DEBITO'
+        };
+        return sale.tipoComprobante?.toUpperCase() === docTypeMap[documentType];
+      });
+    }
+
+    setFilteredSales(filtered);
+    console.log("Filtered sales:", filtered);
   };
 
-  // Transformar datos de ventas reales en filas de tabla
-  const rows = useMemo(() => sales.map((sale, idx) => ({
-    id: idx + 1,
-    cells: [
-      sale.correlativo,
-      sale.tipoComprobante,
-      sale.serie,
-      sale.numero,
-      sale.fechaEmision,
-      sale.fechaVencimiento,
-      sale.moneda,
-      sale.tipoCambio,
-      sale.totales?.totalGeneral.toString()
-    ],
-  } as TableRow)), [sales]);
+  /**
+   * Maneja el filtrado desde la barra superior
+   */
+  const handleTopFilter = () => {
+    applyAllFilters();
+  };
+
+  /**
+   * Maneja el filtrado desde los filtros secundarios
+   */
+  const handleSecondaryFilter = () => {
+    applyAllFilters();
+  };
+
+  // Transformar datos de ventas filtradas en filas de tabla
+  const rows = useMemo(
+    () =>
+      filteredSales.map(
+        (sale, idx) =>
+          ({
+            id: idx + 1,
+            cells: [
+              sale.correlativo,
+              sale.tipoComprobante,
+              sale.serie,
+              sale.numero,
+              sale.fechaEmision,
+              sale.fechaVencimiento,
+              sale.moneda,
+              sale.tipoCambio,
+              sale.totales?.totalGeneral.toString(),
+            ],
+          } as TableRow)
+      ),
+    [filteredSales]
+  );
 
   // Cabeceras de la tabla basadas en la interfaz Transaction
   const headers = [
@@ -99,104 +180,157 @@ export const MainPage: React.FC = () => {
     >
       {/* Barra de filtros superior */}
       <section className={styles.filtersTop}>
-        <FormField
-          type="combobox"
-          label="Tipo de filtro"
-          options={filterTypeOptions}
-          value={filterType}
-          onChange={(v) => setFilterType(v as string)}
-          placeholder="Seleccionar"
-          size="medium"
-        />
-
-        <FormField
-          type="combobox"
-          label="Mes"
-          options={monthOptions}
-          value={month}
-          onChange={(v) => setMonth(v as string)}
-          placeholder="Mes"
-          size="medium"
-        />
-
-        <FormField
-          type="combobox"
-          label="Año"
-          options={yearOptions}
-          value={year}
-          onChange={(v) => setYear(v as string)}
-          placeholder="Año"
-          size="medium"
-        />
-
-        <FormField
-          type="date"
-          label="Inicio de rango"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-
-        <FormField
-          type="date"
-          label="Fin de rango"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-
-        <div className={styles.alignEnd}>
-          <Button size="large" onClick={handleTopFilter}>Filtrar</Button>
+        <div className={styles.filter}>
+          <Text size="xs" color="neutral-primary">
+            Tipo de filtro
+          </Text>
+          <ComboBox
+            options={filterTypeOptions}
+            size="xs"
+            variant="createSale"
+            value={filterType}
+            onChange={(v) => setFilterType(v as string)}
+            placeholder="Seleccionar"
+          />
         </div>
+
+        {/* Filtros condicionales según el tipo seleccionado */}
+        {filterType === "mes-anio" && (
+          <>
+            <div className={styles.filter}>
+              <Text size="xs" color="neutral-primary">
+                Año
+              </Text>
+              <ComboBox
+                options={yearOptions}
+                size="xs"
+                variant="createSale"
+                value={year}
+                onChange={(v) => setYear(v as string)}
+                placeholder="Seleccionar año"
+              />
+            </div>
+
+            <div className={styles.filter}>
+              <Text size="xs" color="neutral-primary">
+                Mes
+              </Text>
+              <ComboBox
+                options={monthOptions}
+                size="xs"
+                variant="createSale"
+                value={month}
+                onChange={(v) => setMonth(v as string)}
+                placeholder="Seleccionar mes"
+              />
+            </div>
+          </>
+        )}
+
+        {filterType === "rango-fechas" && (
+          <>
+            <div className={styles.filter}>
+              <Text size="xs" color="neutral-primary">
+                Desde
+              </Text>
+              <Input
+                type="date"
+                size="xs"
+                variant="createSale"
+                value={startDate}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setStartDate(e.target.value)
+                }
+                placeholder="Seleccionar"
+              />
+            </div>
+            <div className={styles.filter}>
+              <Text size="xs" color="neutral-primary">
+                Hasta
+              </Text>
+              <Input
+                type="date"
+                size="xs"
+                variant="createSale"
+                value={endDate}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEndDate(e.target.value)
+                }
+                placeholder="Seleccionar"
+              />
+            </div>
+          </>
+        )}
+        <Button size="small" onClick={handleTopFilter}>
+          Filtrar
+        </Button>
       </section>
+
+      <Divider />
 
       {/* Botones de acciones */}
       <section className={styles.actionsRow}>
-        <Button size="large" onClick={handleRegisterSale}>+ Nueva venta</Button>
-        <Button size="large" onClick={() => setUploadOpen(true)}>⇪ Subir ventas</Button>
+        <Button size="medium" onClick={handleRegisterSale}>
+          + Nueva venta
+        </Button>
+        <Button disabled={true} size="medium" onClick={() => setUploadOpen(true)}>
+          ⇪ Subir ventas
+        </Button>
       </section>
+
+      <Divider />
 
       {/* Barra de búsqueda secundaria */}
       <section className={styles.filtersSecondary}>
-        <FormField
-          type="text"
-          label="Entidad"
-          placeholder="Buscar entidad"
-          value={entity}
-          onChange={(e) => setEntity(e.target.value)}
-        />
-
-        <FormField
-          type="combobox"
-          label="Tipo de documento"
-          options={documentTypeOptions}
-          value={documentType}
-          onChange={(v) => setDocumentType(v as string)}
-          placeholder="Seleccionar"
-        />
-
-        <FormField
-          type="combobox"
-          label="Estado de SUNAT"
-          options={sunatStatusOptions}
-          value={sunatStatus}
-          onChange={(v) => setSunatStatus(v as string)}
-          placeholder="Seleccionar"
-        />
-
-        <div className={styles.alignEnd}>
-          <Button size="large">Filtrar búsqueda</Button>
+        <div className={styles.filter}>
+          <Text size="xs" color="neutral-primary">
+            Serie y número
+          </Text>
+          <Input
+            type="text"
+            size="xs"
+            variant="createSale"
+            value={entity}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEntity(e.target.value)
+            }
+            placeholder="Buscar por correlativo o serie"
+          />
         </div>
+        <div className={styles.filter}>
+          <Text size="xs" color="neutral-primary">
+            Tipo de comprobante
+          </Text>
+          <ComboBox
+            options={documentTypeOptions}
+            size="xs"
+            variant="createSale"
+            value={documentType}
+            onChange={(v) => setDocumentType(v as string)}
+            placeholder="Seleccionar"
+          />
+        </div>
+
+        <Button size="small" onClick={handleSecondaryFilter}>
+          Filtrar búsqueda
+        </Button>
       </section>
+
+      <Divider />
 
       {/* Tabla de resultados */}
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
 
       {/* Modal Subir ventas */}
-      <BulkUploadModal
-        show={isUploadOpen}
-        setShow={setUploadOpen}
-        onDownload={downloadSalesTemplate}
-        onUpload={(file) => {handleBulkRegister(); console.log(file)}}
-      />
+      <Modal
+        isOpen={isUploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Subir ventas"
+      >
+        <Text size="sm" color="neutral-primary">
+          Funcionalidad de carga masiva en desarrollo.
+        </Text>
+      </Modal>
       {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );

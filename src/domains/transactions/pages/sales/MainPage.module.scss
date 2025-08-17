@@ -6,13 +6,30 @@
   gap: $spacing-lg;
 }
 
-.filtersTop,
-.filtersSecondary {
+.filtersTop {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: $spacing-lg;
   align-items: end;
-  padding-bottom: $spacing-2xl;
+}
+
+.filtersTopContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filtersSecondary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  align-items: end;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 // cada Field (label + control)
@@ -29,13 +46,9 @@
 
 .actionsRow {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $spacing-xl;
-  padding-bottom: $spacing-2xl;
-
-  button {
-    justify-self: stretch;
-  }
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .tableWrapper {
@@ -48,8 +61,31 @@
 
 .table {
   width: 100%;
+  border-collapse: collapse;
+}
+
+.row {
   display: grid;
-  grid-auto-rows: minmax(48px, auto);
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px;
+  gap: 8px;
+  align-items: center;
+}
+
+.header {
+  font-weight: 600;
+  padding: 12px 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cell {
+  padding: 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
 }
 
 .row {
