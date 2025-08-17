@@ -70,6 +70,7 @@ export const FINANCIAL_STATEMENTS_ROUTES = {
   CASH_FLOW_STATEMENT: '/cash-flow-statement',
   STATEMENT_OF_CHANGES_IN_EQUITY: '/statement-of-changes-in-equity',
   COST_OF_SALES_STATEMENT: '/cost-of-sales-statement',
+  COST_OF_SALES_STATEMENT_BY_INVENTORY: '/cost-of-sales-statement-by-inventory',
 } as const;
 
 // Rutas del módulo de configuración
