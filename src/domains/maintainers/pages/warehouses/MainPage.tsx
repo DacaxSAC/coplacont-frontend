@@ -104,9 +104,10 @@ export const MainPage: React.FC = () => {
       setLoading(true);
       const data = await WarehouseService.getAll(true);
       setWarehouses(Array.isArray(data) ? data : []);
-      setLoading(false);
     } catch (error) {
       console.error("Error al obtener almacenes:", error);
+    } finally {
+      setLoading(false);
     }
   };
 

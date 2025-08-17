@@ -45,6 +45,7 @@ export const MainPage: React.FC = () => {
 
   // Opciones para ComboBox
   const statusOptions = [
+    { label: "Todos", value: "" },
     { label: "Activo", value: "true" },
     { label: "Inactivo", value: "false" },
   ];
