@@ -9,9 +9,18 @@ export class AuthService {
 
   static async login(credentials: ILoginRequest): Promise<ILoginResponse> {
     try {
+      console.log('AuthService: Enviando solicitud de login al API');
       const response = await authApi.login(credentials);
+      
+      console.log('AuthService: Respuesta del API recibida:', {
+        status: response.status,
+        hasData: !!response.data,
+        dataKeys: response.data ? Object.keys(response.data) : []
+      });
+      
       return response.data;
     } catch (error) {
+      console.error('AuthService: Error en la solicitud de login:', error);
       const apiError = handleApiError(error);
       throw new Error(apiError.message);
     }

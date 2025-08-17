@@ -18,35 +18,72 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = () => {
       try {
+        // Verificar si localStorage está disponible
+        if (typeof Storage === 'undefined') {
+          console.warn('localStorage no está disponible');
+          setIsLoading(false);
+          return;
+        }
+
         const savedToken = localStorage.getItem('jwt');
         const savedUser = localStorage.getItem('user');
         const savedPersona = localStorage.getItem('persona');
         const savedRoles = localStorage.getItem('roles');
 
+        console.log('AuthProvider: Inicializando autenticación', {
+          hasToken: !!savedToken,
+          hasUser: !!savedUser,
+          hasPersona: !!savedPersona,
+          hasRoles: !!savedRoles,
+          tokenLength: savedToken?.length || 0,
+          userLength: savedUser?.length || 0,
+          localStorageLength: localStorage.length,
+          windowLocation: window.location.href,
+          userAgent: navigator.userAgent,
+          isProduction: import.meta.env.PROD
+        });
+
         if (savedToken && savedUser) {
-          const parsedUser = JSON.parse(savedUser) as IAuthUser;
-          
-          // Si hay persona guardada por separado, la agregamos al usuario
-          if (savedPersona) {
-            const parsedPersona = JSON.parse(savedPersona) as IPersona;
-            parsedUser.persona = parsedPersona;
+          try {
+            const parsedUser = JSON.parse(savedUser) as IAuthUser;
+            
+            // Si hay persona guardada por separado, la agregamos al usuario
+            if (savedPersona) {
+              const parsedPersona = JSON.parse(savedPersona) as IPersona;
+              parsedUser.persona = parsedPersona;
+            }
+            
+            // Si hay roles guardados por separado, los agregamos al usuario
+            if (savedRoles) {
+              const parsedRoles = JSON.parse(savedRoles) as IRole[];
+              parsedUser.roles = parsedRoles;
+            }
+            
+            setToken(savedToken);
+            setUser(parsedUser);
+            console.log('Usuario autenticado restaurado:', parsedUser.email);
+          } catch (parseError) {
+            console.error('Error al parsear datos guardados:', parseError);
+            // Solo limpiar si hay error de parsing
+            localStorage.removeItem('jwt');
+            localStorage.removeItem('user');
+            localStorage.removeItem('persona');
+            localStorage.removeItem('roles');
           }
-          
-          // Si hay roles guardados por separado, los agregamos al usuario
-          if (savedRoles) {
-            const parsedRoles = JSON.parse(savedRoles) as IRole[];
-            parsedUser.roles = parsedRoles;
-          }
-          
-          setToken(savedToken);
-          setUser(parsedUser);
+        } else {
+          console.log('No hay datos de autenticación guardados');
         }
       } catch (error) {
         console.error('Error al inicializar autenticación:', error);
-        localStorage.removeItem('jwt');
-        localStorage.removeItem('user');
-        localStorage.removeItem('persona');
-        localStorage.removeItem('roles');
+        // Solo limpiar en caso de error crítico
+        try {
+          localStorage.removeItem('jwt');
+          localStorage.removeItem('user');
+          localStorage.removeItem('persona');
+          localStorage.removeItem('roles');
+        } catch (cleanupError) {
+          console.error('Error al limpiar localStorage:', cleanupError);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -60,14 +97,101 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
    * Guarda los datos en el estado y en localStorage
    */
   const login = (email: string, jwt: string, persona: IPersona, roles: IRole[]) => {
-    const userData: IAuthUser = { email, persona, roles };
-    
-    setUser(userData);
-    setToken(jwt);
-    localStorage.setItem('jwt', jwt);
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('persona', JSON.stringify(persona));
-    localStorage.setItem('roles', JSON.stringify(roles));
+    try {
+      console.log('AuthProvider: Iniciando proceso de login', {
+        email,
+        hasJwt: !!jwt,
+        hasPersona: !!persona,
+        hasRoles: !!roles,
+        rolesCount: roles?.length || 0,
+        windowLocation: window.location.href,
+        userAgent: navigator.userAgent
+      });
+      
+      const userData: IAuthUser = { email, persona, roles };
+      
+      // Verificar que localStorage esté disponible
+      if (typeof Storage === 'undefined') {
+        console.error('AuthProvider: localStorage no está disponible durante el login');
+        return;
+      }
+      
+      // Verificar estado actual antes de actualizar
+      console.log('AuthProvider: Estado antes del login', {
+        currentUser: user?.email,
+        currentToken: !!token,
+        localStorageUser: localStorage.getItem('user'),
+        localStorageToken: localStorage.getItem('jwt')
+      });
+      
+      // Actualizar estado
+      console.log('AuthProvider: Actualizando estado del contexto...');
+      setUser(userData);
+      setToken(jwt);
+      
+      // Guardar en localStorage con verificación
+      try {
+        console.log('AuthProvider: Guardando en localStorage...');
+        localStorage.setItem('jwt', jwt);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('persona', JSON.stringify(persona));
+        localStorage.setItem('roles', JSON.stringify(roles));
+        
+        console.log('AuthProvider: Datos guardados, verificando...');
+        
+        // Verificar que se guardaron correctamente
+        const savedToken = localStorage.getItem('jwt');
+        const savedUser = localStorage.getItem('user');
+        const savedPersona = localStorage.getItem('persona');
+        const savedRoles = localStorage.getItem('roles');
+        
+        console.log('AuthProvider: Verificación de guardado', {
+          tokenSaved: !!savedToken,
+          userSaved: !!savedUser,
+          personaSaved: !!savedPersona,
+          rolesSaved: !!savedRoles,
+          tokenMatches: savedToken === jwt,
+          userDataLength: savedUser?.length || 0,
+          localStorageLength: localStorage.length
+        });
+        
+        if (!savedToken || !savedUser) {
+          console.error('AuthProvider: Error - Los datos no se guardaron correctamente en localStorage');
+        } else {
+          console.log('AuthProvider: Todos los datos se guardaron correctamente');
+        }
+        
+        // Intentar parsear para verificar integridad
+         if (savedUser) {
+           try {
+             const parsedUser = JSON.parse(savedUser);
+             console.log('AuthProvider: Usuario parseado correctamente', {
+               parsedEmail: parsedUser.email,
+               originalEmail: email
+             });
+           } catch (parseError) {
+             console.error('AuthProvider: Error al parsear usuario guardado', parseError);
+           }
+         }
+        
+      } catch (storageError) {
+        console.error('AuthProvider: Error al guardar en localStorage:', storageError);
+      }
+      
+      // Verificar estado final después de un breve delay
+      setTimeout(() => {
+        console.log('AuthProvider: Estado final después del login', {
+          contextUser: user?.email,
+          contextToken: !!token,
+          contextIsAuthenticated: !!(user && token),
+          localStorageUser: localStorage.getItem('user'),
+          localStorageToken: localStorage.getItem('jwt')
+        });
+      }, 100);
+      
+    } catch (error) {
+      console.error('AuthProvider: Error durante el login:', error);
+    }
   };
 
   /**
