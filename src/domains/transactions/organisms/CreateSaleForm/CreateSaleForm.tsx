@@ -299,29 +299,61 @@ export const CreateSaleForm = () => {
     }
 
     const cantidad = parseFloat(cantidadIngresada);
-    const subtotal = cantidad * precioUnitario;
-    const baseGravado = subtotal / 1.18; // Base gravada (sin IGV)
-    const igv = subtotal - baseGravado; // IGV (18%)
-    const isv = 0; // ISV por defecto 0
-    const total = subtotal;
 
-    const nuevoItem: DetalleVentaItem = {
-      id: Date.now().toString(), // ID único temporal
-      producto: productoSeleccionado,
-      descripcion: productoInventario.producto.nombre,
-      unidadMedida: unidadMedidaSeleccionada,
-      cantidad,
-      precioUnitario,
-      subtotal,
-      baseGravado,
-      igv,
-      isv,
-      total,
-      idInventario: productoInventario.id,
-    };
+    // Verificar si el producto ya existe en el detalle
+    const productoExistente = detalleVenta.find(
+      (item) => item.producto === productoSeleccionado
+    );
 
-    // Agregar al detalle
-    setDetalleVenta((prev) => [...prev, nuevoItem]);
+    if (productoExistente) {
+      // Si el producto ya existe, actualizar la cantidad y recalcular totales
+      setDetalleVenta((prev) =>
+        prev.map((item) => {
+          if (item.producto === productoSeleccionado) {
+            const nuevaCantidad = item.cantidad + cantidad;
+            const nuevoSubtotal = nuevaCantidad * precioUnitario;
+            const nuevaBaseGravada = nuevoSubtotal / 1.18;
+            const nuevoIgv = nuevoSubtotal - nuevaBaseGravada;
+            const nuevoTotal = nuevoSubtotal;
+
+            return {
+              ...item,
+              cantidad: nuevaCantidad,
+              subtotal: nuevoSubtotal,
+              baseGravado: nuevaBaseGravada,
+              igv: nuevoIgv,
+              total: nuevoTotal,
+            };
+          }
+          return item;
+        })
+      );
+    } else {
+      // Si el producto no existe, agregarlo como nuevo
+      const subtotal = cantidad * precioUnitario;
+      const baseGravado = subtotal / 1.18; // Base gravada (sin IGV)
+      const igv = subtotal - baseGravado; // IGV (18%)
+      const isv = 0; // ISV por defecto 0
+      const total = subtotal;
+
+      const nuevoItem: DetalleVentaItem = {
+        id: Date.now().toString(), // ID único temporal
+        producto: productoSeleccionado,
+        descripcion: productoInventario.producto.nombre,
+        unidadMedida: unidadMedidaSeleccionada,
+        cantidad,
+        precioUnitario,
+        subtotal,
+        baseGravado,
+        igv,
+        isv,
+        total,
+        idInventario: productoInventario.id,
+      };
+
+      // Agregar al detalle
+      setDetalleVenta((prev) => [...prev, nuevoItem]);
+    }
 
     // Limpiar campos
     setProductoSeleccionado("");
@@ -445,7 +477,17 @@ export const CreateSaleForm = () => {
   ];
 
   const handleEliminarProducto = (index: number) => {
+    const productoEliminado = detalleVenta[index];
     setDetalleVenta((prev) => prev.filter((_, i) => i !== index));
+    
+    // Si el producto eliminado es el que está actualmente seleccionado, limpiar la selección
+    if (productoEliminado && productoSeleccionado === productoEliminado.producto) {
+      setProductoSeleccionado("");
+      setUnidadMedidaSeleccionada("");
+      setCantidadIngresada("");
+      setPrecioUnitario(0);
+      setPrecioTotalIngresado("");
+    }
   };
 
   const tableRows: TableRow[] = detalleVenta.map((item, index) => {
@@ -543,10 +585,13 @@ export const CreateSaleForm = () => {
   };
 
   const getProductosInventarioOptions = () => {
-    return inventarioProductos.map((item) => ({
-      value: item.producto.id.toString(),
-      label: `${item.producto.nombre} (Stock: ${item.stockActual})`,
-    }));
+    const productosEnDetalle = detalleVenta.map(item => item.producto);
+    return inventarioProductos
+      .filter(item => !productosEnDetalle.includes(item.producto.id.toString()))
+      .map((item) => ({
+        value: item.producto.id.toString(),
+        label: `${item.producto.nombre} (Stock: ${item.stockActual})`,
+      }));
   };
 
   const handleAlmacenChange = (value: string | number) => {

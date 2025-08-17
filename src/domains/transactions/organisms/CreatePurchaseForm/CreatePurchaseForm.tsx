@@ -483,14 +483,21 @@ export const CreatePurchaseForm = () => {
   };
 
   // Función para obtener las opciones de productos del inventario
+  // Filtra los productos que ya están en el detalle de compra para el almacén seleccionado
   const getProductosInventarioOptions = () => {
-    return inventarioProductos.map((item) => ({
-      value: item.producto.id.toString(),
-      label: `${item.producto.codigo} - ${item.producto.nombre}`,
-      unidadMedida: item.producto.unidadMedida,
-      stockActual: item.stockActual,
-      precio: item.producto.precio
-    }));
+    const productosEnDetalle = detalleCompra
+      .filter(item => item.almacen === (almacenes.find(a => a.id.toString() === almacenSeleccionado)?.nombre || almacenSeleccionado))
+      .map(item => item.producto);
+    
+    return inventarioProductos
+      .filter(item => !productosEnDetalle.includes(item.producto.id.toString()))
+      .map((item) => ({
+        value: item.producto.id.toString(),
+        label: `${item.producto.codigo} - ${item.producto.nombre}`,
+        unidadMedida: item.producto.unidadMedida,
+        stockActual: item.stockActual,
+        precio: item.producto.precio
+      }));
   };
 
   // Agrega un producto al detalle de la compra
@@ -551,8 +558,19 @@ export const CreatePurchaseForm = () => {
   };
 
   // Elimina un producto del detalle de la compra
+  // Al eliminar, el producto vuelve a estar disponible en el combo box
   const handleEliminarProducto = (record: DetalleCompraItem, index: number) => {
     setDetalleCompra((prev) => prev.filter((_, i) => i !== index));
+    
+    // Si el producto eliminado era el que estaba seleccionado, limpiar la selección
+    if (productoSeleccionado === record.producto) {
+      setProductoSeleccionado("");
+      setUnidadMedidaSeleccionada("");
+      setCantidadIngresada("");
+      setPrecioUnitarioIngresado("");
+      setPrecioTotalIngresado("");
+    }
+    
     console.log("Producto eliminado:", record);
   };
 
