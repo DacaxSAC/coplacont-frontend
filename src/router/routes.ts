@@ -69,6 +69,7 @@ export const FINANCIAL_STATEMENTS_ROUTES = {
   INCOME_STATEMENT: '/income-statement',
   CASH_FLOW_STATEMENT: '/cash-flow-statement',
   STATEMENT_OF_CHANGES_IN_EQUITY: '/statement-of-changes-in-equity',
+  COST_OF_SALES_STATEMENT: '/cost-of-sales-statement',
 } as const;
 
 // Rutas del módulo de configuración

@@ -128,6 +128,53 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
           </ul>
         </div>
 
+                <div className={styles.section}>
+          <div className={styles.sectionTitle}>
+            <EstadosFinancierosIcon />
+            <h3 className={styles.sectionTitle__title}>Estados Financieros</h3>
+          </div>
+          <ul className={styles.menuList}>
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT}`}
+                className={isActiveLink(`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.COST_OF_SALES_STATEMENT}`) ? styles.active : ''}
+              >
+                Estado de costo de venta
+              </Link>
+            </li>
+            {/*<li>
+              <Link
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`}
+              >
+                Balance General
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.INCOME_STATEMENT}`}
+              >
+                Estado de Resultados
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.CASH_FLOW_STATEMENT}`}
+              >
+                Flujo de efectivo
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.STATEMENT_OF_CHANGES_IN_EQUITY}`}
+              >
+                Estado de patrimonio
+              </Link>
+            </li>*/}
+          </ul>
+
+          
+        </div>
+
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <MantenedoresIcon />
@@ -177,52 +224,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userRole }) => {
           </ul>
         </div>
 
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>
-            <EstadosFinancierosIcon />
-            <h3 className={styles.sectionTitle__title}>Estados Financieros</h3>
-          </div>
-          <ul className={styles.menuList}>
-            <li>
-              <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`}
-                className={isActiveLink(`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`) ? styles.active : ''}
-              >
-                Estado de costo de venta
-              </Link>
-            </li>
-            {/*<li>
-              <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.BALANCE_SHEET}`}
-              >
-                Balance General
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.INCOME_STATEMENT}`}
-              >
-                Estado de Resultados
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.CASH_FLOW_STATEMENT}`}
-              >
-                Flujo de efectivo
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}${FINANCIAL_STATEMENTS_ROUTES.STATEMENT_OF_CHANGES_IN_EQUITY}`}
-              >
-                Estado de patrimonio
-              </Link>
-            </li>*/}
-          </ul>
-
-          
-        </div>
         <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <ConfiguracionIcon />
