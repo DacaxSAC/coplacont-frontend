@@ -12,7 +12,7 @@ import {
   //CierreContableIcon,
   CerrarSesionIcon,
   EstadosFinancierosIcon,
-  ConfiguracionIcon,
+  //ConfiguracionIcon,
 } from "@/components/atoms";
 import {
   MAIN_ROUTES,
@@ -21,7 +21,7 @@ import {
   //ACCOUNTING_ROUTES,
   //FINANCIAL_CLOSING_ROUTES,
   FINANCIAL_STATEMENTS_ROUTES,
-  SETTINGS_ROUTES,
+  //SETTINGS_ROUTES,
   AUTH_ROUTES,
   MAINTAINERS_ROUTES,
 } from "@/router/routes";
@@ -255,7 +255,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
           </ul>
         </div>
 
-        <div className={styles.section}>
+        {/**<div className={styles.section}>
             <div className={styles.sectionTitle}>
               <ConfiguracionIcon />
               <h3 className={styles.sectionTitle__title}>Configuración</h3>
@@ -286,7 +286,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div>*/}
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <CerrarSesionIcon />
