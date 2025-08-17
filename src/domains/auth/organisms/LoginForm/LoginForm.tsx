@@ -113,7 +113,7 @@ export const LoginForm: React.FC<ILoginFormProps> = ({
       
       {/* Link hacia recuperación de contraseña */}
       <div className={styles.recoveryLink}>
-        <Link to="/recovery-password">
+        <Link to="/auth/recovery-password">
           <Text size="sm" color="primary">
             ¿Olvidaste tu contraseña?
           </Text>
