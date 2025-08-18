@@ -46,6 +46,13 @@ export interface KardexMovement {
   saldo: number;
   costoUnitario: number;
   costoTotal: number;
+  detallesSalida?:{
+    id:number,
+    idLote:number,
+    costoUnitarioDeLote:number,
+    cantidad:number,
+    costoTotalDeLote:number
+  }[]
 }
 
 /**

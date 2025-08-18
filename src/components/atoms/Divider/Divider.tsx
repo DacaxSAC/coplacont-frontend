@@ -12,7 +12,7 @@ export const Divider: React.FC<DividerProps> = ({
   orientation = 'horizontal',
   thickness = 1,
   color = 'var(--border-color)',
-  margin = '1rem 0',
+  margin = '0.5rem 0',
 }) => {
   const style = {
     borderTopWidth: orientation === 'horizontal' ? `${thickness}px` : 0,

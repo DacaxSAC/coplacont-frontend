@@ -79,13 +79,25 @@ export const MainPage: React.FC = () => {
 
   /**
    * Calcula el costo total de ventas sumando todos los movimientos de salida
+   * Considera los detalles de salida cuando están disponibles
    */
   const getCostoVentasTotal = (kardexData: KardexMovement[]) => {
     let costoTotal = 0;
     kardexData.forEach((movement) => {
       if (movement.tipo === "Salida") {
-        costoTotal += movement.costoTotal;
-        console.log(costoTotal);
+        if (movement.detallesSalida && movement.detallesSalida.length > 0) {
+          movement.detallesSalida.forEach((detalle) => {
+            const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
+              ? detalle.costoTotalDeLote 
+              : detalle.cantidad * detalle.costoUnitarioDeLote;
+            costoTotal += calculatedDetalleCostoTotal;
+          });
+        } else {
+          const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
+            ? movement.costoTotal 
+            : movement.cantidad * movement.costoUnitario;
+          costoTotal += calculatedCostoTotal;
+        }
       }
     });
     return costoTotal;
@@ -121,7 +133,18 @@ export const MainPage: React.FC = () => {
           kardexResponse.inventarioInicialCostoTotal
         ),
       });
-      console.log(kardexResponse.movimientos);
+      console.log('Kardex movements:', kardexResponse.movimientos);
+      // Debug: revisar valores específicos de los movimientos
+      kardexResponse.movimientos.forEach((mov, index) => {
+        console.log(`Movimiento ${index}:`, {
+          fecha: mov.fecha,
+          tipo: mov.tipo,
+          cantidad: mov.cantidad,
+          costoUnitario: mov.costoUnitario,
+          costoTotal: mov.costoTotal,
+          calculado: mov.cantidad * mov.costoUnitario
+        });
+      });
     } catch (error) {
       console.error("Error fetching kardex by inventory ID:", error);
       setError("Error al cargar los movimientos de kardex");
@@ -237,35 +260,112 @@ export const MainPage: React.FC = () => {
     "Saldo",
   ];
 
-  const rows = [
-    {
+  /**
+   * Formatea un número para mostrar en la tabla
+   */
+  const formatNumber = (value: number | string) => {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    const result = isNaN(num) ? '0.00' : num.toFixed(2);
+    // Debug: logging del formateo
+    if (value === 22.5 || num === 22.5) {
+      console.log('FormatNumber debug:', { input: value, num, result });
+    }
+    return result;
+  };
+
+  /**
+   * Genera las filas de la tabla expandiendo movimientos de salida con detalles
+   */
+  const generateTableRows = () => {
+    const tableRows = [];
+    let currentSaldo = parseFloat(reportes.inventarioInicialCantidad.toString());
+    let currentCostoTotal = parseFloat(reportes.inventarioInicialCostoTotal.toString());
+
+    // Fila inicial de saldo
+    tableRows.push({
       id: "manual-header",
       cells: [
         "-",
         "Saldo inicial",
         "-",
         "-",
-        reportes.inventarioInicialCantidad,
-        reportes.inventarioInicialCostoTotal /
-          reportes.inventarioInicialCantidad,
-        reportes.inventarioInicialCostoTotal,
+        formatNumber(reportes.inventarioInicialCantidad),
+        formatNumber(reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad),
+        formatNumber(reportes.inventarioInicialCostoTotal),
         "-",
       ],
-    },
-    ...kardexData.map((movement, index) => ({
-      id: index.toString(),
-      cells: [
-        movement.fecha,
-        <MovimientoTag movimiento={movement.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
-        movement.tComprob,
-        movement.nComprobante,
-        movement.cantidad,
-        movement.costoUnitario,
-        movement.costoTotal,
-        movement.saldo,
-      ],
-    })),
-  ];
+    });
+
+    kardexData.forEach((movement, index) => {
+      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
+        // Para movimientos de salida con detalles, crear una fila por cada detalle
+        movement.detallesSalida.forEach((detalle, detalleIndex) => {
+          // Calcular costoTotal del detalle si es 0 o undefined
+          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
+            ? detalle.costoTotalDeLote 
+            : detalle.cantidad * detalle.costoUnitarioDeLote;
+          
+          // Calcular nuevo saldo después de este detalle
+          currentSaldo -= detalle.cantidad;
+          currentCostoTotal -= calculatedDetalleCostoTotal;
+
+          tableRows.push({
+            id: `${index}-detalle-${detalleIndex}`,
+            cells: [
+              movement.fecha,
+              <MovimientoTag movimiento="Salida" />,
+              movement.tComprob,
+              movement.nComprobante,
+              formatNumber(detalle.cantidad),
+              formatNumber(detalle.costoUnitarioDeLote),
+              formatNumber(calculatedDetalleCostoTotal),
+              formatNumber(currentSaldo),
+            ],
+          });
+        });
+      } else {
+        // Para movimientos sin detalles (entradas o salidas simples)
+        // Calcular costoTotal si es 0 o undefined
+        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
+          ? movement.costoTotal 
+          : movement.cantidad * movement.costoUnitario;
+        
+        // Debug: mostrar el cálculo
+        console.log(`Movimiento ${movement.fecha}:`, {
+          costoTotalOriginal: movement.costoTotal,
+          cantidad: movement.cantidad,
+          costoUnitario: movement.costoUnitario,
+          calculatedCostoTotal: calculatedCostoTotal
+        });
+
+        if (movement.tipo === 'Entrada') {
+          currentSaldo += movement.cantidad;
+          currentCostoTotal += calculatedCostoTotal;
+        } else {
+          currentSaldo -= movement.cantidad;
+          currentCostoTotal -= calculatedCostoTotal;
+        }
+
+        tableRows.push({
+          id: index.toString(),
+          cells: [
+            movement.fecha,
+            <MovimientoTag movimiento={movement.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
+            movement.tComprob,
+            movement.nComprobante,
+            formatNumber(movement.cantidad),
+            formatNumber(movement.costoUnitario),
+            formatNumber(calculatedCostoTotal),
+            formatNumber(currentSaldo),
+          ],
+        });
+      }
+    });
+
+    return tableRows;
+  };
+
+  const rows = generateTableRows();
 
   const reporterHeaders = [
     "Existencias finales",
@@ -311,10 +411,11 @@ export const MainPage: React.FC = () => {
   };
 
   /**
-   * Genera el contenido CSV para el kardex
+   * Genera el contenido CSV para el kardex incluyendo detalles de salida expandidos
    */
   const generateKardexCSV = (response: any, movements: KardexMovement[], reportData: any) => {
     let csv = '';
+    let currentSaldo = parseFloat(reportData.inventarioInicialCantidad.toString());
     
     // Información del reporte
     csv += `Reporte de Kardex\n`;
@@ -335,9 +436,33 @@ export const MainPage: React.FC = () => {
     // Saldo inicial
     csv += `-,Saldo inicial,-,-,${reportData.inventarioInicialCantidad},${reportData.inventarioInicialCostoTotal / reportData.inventarioInicialCantidad},${reportData.inventarioInicialCostoTotal},-\n`;
     
-    // Movimientos
+    // Movimientos con detalles expandidos
     movements.forEach(movement => {
-      csv += `${movement.fecha},${movement.tipo},${movement.tComprob},${movement.nComprobante},${movement.cantidad},${movement.costoUnitario},${movement.costoTotal},${movement.saldo}\n`;
+      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
+        // Para movimientos de salida con detalles, crear una fila por cada detalle
+        movement.detallesSalida.forEach((detalle) => {
+          // Calcular costoTotal del detalle si es 0 o undefined
+          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
+            ? detalle.costoTotalDeLote 
+            : detalle.cantidad * detalle.costoUnitarioDeLote;
+          
+          currentSaldo -= detalle.cantidad;
+          csv += `${movement.fecha},${movement.tipo},${movement.tComprob},${movement.nComprobante},${detalle.cantidad},${detalle.costoUnitarioDeLote},${calculatedDetalleCostoTotal},${currentSaldo}\n`;
+        });
+      } else {
+        // Para movimientos sin detalles (entradas o salidas simples)
+        // Calcular costoTotal si es 0 o undefined
+        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
+          ? movement.costoTotal 
+          : movement.cantidad * movement.costoUnitario;
+
+        if (movement.tipo === 'Entrada') {
+          currentSaldo += movement.cantidad;
+        } else {
+          currentSaldo -= movement.cantidad;
+        }
+        csv += `${movement.fecha},${movement.tipo},${movement.tComprob},${movement.nComprobante},${movement.cantidad},${movement.costoUnitario},${calculatedCostoTotal},${currentSaldo}\n`;
+      }
     });
     
     return csv;
