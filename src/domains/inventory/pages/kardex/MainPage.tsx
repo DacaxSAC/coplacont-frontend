@@ -16,6 +16,7 @@ import { WarehouseService } from "@/domains/maintainers/services";
 import type { KardexMovement } from "../../services/types";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import { downloadFile } from "@/shared/utils/downloadUtils";
+import * as XLSX from 'xlsx';
 
 export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -390,9 +391,9 @@ export const MainPage: React.FC = () => {
   const reporterGridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr";
 
   /**
-   * Exporta los datos del kardex a Excel
+   * Exporta los datos del kardex a CSV
    */
-  const handleExportToExcel = () => {
+  const handleExportToCSV = () => {
     if (!kardexResponse || !kardexData.length) {
       return;
     }
@@ -405,9 +406,229 @@ export const MainPage: React.FC = () => {
     const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     
     // Generar nombre del archivo
-    const filename = `kardex_${kardexResponse.producto.replace(/\s+/g, '_')}_${kardexResponse.almacen.replace(/\s+/g, '_')}_${selectedYear}.csv`;
+    const producto = kardexResponse.producto || 'producto';
+    const almacen = kardexResponse.almacen || 'almacen';
+    const filename = `kardex_${producto.replace(/\s+/g, '_')}_${almacen.replace(/\s+/g, '_')}_${selectedYear}.csv`;
     
     downloadFile(blob, filename);
+  };
+
+  /**
+   * Exporta los datos del kardex a Excel (.xlsx)
+   */
+  const handleExportToExcel = () => {
+    if (!kardexResponse || !kardexData.length) {
+      return;
+    }
+
+    // Crear un nuevo libro de trabajo
+    const workbook = XLSX.utils.book_new();
+
+    // Crear hoja de resumen
+    const summaryData = [
+      ['REPORTE DE KARDEX'],
+      [],
+      ['Producto:', kardexResponse.producto],
+      ['Almacén:', kardexResponse.almacen],
+      ['Año:', selectedYear],
+      ['Fecha de Generación:', new Date().toLocaleDateString()],
+      [],
+      ['RESUMEN'],
+      ['Existencias finales', 'Costo unitario final', 'Costo total final', 'Costo de ventas total'],
+       [
+         reportes.cantidadActual.toString(),
+         reportes.costoUnitarioFinal.toString(),
+         reportes.costoTotalFinal.toString(),
+         reportes.costoVentasTotal.toString()
+       ]
+    ];
+
+    const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Resumen');
+
+    // Crear hoja de movimientos
+    const movementsData = [
+      ['MOVIMIENTOS'],
+      [],
+      ['Fecha', 'Tipo', 'Tipo de comprobante', 'Cod de comprobante', 'Cantidad', 'Costo Unitario', 'Costo Total', 'Saldo']
+    ];
+
+    // Agregar saldo inicial
+     movementsData.push([
+       '-',
+       'Saldo inicial',
+       '-',
+       '-',
+       reportes.inventarioInicialCantidad.toString(),
+       (reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad).toString(),
+       reportes.inventarioInicialCostoTotal.toString(),
+       '-'
+     ]);
+
+    // Agregar movimientos con detalles expandidos
+    let currentSaldo = parseFloat(reportes.inventarioInicialCantidad.toString());
+    let currentCostoTotal = parseFloat(reportes.inventarioInicialCostoTotal.toString());
+
+    kardexData.forEach(movement => {
+      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
+        movement.detallesSalida.forEach(detalle => {
+          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
+            ? detalle.costoTotalDeLote 
+            : detalle.cantidad * detalle.costoUnitarioDeLote;
+          
+          currentSaldo -= detalle.cantidad;
+          currentCostoTotal -= calculatedDetalleCostoTotal;
+          
+          movementsData.push([
+             movement.fecha,
+             movement.tipo,
+             movement.tComprob,
+             movement.nComprobante,
+             detalle.cantidad.toString(),
+             detalle.costoUnitarioDeLote.toString(),
+             calculatedDetalleCostoTotal.toString(),
+             currentSaldo.toString()
+           ]);
+        });
+      } else {
+        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
+          ? movement.costoTotal 
+          : movement.cantidad * movement.costoUnitario;
+        
+        if (movement.tipo === 'Entrada') {
+          currentSaldo += movement.cantidad;
+          currentCostoTotal += calculatedCostoTotal;
+        } else {
+          currentSaldo -= movement.cantidad;
+          currentCostoTotal -= calculatedCostoTotal;
+        }
+        
+        movementsData.push([
+           movement.fecha,
+           movement.tipo,
+           movement.tComprob,
+           movement.nComprobante,
+           movement.cantidad.toString(),
+           movement.costoUnitario.toString(),
+           calculatedCostoTotal.toString(),
+           currentSaldo.toString()
+         ]);
+      }
+    });
+
+    const movementsWorksheet = XLSX.utils.aoa_to_sheet(movementsData);
+    XLSX.utils.book_append_sheet(workbook, movementsWorksheet, 'Movimientos');
+
+    // Generar nombre del archivo
+    const producto = kardexResponse.producto || 'producto';
+    const almacen = kardexResponse.almacen || 'almacen';
+    const filename = `kardex_${producto.replace(/\s+/g, '_')}_${almacen.replace(/\s+/g, '_')}_${selectedYear}.xlsx`;
+
+    // Escribir el archivo
+    XLSX.writeFile(workbook, filename);
+  };
+
+  /**
+   * Exporta los datos del kardex a PDF (usando ventana de impresión)
+   */
+  const handleExportToPDF = () => {
+    if (!kardexResponse || !kardexData.length) {
+      return;
+    }
+
+    // Crear contenido HTML para imprimir
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Reporte de Kardex - ${kardexResponse.producto} - ${kardexResponse.almacen} - ${selectedYear}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; margin-bottom: 30px; }
+          h2 { margin-bottom: 15px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f5f5f5; }
+          .info { margin-bottom: 20px; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>REPORTE DE KARDEX</h1>
+        
+        <div class="info">
+          <p><strong>Producto:</strong> ${kardexResponse.producto}</p>
+          <p><strong>Almacén:</strong> ${kardexResponse.almacen}</p>
+          <p><strong>Año:</strong> ${selectedYear}</p>
+          <p><strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        
+        <h2>RESUMEN</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Existencias finales</th>
+              <th>Costo unitario final</th>
+              <th>Costo total final</th>
+              <th>Costo de ventas total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${reportes.cantidadActual}</td>
+              <td>${reportes.costoUnitarioFinal}</td>
+              <td>${reportes.costoTotalFinal}</td>
+              <td>${reportes.costoVentasTotal}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h2>MOVIMIENTOS</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Tipo de comprobante</th>
+              <th>Cod de comprobante</th>
+              <th>Cantidad</th>
+              <th>Costo Unitario</th>
+              <th>Costo Total</th>
+              <th>Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>-</td>
+              <td>Saldo inicial</td>
+              <td>-</td>
+              <td>-</td>
+              <td>${reportes.inventarioInicialCantidad}</td>
+              <td>${(reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad).toFixed(2)}</td>
+              <td>${reportes.inventarioInicialCostoTotal}</td>
+              <td>-</td>
+            </tr>
+            ${generateTableRows().slice(1).map(row => `
+            <tr>
+              ${row.cells.map(cell => `<td>${cell}</td>`).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    // Abrir nueva ventana e imprimir
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
   };
 
   /**
@@ -538,14 +759,33 @@ export const MainPage: React.FC = () => {
                 </Text>
               </div>
 
-             <Button
-               size="small"
-               variant="primary"
-               onClick={handleExportToExcel}
-               disabled={!kardexData || kardexData.length === 0}
-             >
-               Exportar como Excel
-             </Button>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.25rem'}}>
+              <Button
+                size="small"
+                variant="primary"
+                onClick={handleExportToCSV}
+                disabled={!kardexData || kardexData.length === 0}
+              >
+                Exportar como CSV
+              </Button>
+              <Button
+                size="small"
+                variant="primary"
+                onClick={handleExportToExcel}
+                disabled={!kardexData || kardexData.length === 0}
+              >
+                Exportar como Excel
+              </Button>
+
+              <Button
+                size="small"
+                variant="primary"
+                onClick={handleExportToPDF}
+                disabled={!kardexData || kardexData.length === 0}
+              >
+                Exportar como PDF
+              </Button>
+            </div>
            </div>
          )}
 
