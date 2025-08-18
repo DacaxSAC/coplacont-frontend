@@ -107,9 +107,9 @@ export const MainPage: React.FC = () => {
   }, [inventory, almacenFilter, productoFilter]);
 
   const headers = [
-    "Código almacen",
+    "COD almacen",
     "Almacén",
-    "Código producto",
+    "COD producto",
     "Producto",
     "Stock Actual",
     "Acciones",
@@ -135,7 +135,7 @@ export const MainPage: React.FC = () => {
     ],
   }));
 
-  const gridTemplate = "1.5fr 2fr 1.5fr 2fr 1fr 2fr";
+  const gridTemplate = "1fr 1.2fr 1.2fr 2fr 1fr 1fr";
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -231,6 +231,19 @@ export const MainPage: React.FC = () => {
         buttonText="Cerrar"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div>
+            <Text size="xs" color="neutral-primary">
+              Almacén
+            </Text>
+            <ComboBox
+              options={modalWarehouseOptions}
+              size="xs"
+              variant="createSale"
+              value={selectedWarehouse}
+              onChange={(v) => setSelectedWarehouse(v as string)}
+              placeholder="Seleccionar"
+            />
+          </div>
           <div>
             <Text size="xs" color="neutral-primary">
               Producto
@@ -245,19 +258,7 @@ export const MainPage: React.FC = () => {
             />
           </div>
           
-          <div>
-            <Text size="xs" color="neutral-primary">
-              Almacén
-            </Text>
-            <ComboBox
-              options={modalWarehouseOptions}
-              size="xs"
-              variant="createSale"
-              value={selectedWarehouse}
-              onChange={(v) => setSelectedWarehouse(v as string)}
-              placeholder="Seleccionar"
-            />
-          </div>
+
           
           {error && (
             <Text size="xs" color="danger">

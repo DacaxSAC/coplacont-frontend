@@ -171,6 +171,52 @@ export const CreatePurchaseForm = () => {
   const [newProviderError, setNewProviderError] = useState<string>("");
   const [newProviderLoading, setNewProviderLoading] = useState(false);
 
+  // Estado para costos adicionales
+  const [costosAdicionales, setCostosAdicionales] = useState<string>("");
+
+  /**
+   * Distribuye los costos adicionales entre todos los items del detalle
+   * El costo adicional se divide entre la cantidad total de unidades
+   * @param items - Array de items del detalle de compra
+   * @param costoAdicional - Monto total a distribuir
+   * @returns Array de items con precios unitarios actualizados
+   */
+  const distribuirCostosAdicionales = (items: DetalleCompraItem[], costoAdicional: number): DetalleCompraItem[] => {
+    if (costoAdicional <= 0 || items.length === 0) {
+      return items;
+    }
+
+    // Calcular la cantidad total de todos los items
+    const cantidadTotal = items.reduce((total, item) => total + item.cantidad, 0);
+    
+    if (cantidadTotal === 0) {
+      return items;
+    }
+
+    // Calcular el costo adicional por unidad (dividir el total entre todas las unidades)
+    const costoAdicionalPorUnidad = costoAdicional / cantidadTotal;
+
+    // Aplicar el mismo costo adicional por unidad a todos los items
+    return items.map(item => {
+      const nuevoPrecioUnitario = item.precioUnitario + costoAdicionalPorUnidad;
+      
+      // Recalcular todos los valores basados en el nuevo precio unitario
+      const subtotal = item.cantidad * nuevoPrecioUnitario;
+      const baseGravado = subtotal / 1.18; // Asumiendo IGV del 18%
+      const igv = subtotal - baseGravado;
+      const total = subtotal;
+      
+      return {
+        ...item,
+        precioUnitario: nuevoPrecioUnitario,
+        subtotal,
+        baseGravado,
+        igv,
+        total
+      };
+    });
+  };
+
   // Obtener el correlativo al montar el componente
   useEffect(() => {
     const fetchCorrelativo = async () => {
@@ -676,7 +722,14 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      const detallesAPI = detalleCompra.map((item) => ({
+      
+      // Aplicar costos adicionales si existen
+      let detalleConCostosAdicionales = [...detalleCompra];
+      if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
+        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+      }
+      
+      const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -725,7 +778,14 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      const detallesAPI = detalleCompra.map((item) => ({
+      
+      // Aplicar costos adicionales si existen
+      let detalleConCostosAdicionales = [...detalleCompra];
+      if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
+        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+      }
+      
+      const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -976,10 +1036,6 @@ export const CreatePurchaseForm = () => {
               onChange={handleComboBoxChange("tipoCompra")}
             />
           </div>
-        </div>
-
-        {/** Fila 5: Serie, Número y Fecha de vencimiento */}
-        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--half"]}`}
           >
@@ -995,6 +1051,11 @@ export const CreatePurchaseForm = () => {
               onChange={handleComboBoxChange("tipoProductoCompra")}
             />
           </div>
+        </div>
+
+        {/** Fila 5: Serie, Número y Fecha de vencimiento */}
+        <div className={styles.CreatePurchaseForm__FormRow}>
+          
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
@@ -1037,6 +1098,21 @@ export const CreatePurchaseForm = () => {
               onChange={handleInputChange("fechaVencimiento")}
             />
           </div>
+           <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Costos adicionales S/. (opcional)
+              </Text>
+              <Input
+                type="number"
+                size="xs"
+                variant="createSale"
+                value={costosAdicionales}
+                onChange={(e) => setCostosAdicionales(e.target.value)}
+                placeholder="0.00"
+              />
+            </div>
         </div>
       </div>
 
@@ -1159,6 +1235,15 @@ export const CreatePurchaseForm = () => {
                 rows={tableRows}
                 gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
               />
+              
+              {/* Mensaje informativo sobre costos adicionales */}
+              {costosAdicionales && parseFloat(costosAdicionales) > 0 && (
+                <div style={{ marginTop: '8px', marginBottom: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef' }}>
+                  <Text size="xs" color="neutral-secondary">
+                    A cada producto se le añadirá S/ {(parseFloat(costosAdicionales) / detalleCompra.reduce((sum, item) => sum + item.cantidad, 0)).toFixed(2)} por concepto de costos adicionales
+                  </Text>
+                </div>
+              )}
               
               {/* Totales */}
               <div className={styles.CreatePurchaseForm__Totals}>
