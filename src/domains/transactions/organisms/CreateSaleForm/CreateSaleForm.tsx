@@ -140,7 +140,6 @@ export const CreateSaleForm = () => {
       formState.tipoProductoVenta !== "" &&
       formState.serie !== "" &&
       formState.numero !== "" &&
-      formState.fechaVencimiento !== "" &&
       detalleVenta.length > 0
     );
   };
@@ -810,7 +809,7 @@ export const CreateSaleForm = () => {
             className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
-              Fecha de vencimiento
+              Fecha de vencimiento (opcional)
             </Text>
             <Input
               size="xs"

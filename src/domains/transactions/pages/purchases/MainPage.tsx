@@ -33,6 +33,10 @@ export const MainPage: React.FC = () => {
   // State for purchases
   const [purchases, setPurchases] = useState<Transaction[]>([]);
   const [filteredPurchases, setFilteredPurchases] = useState<Transaction[]>([]);
+  
+  // State for modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState<Transaction | null>(null);
 
   // Fetch purchases on component mount
   useEffect(() => {
@@ -82,22 +86,19 @@ export const MainPage: React.FC = () => {
     if (filterType === "mes-anio") {
       if (month && year) {
         filtered = filtered.filter((purchase) => {
-          const emissionDate = new Date(purchase.fechaEmision);
-          const purchaseMonth = String(emissionDate.getMonth() + 1).padStart(
-            2,
-            "0"
-          );
-          const purchaseYear = String(emissionDate.getFullYear());
+          // Extraer mes y año directamente de la cadena de fecha (formato: YYYY-MM-DD)
+          const dateParts = purchase.fechaEmision.split('-');
+          const purchaseYear = dateParts[0];
+          const purchaseMonth = dateParts[1];
           return purchaseMonth === month && purchaseYear === year;
         });
       }
     } else if (filterType === "rango-fechas") {
       if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
         filtered = filtered.filter((purchase) => {
-          const emissionDate = new Date(purchase.fechaEmision);
-          return emissionDate >= start && emissionDate <= end;
+          // Comparar fechas directamente como cadenas (formato: YYYY-MM-DD)
+          const emissionDate = purchase.fechaEmision;
+          return emissionDate >= startDate && emissionDate <= endDate;
         });
       }
     }
@@ -143,6 +144,22 @@ export const MainPage: React.FC = () => {
 
   // Nota: La lógica de búsqueda secundaria se conectará con el servicio cuando esté disponible.
 
+  /**
+   * Abre el modal con el detalle de la compra seleccionada
+   */
+  const handleOpenDetailModal = (purchase: Transaction) => {
+    setSelectedPurchase(purchase);
+    setIsModalOpen(true);
+  };
+
+  /**
+   * Cierra el modal de detalle
+   */
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPurchase(null);
+  };
+
   // Transformar datos de compras filtradas en filas de tabla
   const rows = useMemo(
     () =>
@@ -160,6 +177,13 @@ export const MainPage: React.FC = () => {
               purchase.moneda,
               purchase.tipoCambio,
               purchase.totales.totalGeneral.toString(),
+              <Button 
+                size="tableItemSize" 
+                variant="tableItemStyle"
+                onClick={() => handleOpenDetailModal(purchase)}
+              > 
+                Ver Detalle 
+              </Button>
             ],
           } as TableRow)
       ),
@@ -177,9 +201,10 @@ export const MainPage: React.FC = () => {
     "Moneda",
     "Tipo Cambio",
     "Total General",
+    "Acciones",
   ];
 
-  const gridTemplate = "1fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr";
+  const gridTemplate = "0.8fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr 1fr";
 
   return (
     <PageLayout
@@ -328,6 +353,105 @@ export const MainPage: React.FC = () => {
 
       {/* Tabla de resultados */}
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
+
+      {/* Modal Detalle de compra */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={`Detalle de Compra - ${selectedPurchase?.numero || ''}`}
+        description={`${selectedPurchase?.persona?.razonSocial || ''} - ${selectedPurchase?.fechaEmision || ''}`}
+      >
+        {selectedPurchase && (
+          <div>
+            {/* Datos de cabecera */}
+            <div style={{ marginBottom: '24px' }}>
+              <Text as="h3" size="md" weight={600}>
+                Información General
+              </Text>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '16px' }}>
+                <div>
+                  <Text size="sm" weight={500}>Número de Documento:</Text>
+                  <Text size="sm">{selectedPurchase.persona.numeroDocumento}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Razón Social:</Text>
+                  <Text size="sm">{selectedPurchase.persona.razonSocial || selectedPurchase.persona.nombreCompleto}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Tipo de Comprobante:</Text>
+                  <Text size="sm">{selectedPurchase.tipoComprobante}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Serie - Número:</Text>
+                  <Text size="sm">{selectedPurchase.serie} - {selectedPurchase.numero}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Fecha de Emisión:</Text>
+                  <Text size="sm">{selectedPurchase.fechaEmision}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Tipo de Cambio:</Text>
+                  <Text size="sm">{selectedPurchase.tipoCambio}</Text>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabla de detalles */}
+            <div>
+              <Text as="h3" size="md" weight={600}>
+                Detalle de Items
+              </Text>
+              <div style={{ marginTop: '16px' }}>
+                <Table
+                  headers={[
+                    'Cantidad',
+                    'Descripción',
+                    'Precio Unitario',
+                    'Subtotal',
+                    'IGV',
+                    'ISC',
+                    'Total'
+                  ]}
+                  rows={selectedPurchase.detalles.map((detalle, index) => ({
+                    id: index.toString(),
+                    cells: [
+                      detalle.cantidad,
+                      detalle.descripcion,
+                      `S/ ${detalle.precioUnitario}`,
+                      `S/ ${detalle.subtotal}`,
+                      `S/ ${detalle.igv}`,
+                      `S/ ${detalle.isc}`,
+                      `S/ ${detalle.total}`
+                    ]
+                  } as TableRow))}
+                  gridTemplate="80px 1fr 120px 120px 100px 100px 120px"
+                />
+              </div>
+            </div>
+
+            {/* Totales */}
+            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <Text as="h3" size="md" weight={600}>
+                Totales
+              </Text>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '12px' }}>
+                <div>
+                  <Text size="sm" weight={500}>Total Gravada:</Text>
+                  <Text size="sm">S/ {selectedPurchase.totales.totalGravada}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>IGV:</Text>
+                  <Text size="sm">S/ {selectedPurchase.totales.totalIgv}</Text>
+                </div>
+                <div>
+                  <Text size="sm" weight={500}>Total General:</Text>
+                  <Text size="sm" weight={600}>S/ {selectedPurchase.totales.totalGeneral}</Text>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Modal Subir compras */}
       <Modal

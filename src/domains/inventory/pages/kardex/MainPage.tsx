@@ -386,7 +386,7 @@ export const MainPage: React.FC = () => {
     },
   ];
 
-  const gridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
+  const gridTemplate = "1fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr 1fr";
   const reporterGridTemplate = "1.5fr 1.5fr 1.5fr 1.5fr";
 
   /**

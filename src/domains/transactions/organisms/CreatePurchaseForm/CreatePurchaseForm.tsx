@@ -407,8 +407,7 @@ export const CreatePurchaseForm = () => {
       formState.fechaEmision &&
       formState.moneda &&
       formState.serie &&
-      formState.numero &&
-      formState.fechaVencimiento
+      formState.numero 
     );
 
     // Validar que haya al menos un item en el detalle
@@ -926,7 +925,7 @@ export const CreatePurchaseForm = () => {
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
             <Text size="xs" color="neutral-primary">
-              Fecha de vencimiento
+              Fecha de vencimiento (opcional)
             </Text>
             <Input
               size="xs"
