@@ -1,0 +1,40 @@
+.RoleTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.25rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  
+  &__Icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  
+  &__Contribuyente {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fbbf24;
+  }
+  
+  &__Administrador {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #60a5fa;
+  }
+  
+  &__Contador {
+    background-color: #fed7d7;
+    color: #c53030;
+    border: 1px solid #fc8181;
+  }
+  
+  &__Default {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+}

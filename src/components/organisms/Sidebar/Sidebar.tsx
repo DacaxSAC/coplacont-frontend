@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./Sidebar.module.scss";
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Logo } from "@/components/atoms";
+import { ConfiguracionIcon, Logo } from "@/components/atoms";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle/ThemeToggle";
 import {
   TransaccionesIcon,
@@ -24,6 +24,7 @@ import {
   //SETTINGS_ROUTES,
   AUTH_ROUTES,
   MAINTAINERS_ROUTES,
+  SETTINGS_ROUTES,
 } from "@/router/routes";
 import { useAuth } from "@/domains/auth";
 
@@ -43,7 +44,7 @@ const ROLE_DISPLAY_NAMES: Record<string, string> = {
   [UserRoleType.CONTADOR]: 'Contador'
 };
 
-interface SidebarProps {}
+interface SidebarProps { }
 
 export const Sidebar: React.FC<SidebarProps> = () => {
   const navigate = useNavigate();
@@ -51,12 +52,12 @@ export const Sidebar: React.FC<SidebarProps> = () => {
   const { logout, user } = useAuth();
 
   // Construir el nombre completo del usuario
-  const userName = user?.persona 
+  const userName = user?.persona
     ? `${user.persona.primerNombre} ${user.persona.primerApellido}`
     : user?.email || 'Usuario';
 
   // Obtener el rol principal del usuario con nombre descriptivo
-  const userRole = user?.roles && user.roles.length > 0 
+  const userRole = user?.roles && user.roles.length > 0
     ? ROLE_DISPLAY_NAMES[user.roles[0].nombre] || user.roles[0].nombre
     : 'Sin rol';
 
@@ -134,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
               </Link>
             </li>
             <li>
-              <Link 
+              <Link
                 to={`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`}
                 className={isActiveLink(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}`) ? styles.active : ''}
               >
@@ -151,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
           </ul>
         </div>
 
-                <div className={styles.section}>
+        <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <EstadosFinancierosIcon />
             <h3 className={styles.sectionTitle__title}>Estados Financieros</h3>
@@ -203,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
             </li>*/}
           </ul>
 
-          
+
         </div>
 
         <div className={styles.section}>
@@ -255,50 +256,54 @@ export const Sidebar: React.FC<SidebarProps> = () => {
           </ul>
         </div>
 
-        {/**<div className={styles.section}>
-            <div className={styles.sectionTitle}>
-              <ConfiguracionIcon />
-              <h3 className={styles.sectionTitle__title}>Configuración</h3>
-            </div>
-            <ul className={styles.menuList}>
-              <li>
-                <Link
-                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`}
-                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`) ? styles.active : ''}
-                >
-                  Periodos Contables
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
-                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`) ? styles.active : ''}
-                >
-                  Usuarios y Roles
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}
-                  className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`) ? styles.active : ''}
-                >
-                  Parámetros
-                </Link>
-              </li>
-            </ul>
-          </div>*/}
-          <div className={styles.section}>
-            <div className={styles.sectionTitle}>
-              <CerrarSesionIcon />
-              <Link
-                to={`${AUTH_ROUTES.AUTH}${AUTH_ROUTES.LOGIN}`}
-                onClick={handleLogout}
-                className={styles.sectionTitle__title}
-              >
-                Cerrar Sesión
-              </Link>
-            </div>
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>
+            <ConfiguracionIcon />
+            <h3 className={styles.sectionTitle__title}>Configuración</h3>
           </div>
+          <ul className={styles.menuList}>
+            {/*
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`}
+                className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`) ? styles.active : ''}
+              >
+                Periodos Contables
+              </Link>
+            </li>
+            */}
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
+                className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`) ? styles.active : ''}
+              >
+                Usuarios y Roles
+              </Link>
+            </li>
+            {/*
+            <li>
+              <Link
+                to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}
+                className={isActiveLink(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`) ? styles.active : ''}
+              >
+                Parámetros
+              </Link>
+            </li>
+            */}
+          </ul>
+        </div>
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>
+            <CerrarSesionIcon />
+            <Link
+              to={`${AUTH_ROUTES.AUTH}${AUTH_ROUTES.LOGIN}`}
+              onClick={handleLogout}
+              className={styles.sectionTitle__title}
+            >
+              Cerrar Sesión
+            </Link>
+          </div>
+        </div>
 
         {/*<div className={styles.section}>
           <div className={styles.sectionTitle}>

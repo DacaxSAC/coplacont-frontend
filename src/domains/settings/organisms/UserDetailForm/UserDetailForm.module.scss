@@ -1,0 +1,101 @@
+.UserDetailForm{
+  &__Container {
+    width: 100%;
+    padding: 0;
+    background: transparent;
+  }
+
+  &__Title {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__Section {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__SectionTitle {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  &__FormGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__FormField{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    &--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__Form{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  &__PasswordSection {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+
+  &__PasswordButton {
+    margin-bottom: 1rem;
+  }
+
+  &__PasswordForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__ButtonGroup {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__Alert {
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    
+    &--success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    &--error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+  }
+}
