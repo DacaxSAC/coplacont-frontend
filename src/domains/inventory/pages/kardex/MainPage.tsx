@@ -695,7 +695,7 @@ export const MainPage: React.FC = () => {
 
   return (
     <PageLayout
-      title="Kardex"
+      title="Kardex (Método de evaluación FIFO)"
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
