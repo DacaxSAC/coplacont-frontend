@@ -257,7 +257,7 @@ export const MainPage: React.FC = () => {
           </div>
           <div className={styles.MainPage__Filter}>
             <Text size="xs" color="neutral-primary">
-              Almacén
+              Almacén (Opcional)
             </Text>
             <ComboBox
               options={warehouseOptions}
@@ -270,7 +270,7 @@ export const MainPage: React.FC = () => {
           </div>
           <div className={styles.MainPage__Filter}>
             <Text size="xs" color="neutral-primary">
-              Producto
+              Producto (Opcional)
             </Text>
             <ComboBox
               options={productOptions}
