@@ -85,7 +85,7 @@ export const Dashboard: React.FC = () => {
   return (
     <PageLayout
       title="Panel de control"
-      subtitle="amente a las funcionalidades principales del sistema de gestión contable"
+      subtitle="Acceda directamente a las funcionalidades principales del sistema de gestión contable"
     >
       <div className={styles.dashboard}>
         {/* Sección de bienvenida */}
