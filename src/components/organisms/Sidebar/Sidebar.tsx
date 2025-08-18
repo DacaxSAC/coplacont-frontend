@@ -1,6 +1,8 @@
 import React from "react";
 import styles from "./Sidebar.module.scss";
 
+import { GoHomeFill } from "react-icons/go";
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Logo } from "@/components/atoms";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle/ThemeToggle";
@@ -66,7 +68,11 @@ export const Sidebar: React.FC<SidebarProps> = () => {
    * @returns true si el enlace está activo
    */
   const isActiveLink = (path: string): boolean => {
-    return location.pathname === path;
+    // Para la ruta home, verificar que sea exactamente '/'
+    if (path === MAIN_ROUTES.HOME) {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   const handleLogout = () => {
@@ -91,6 +97,20 @@ export const Sidebar: React.FC<SidebarProps> = () => {
       </div>
 
       <nav className={styles.navigation}>
+        {/* Dashboard - Página de inicio */}
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>
+            <Link
+              to={MAIN_ROUTES.HOME}
+              className={`${styles.sectionTitle__title} ${isActiveLink(MAIN_ROUTES.HOME) ? styles.active : ''}`}
+              style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <GoHomeFill />
+              Panel de control
+            </Link>
+          </div>
+        </div>
+
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <TransaccionesIcon />
