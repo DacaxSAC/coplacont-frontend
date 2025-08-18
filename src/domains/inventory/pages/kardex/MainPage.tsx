@@ -695,7 +695,7 @@ export const MainPage: React.FC = () => {
 
   return (
     <PageLayout
-      title="Kardex (MÉTODO DE VALUACIÓN PROMEDIO PONDERADO)"
+      title="Kardex (Método de valuación PROMEDIO PONDERADO)"
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
