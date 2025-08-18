@@ -14,7 +14,7 @@
   &__FormRow {
     display: flex;
     gap: $spacing-md;
-    align-items: flex-start;
+    align-items: flex-end;
     
     @media (max-width: 768px) {
       flex-direction: column;
