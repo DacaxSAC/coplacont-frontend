@@ -47,7 +47,7 @@ export const MainPage: React.FC = () => {
 
   const handleCreateProduct = async (data: {
     nombre: string;
-    descripcion: string;
+    descripcion?: string;
     unidadMedida: string;
     idCategoria: number;
   }) => {
@@ -208,16 +208,16 @@ export const MainPage: React.FC = () => {
                 setIsOpen(true);
               },
             },
-            {
-              label: "Nuevo servicio",
-              onClick: () => {
-                setProductType("servicio");
-                resetForm();
-                setIsView(false);
-                setSelectedProduct(null);
-                setIsOpen(true);
-              },
-            },
+            //{
+            //  label: "Nuevo servicio",
+            //  onClick: () => {
+            //    setProductType("servicio");
+            //    resetForm();
+            //    setIsView(false);
+            //    setSelectedProduct(null);
+            //    setIsOpen(true);
+            //  },
+            //},
           ]}
         />
       }

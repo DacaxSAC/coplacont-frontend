@@ -93,7 +93,7 @@ export const Main: React.FC<CreateProductModalProps> = ({
   ]
 
   const handleSubmit = async () => {
-    if (!nombre?.trim() || !descripcion?.trim() || (!isService && !unidadMedida) || !categoriaId)
+    if (!nombre?.trim() || (!isService && !unidadMedida) || !categoriaId)
       return;
 
     const dataToSubmit = {
@@ -115,7 +115,7 @@ export const Main: React.FC<CreateProductModalProps> = ({
   };
 
   const isFormValid =
-    nombre?.trim() && descripcion?.trim() && (isService || unidadMedida) && categoriaId;
+    nombre?.trim() && (isService || unidadMedida) && categoriaId;
 
   return (
     <Modal
@@ -140,9 +140,10 @@ export const Main: React.FC<CreateProductModalProps> = ({
 
         <div className={styles.formField}>
           <Text size="xs" color="neutral-primary">
-            Descripción
+            Descripción (opcional)
           </Text>
           <Input
+            placeholder="Ingresa descripción"
             size="xs"
             variant="createSale"
             value={descripcion}

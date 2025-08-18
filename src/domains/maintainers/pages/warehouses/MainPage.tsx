@@ -78,10 +78,6 @@ export const MainPage: React.FC = () => {
       setError("El responsable es obligatorio.");
       return;
     }
-    if (!newWarehouse.telefono.trim()) {
-      setError("El teléfono es obligatorio.");
-      return;
-    }
 
     try {
       setLoading(true);

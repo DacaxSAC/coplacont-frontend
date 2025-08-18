@@ -24,7 +24,7 @@ export interface Product {
 export interface CreateProductPayload {
   nombre: string;
   tipo: 'producto' | 'servicio';
-  descripcion: string;
+  descripcion?: string;
   unidadMedida: string;
   estado: boolean;
   categoriaId: number;
