@@ -127,7 +127,7 @@ export const MainPage: React.FC = () => {
 
   const fetchClients = () => {
     setLoading(true);
-    EntitiesService.getClients(true).then((res) => {
+    EntitiesService.getClients().then((res) => {
       setClients(res);
     }).finally(() => {
       setLoading(false);

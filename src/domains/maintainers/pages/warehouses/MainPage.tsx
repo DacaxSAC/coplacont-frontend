@@ -98,7 +98,7 @@ export const MainPage: React.FC = () => {
   const fetchWarehouses = async () => {
     try {
       setLoading(true);
-      const data = await WarehouseService.getAll(true);
+      const data = await WarehouseService.getAll();
       setWarehouses(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error al obtener almacenes:", error);

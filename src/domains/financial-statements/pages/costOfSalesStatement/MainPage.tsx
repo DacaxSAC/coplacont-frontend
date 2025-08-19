@@ -35,10 +35,10 @@ export const MainPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsResponse = await ProductService.getAll(true);
+        const productsResponse = await ProductService.getAll();
         setProducts(productsResponse);
 
-        const warehousesResponse = await WarehouseService.getAll(true);
+        const warehousesResponse = await WarehouseService.getAll();
         setWarehouses(warehousesResponse);
 
         // Si hay parámetros en la URL, seleccionarlos automáticamente

@@ -53,10 +53,10 @@ export const MainPage: React.FC = () => {
           await fetchKardexByInventoryId(parseInt(inventoryIdFromUrl));
         } else {
           // Flujo normal: cargar productos y almacenes
-          const productsResponse = await ProductService.getAll(true);
+          const productsResponse = await ProductService.getAll();
           setProducts(productsResponse);
 
-          const warehousesResponse = await WarehouseService.getAll(true);
+          const warehousesResponse = await WarehouseService.getAll();
           setWarehouses(warehousesResponse);
 
           // Si hay parámetros en la URL, seleccionarlos automáticamente
