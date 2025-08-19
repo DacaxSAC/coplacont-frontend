@@ -190,8 +190,10 @@ export const MainPage: React.FC = () => {
         setReportes({
           cantidadActual: parseFloat(kardexResponse.saldoActual),
           costoUnitarioFinal:
-            parseFloat(kardexResponse.costoFinal) /
-            parseFloat(kardexResponse.saldoActual),
+            parseFloat(kardexResponse.saldoActual) === 0
+              ? 0
+              : parseFloat(kardexResponse.costoFinal) /
+                parseFloat(kardexResponse.saldoActual),
           costoTotalFinal: parseFloat(kardexResponse.costoFinal),
           costoVentasTotal: getCostoVentasTotal(kardexResponse.movimientos),
           inventarioInicialCantidad: parseFloat(
