@@ -1,6 +1,5 @@
-import { useState } from "react";
 import styles from "./FormUser.module.scss";
-import { Text, Input, Button, ComboBox } from "@/components";
+import { Text, Input, ComboBox } from "@/components";
 import type { User, CreateUserPayload } from "../../types";
 import { documentTypeOptions, userTypeOptions } from "../../types";
 
