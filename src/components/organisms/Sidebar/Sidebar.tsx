@@ -72,7 +72,23 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     if (path === MAIN_ROUTES.HOME) {
       return location.pathname === '/';
     }
-    return location.pathname.startsWith(path);
+    
+    // Para evitar activación múltiple, verificar coincidencia exacta o que el siguiente carácter sea '/'
+    // Esto previene que '/inventory/' active '/inventory/kardex' y viceversa
+    const currentPath = location.pathname;
+    
+    // Si la ruta actual es exactamente igual al path
+    if (currentPath === path) {
+      return true;
+    }
+    
+    // Si la ruta actual empieza con el path y el siguiente carácter es '/' o es el final
+    if (currentPath.startsWith(path)) {
+      const nextChar = currentPath[path.length];
+      return nextChar === '/' || nextChar === undefined;
+    }
+    
+    return false;
   };
 
   const handleLogout = () => {
