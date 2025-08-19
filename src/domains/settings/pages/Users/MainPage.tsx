@@ -39,6 +39,7 @@ export const MainPage: React.FC = () => {
   // Filtros
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [documentType, setDocumentType] = useState("DNI");
 
   // Form state
   const [newUser, setNewUser] = useState<CreateUserPayload>({
@@ -52,6 +53,8 @@ export const MainPage: React.FC = () => {
       fechaNacimiento: new Date(),
       telefono: "",
       dni: "",
+      tipoDocumento: "DNI",
+      direccion: "",
     },
   });
 
@@ -119,8 +122,11 @@ export const MainPage: React.FC = () => {
         fechaNacimiento: new Date(),
         telefono: "",
         dni: "",
+        tipoDocumento: "DNI",
+        direccion: "",
       },
     });
+    setDocumentType("DNI");
     setError("");
   };
 
@@ -128,18 +134,34 @@ export const MainPage: React.FC = () => {
     setNewUser({ ...newUser, [field]: value });
   };
 
+  const handleDocumentTypeChange = (value: string) => {
+    setDocumentType(value);
+    // También actualizar el campo tipoDocumento en el formulario
+    handleFormChange('createPersonaDto', {
+      ...newUser.createPersonaDto,
+      tipoDocumento: value,
+    });
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Sincronizar documentType cuando se selecciona un usuario
+  useEffect(() => {
+    if (selectedUser && selectedUser.persona?.tipoDocumento) {
+      setDocumentType(selectedUser.persona.tipoDocumento);
+    }
+  }, [selectedUser]);
 
   // Filtrado
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const matchesSearch = 
-        u.persona.primerNombre.toLowerCase().includes(search.toLowerCase()) ||
-        u.persona.primerApellido.toLowerCase().includes(search.toLowerCase()) ||
+        (u.persona?.primerNombre?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
+        (u.persona?.primerApellido?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
         u.email.toLowerCase().includes(search.toLowerCase()) ||
-        u.persona.dni.includes(search);
+        (u.persona?.dni?.includes(search) ?? false);
       const matchesStatus = status === "" || (u.habilitado ?? true).toString() === status;
       return matchesSearch && matchesStatus;
     });
@@ -148,10 +170,10 @@ export const MainPage: React.FC = () => {
   const rows: TableRow[] = filteredUsers.map((u) => ({
     id: u.id,
     cells: [
-      u.persona.dni,
-      `${u.persona.primerNombre} ${u.persona.primerApellido}`,
+      u.persona?.dni || "No especificado",
+      `${u.persona?.primerNombre || ""} ${u.persona?.primerApellido || ""}`.trim() || "No especificado",
       u.email,
-      u.persona.telefono || "No especificado",
+      u.persona?.telefono || "No especificado",
       u.roles && u.roles.length > 0 ? (
         <div style={{ display: "flex", gap: "2px", flexWrap: "wrap" }}>
           {u.roles.map((role, index) => (
@@ -264,6 +286,8 @@ export const MainPage: React.FC = () => {
           onChange={handleFormChange}
           onSubmit={handleCreateUser}
           isCreate={!isView}
+          documentType={documentType}
+          onDocumentTypeChange={handleDocumentTypeChange}
         />
       </Modal>
 

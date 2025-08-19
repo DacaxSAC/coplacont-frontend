@@ -1,5 +1,5 @@
 import styles from "./FormUser.module.scss";
-import { Text, Input, ComboBox } from "@/components";
+import { Text, Input, ComboBox, Button } from "@/components";
 import type { User, CreateUserPayload } from "../../types";
 import { documentTypeOptions, userTypeOptions } from "../../types";
 
@@ -13,6 +13,8 @@ type FormUserProps = {
   onChange: (field: keyof CreateUserPayload, value: any) => void;
   onSubmit?: () => void;
   isCreate?: boolean;
+  documentType?: string;
+  onDocumentTypeChange?: (value: string) => void;
 };
 
 export const FormUser = ({
@@ -23,6 +25,8 @@ export const FormUser = ({
   onChange,
   onSubmit,
   isCreate,
+  documentType = "DNI",
+  onDocumentTypeChange,
 }: FormUserProps) => {
   const handlePersonaChange = (field: string, value: any) => {
     onChange('createPersonaDto', {
@@ -50,8 +54,8 @@ export const FormUser = ({
           <ComboBox
             size="xs"
             variant="createSale"
-            value="1"
-            onChange={() => {}}
+            value={documentType}
+            onChange={(value) => onDocumentTypeChange?.(String(value))}
             options={documentTypeOptions}
             disabled={readOnly}
           />
@@ -135,8 +139,8 @@ export const FormUser = ({
           <Input
             size="xs"
             variant="createSale"
-            value=""
-            onChange={() => {}}
+            value={(user as CreateUserPayload).createPersonaDto?.direccion || ""}
+            onChange={(e) => handlePersonaChange('direccion', e.target.value)}
             disabled={readOnly}
           />
         </div>
@@ -205,6 +209,18 @@ export const FormUser = ({
           />
         </div>
       </div>
-    </div>
+        
+        {/* Botón de guardar */}
+        {onSubmit && (
+          <Button
+            disabled={loading || readOnly}
+            size="medium"
+            onClick={onSubmit}
+            className={styles.FormUser__SaveButton}
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
+          </Button>
+        )}
+      </div>
   );
 };

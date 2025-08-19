@@ -51,23 +51,14 @@ export const RegisterPage: React.FC = () => {
       title="Agregar nuevo usuario"
       subtitle="Permite al administrador crear un nuevo usuario y asignarle un rol."
       header={
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <Button
-            variant="secondary"
-            size="large"
-            onClick={handleCancel}
-            disabled={loading}
-          >
-            Cancelar
-          </Button>
-          <Button
-            size="large"
-            onClick={handleCreateUser}
-            disabled={loading}
-          >
-            Guardar usuario
-          </Button>
-        </div>
+        <Button
+          variant="secondary"
+          size="large"
+          onClick={handleCancel}
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
       }
     >
       <FormUser

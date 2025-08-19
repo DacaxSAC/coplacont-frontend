@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./UserDetailForm.module.scss";
-import { Text, Input, Button, ComboBox } from "@/components";
+import { Text, Input, Button, ComboBox, Loader } from "@/components";
 import type { User, UpdateUserPayload } from "../../types";
 import { UserService } from "../../services";
-import { documentTypeOptions, userTypeOptions } from "../../types";
+import { documentTypeOptions } from "../../types";
+import { AuthService } from "@/domains/auth";
 
 type UserDetailFormProps = {
   user: User;
@@ -39,19 +40,37 @@ export const UserDetailForm = ({
       })(),
       telefono: user.persona?.telefono || "",
       dni: user.persona?.dni || "",
+      tipoDocumento: user.persona?.tipoDocumento || "DNI",
       direccion: user.persona?.direccion || "",
     },
   });
 
   const [isEdit, setIsEdit] = useState(false);
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  // Auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (passwordSuccess) {
+      const timer = setTimeout(() => {
+        setPasswordSuccess('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [passwordSuccess]);
+
+  // Auto-hide error message after 5 seconds
+  useEffect(() => {
+    if (passwordError) {
+      const timer = setTimeout(() => {
+        setPasswordError('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [passwordError]);
+
+
 
   const handleUpdateUser = async () => {
     setLoading(true);
@@ -74,31 +93,29 @@ export const UserDetailForm = ({
     });
   };
 
-  const handlePasswordChange = async () => {
+  const handlePasswordChange = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     setPasswordError('');
     setPasswordSuccess('');
     
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden');
-      return;
-    }
-    
-    if (passwordData.newPassword.length < 6) {
-      setPasswordError('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-    
-    setLoading(true);
+    setPasswordLoading(true);
     try {
-      // Aquí iría la llamada al servicio para cambiar contraseña
-      // await UserService.changePassword(user.id!, passwordData);
-      setPasswordSuccess('Contraseña cambiada exitosamente');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setShowPasswordChange(false);
+      const response = await AuthService.recoverPassword(user.email);
+      
+      if (response.success) {
+        setPasswordSuccess('Correo de recuperación enviado exitosamente. Revisa tu bandeja de entrada.');
+      } else {
+        setPasswordError(response.message || 'Error al enviar el correo de recuperación');
+      }
     } catch (error) {
-      setPasswordError('Error al cambiar la contraseña');
+      console.error('Error en handlePasswordChange:', error);
+      setPasswordError('Error al solicitar el cambio de contraseña');
     }
-    setLoading(false);
+    setPasswordLoading(false);
   };
 
   return (
@@ -112,9 +129,17 @@ export const UserDetailForm = ({
       )}
 
       {passwordSuccess && (
-        <div className={`${styles.UserDetailForm__Alert} ${styles.UserDetailForm__Alert}--success`}>
+        <div className={`${styles.UserDetailForm__Alert} ${styles['UserDetailForm__Alert--success']}`}>
           <Text as="p" size="xs">
             {passwordSuccess}
+          </Text>
+        </div>
+      )}
+
+      {passwordError && (
+        <div className={`${styles.UserDetailForm__Alert} ${styles['UserDetailForm__Alert--error']}`}>
+          <Text as="p" size="xs">
+            {passwordError}
           </Text>
         </div>
       )}
@@ -136,6 +161,8 @@ export const UserDetailForm = ({
               size="xs"
               variant="createSale"
               options={documentTypeOptions}
+              value={user.persona?.tipoDocumento || "DNI"}
+              onChange={(value) => handlePersonaChange('tipoDocumento', value)}
               disabled={!isEdit}
               placeholder="Seleccionar"
             />
@@ -286,91 +313,23 @@ export const UserDetailForm = ({
         </div>
         
         <div className={styles.UserDetailForm__PasswordSection}>
-          {!showPasswordChange ? (
-            <div>
-              <Button
-                variant="secondary"
-                size="medium"
-                onClick={() => setShowPasswordChange(true)}
-                className={styles.UserDetailForm__PasswordButton}
-              >
-                Cambiar contraseña
-              </Button>
-              <Text as="p" size="xs" color="neutral-secondary">
-                Te enviamos un enlace para cambiar contraseña.
-              </Text>
-            </div>
-          ) : (
-            <div className={styles.UserDetailForm__PasswordForm}>
-              {passwordError && (
-                <div className={`${styles.UserDetailForm__Alert} ${styles.UserDetailForm__Alert}--error`}>
-                  <Text as="p" size="xs">
-                    {passwordError}
-                  </Text>
-                </div>
-              )}
-              
-              <div className={styles.UserDetailForm__FormField}>
-                <Text size="xs" color="neutral-primary">
-                  Contraseña actual
-                </Text>
-                <Input
-                  type="password"
-                  size="xs"
-                  variant="createSale"
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                />
-              </div>
-              
-              <div className={styles.UserDetailForm__FormField}>
-                <Text size="xs" color="neutral-primary">
-                  Nueva contraseña
-                </Text>
-                <Input
-                  type="password"
-                  size="xs"
-                  variant="createSale"
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                />
-              </div>
-              
-              <div className={styles.UserDetailForm__FormField}>
-                <Text size="xs" color="neutral-primary">
-                  Confirmar nueva contraseña
-                </Text>
-                <Input
-                  type="password"
-                  size="xs"
-                  variant="createSale"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                />
-              </div>
-              
-              <div className={styles.UserDetailForm__ButtonGroup}>
-                <Button
-                  variant="secondary"
-                  size="medium"
-                  onClick={() => {
-                    setShowPasswordChange(false);
-                    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                    setPasswordError('');
-                  }}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  disabled={loading}
-                  size="medium"
-                  onClick={handlePasswordChange}
-                >
-                  Cambiar contraseña
-                </Button>
-              </div>
-            </div>
-          )}
+          <div>
+            <Button
+              type="button"
+              variant="secondary"
+              size="medium"
+              onClick={handlePasswordChange}
+              disabled={passwordLoading}
+              className={styles.UserDetailForm__PasswordButton}
+            >
+              {passwordLoading ? 'Enviando correo...' : 'Cambiar contraseña'}
+            </Button>
+            
+
+            <Text as="p" size="xs" color="neutral-secondary">
+              Te enviamos un enlace para cambiar contraseña.
+            </Text>
+          </div>
         </div>
       </div>
 
@@ -394,6 +353,8 @@ export const UserDetailForm = ({
           </Button>
         )}
       </div>
+      
+      {passwordLoading && <Loader text="Enviando correo de recuperación..." />}
     </div>
   );
 };

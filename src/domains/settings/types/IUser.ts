@@ -20,6 +20,7 @@ export interface Persona {
   fechaNacimiento: Date;
   telefono: string;
   dni: string;
+  tipoDocumento?: string;
   direccion?: string;
 }
 
@@ -58,6 +59,8 @@ export type CreateUserPayload = {
     fechaNacimiento: Date;
     telefono: string;
     dni: string;
+    tipoDocumento?: string;
+    direccion?: string;
   };
 };
 
