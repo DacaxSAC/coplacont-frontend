@@ -123,7 +123,7 @@ export const MainPage: React.FC = () => {
 
   const fetchProducts = () => {
     setLoading(true);
-    ProductService.getAll(true)
+    ProductService.getAll()
       .then((res: Product[]) => {
         console.log("Productos cargados:", res);
         setProducts(res);

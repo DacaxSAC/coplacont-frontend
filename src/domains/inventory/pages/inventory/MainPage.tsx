@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './MainPage.module.scss';
-import { PageLayout, Button, Table, Text, ComboBox, Modal, Loader } from "@/components";
+import { PageLayout, Button, Table, Text, ComboBox, Modal, Loader, Input } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
+import { InventoryLotService } from "../../services/InventoryLotService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
 import { MAIN_ROUTES, INVENTORY_ROUTES } from "@/router";
 import type { InventoryItem } from "../../services/types";
@@ -20,6 +21,8 @@ export const MainPage: React.FC = () => {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [selectedStock, setSelectedStock] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -43,7 +46,7 @@ export const MainPage: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await ProductService.getAll(true);
+      const response = await ProductService.getAll();
       setProducts(response);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -52,7 +55,7 @@ export const MainPage: React.FC = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const response = await WarehouseService.getAll(true);
+      const response = await WarehouseService.getAll();
       setWarehouses(response);
     } catch (error) {
       console.error("Error fetching warehouses:", error);
@@ -148,6 +151,8 @@ export const MainPage: React.FC = () => {
     setIsModalOpen(false);
     setSelectedProduct("");
     setSelectedWarehouse("");
+    setSelectedStock("");
+    setSelectedPrice("");
     setError("");
   };
 
@@ -161,15 +166,31 @@ export const MainPage: React.FC = () => {
       setLoading(true);
       setError("");
       
-      // Crear el payload con stockActual en 0
+      const stockValue = selectedStock ? parseInt(selectedStock) : 0;
+      const priceValue = selectedPrice ? parseFloat(selectedPrice) : 0;
+      
+      // Crear el payload con stockActual inicial
       const payload = {
         idAlmacen: parseInt(selectedWarehouse),
         idProducto: parseInt(selectedProduct),
-        stockActual: 0
+        stockActual: stockValue
       };
       
       // Llamar al servicio para crear el inventario
-      await InventoryService.createInventory(payload);
+      const inventoryResponse = await InventoryService.createInventory(payload);
+      
+      // Si hay stock inicial, crear un lote con el precio
+      if (stockValue > 0 && priceValue > 0) {
+        const lotPayload = {
+          idInventario: parseInt(inventoryResponse.id),
+          fechaIngreso: new Date().toISOString().split('T')[0],
+          cantidadInicial: stockValue,
+          cantidadActual: stockValue,
+          costoUnitario: priceValue,
+        };
+        
+        await InventoryLotService.createInventoryLot(lotPayload);
+      }
       
       // Cerrar modal y refrescar inventario
       handleCloseModal();
@@ -256,6 +277,30 @@ export const MainPage: React.FC = () => {
               onChange={(v) => setSelectedProduct(v as string)}
               placeholder="Seleccionar"
             />
+          </div>
+          
+          <div>
+            <Text size="xs" color="neutral-primary">
+              Stock Inicial
+            </Text>
+            <Input
+               type="number"
+               value={selectedStock}
+               onChange={(e) => setSelectedStock(e.target.value)}
+               placeholder="Ingresa el stock inicial"
+             />
+          </div>
+          
+          <div>
+            <Text size="xs" color="neutral-primary">
+              Precio
+            </Text>
+            <Input
+               type="number"
+               value={selectedPrice}
+               onChange={(e) => setSelectedPrice(e.target.value)}
+               placeholder="Ingresa el precio unitario"
+             />
           </div>
           
 
