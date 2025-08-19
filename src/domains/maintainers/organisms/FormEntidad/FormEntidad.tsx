@@ -172,7 +172,7 @@ export const FormEntidad = ({
 
       {/* Direccion */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">Direccion</Text>
+        <Text size="xs" color="neutral-primary">Direccion (opcional)</Text>
         <Input
           size="xs"
           variant="createSale"
@@ -193,7 +193,7 @@ export const FormEntidad = ({
 
       {/* Telefono */}
       <div className={styles.FormEntidad__FormField}>
-        <Text size="xs" color="neutral-primary">Telefono</Text>
+        <Text size="xs" color="neutral-primary">Telefono (opcional)</Text>
         <Input
           size="xs"
           variant="createSale"

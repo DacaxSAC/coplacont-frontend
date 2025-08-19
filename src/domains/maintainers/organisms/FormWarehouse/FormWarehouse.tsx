@@ -130,7 +130,7 @@ export const FormWarehouse = ({
       {/* Telefono */}
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
-          Telefono
+          Telefono (Opcional)
         </Text>
         <Input
           size="xs"
@@ -159,7 +159,7 @@ export const FormWarehouse = ({
       {/* Telefono */}
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
-          Descripción
+          Descripción (Opcional)
         </Text>
         <Input
           size="xs"

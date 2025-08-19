@@ -10,6 +10,7 @@ import {
   Button,
   CloseIcon,
   Loader,
+  Modal,
 } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
@@ -20,7 +21,8 @@ import {
 } from "@/domains/maintainers/services";
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
-import type { Entidad } from "@/domains/maintainers/services/entitiesService";
+import type { Entidad, EntidadParcial } from "@/domains/maintainers/services/entitiesService";
+import { FormEntidad } from "@/domains/maintainers/organisms/FormEntidad/FormEntidad";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import { TipoComprobanteEnum, MonedaEnum } from "./enums";
 import type {
@@ -101,6 +103,22 @@ export const CreateSaleForm = () => {
         [field]: String(value),
       }));
     };
+
+  /**
+   * Maneja los cambios específicos en el ComboBox de cliente
+   * Captura el texto ingresado para poder precargarlo en el formulario de nueva entidad
+   */
+  const handleClientComboBoxChange = (value: string | number) => {
+    setFormState((prev) => ({
+      ...prev,
+      cliente: String(value),
+    }));
+    
+    // Si se selecciona un cliente, limpiar el texto de búsqueda
+    if (value) {
+      setClientSearchText("");
+    }
+  };
 
   const handleTipoComprobanteChange = (value: string | number) => {
     const tipoComprobanteValue = String(value) as TipoComprobanteType;
@@ -526,6 +544,26 @@ export const CreateSaleForm = () => {
   console.log(warehouses);
   const [inventarioProductos, setInventarioProductos] = useState<any[]>([]);
   const [almacenSeleccionado, setAlmacenSeleccionado] = useState<string>("");
+  
+  // Estados para el modal de nuevo cliente
+  const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
+  const [newClientData, setNewClientData] = useState<EntidadParcial>({
+    esProveedor: false,
+    esCliente: true,
+    tipo: "NATURAL",
+    numeroDocumento: "",
+    nombre: "",
+    apellidoMaterno: "",
+    apellidoPaterno: "",
+    razonSocial: "",
+    direccion: "",
+    telefono: "",
+  });
+  const [newClientError, setNewClientError] = useState("");
+  const [newClientLoading, setNewClientLoading] = useState(false);
+  
+  // Estado para rastrear el texto ingresado en el ComboBox de cliente
+  const [clientSearchText, setClientSearchText] = useState("");
 
   useEffect(() => {
     EntitiesService.getClients().then((data) => {
@@ -632,6 +670,99 @@ export const CreateSaleForm = () => {
     return selectedClient ? selectedClient.id : null;
   };
 
+  /**
+   * Determina si se debe mostrar el botón "Agregar nuevo cliente"
+   * Se muestra cuando el tipo de comprobante está seleccionado pero no hay cliente seleccionado
+   */
+  const shouldShowAddClientButton = (): boolean => {
+    return isClienteEnabled() && !formState.cliente;
+  };
+
+  /**
+   * Obtiene el texto ingresado en el ComboBox de cliente para precargarlo en el formulario
+   */
+  const getClientSearchText = (): string => {
+    // Si hay un valor seleccionado, no hay texto libre
+    if (formState.cliente) return "";
+    
+    // Retornar el texto de búsqueda capturado
+    return clientSearchText;
+  };
+
+  /**
+   * Abre el modal para agregar un nuevo cliente
+   * Configura el tipo de entidad según el tipo de comprobante seleccionado
+   * Precarga el número de documento si se ingresó texto en el ComboBox
+   */
+  const handleOpenNewClientModal = () => {
+    const tipoEntidad = formState.tipoComprobante === TipoComprobanteEnum.FACTURA ? "JURIDICA" : "NATURAL";
+    const numeroDocumentoIngresado = getClientSearchText();
+    
+    setNewClientData({
+      esProveedor: false,
+      esCliente: true,
+      tipo: tipoEntidad,
+      numeroDocumento: numeroDocumentoIngresado,
+      nombre: "",
+      apellidoMaterno: "",
+      apellidoPaterno: "",
+      razonSocial: "",
+      direccion: "",
+      telefono: "",
+    });
+    setNewClientError("");
+    setIsNewClientModalOpen(true);
+  };
+
+  /**
+   * Cierra el modal de nuevo cliente
+   */
+  const handleCloseNewClientModal = () => {
+    setIsNewClientModalOpen(false);
+    setNewClientError("");
+  };
+
+  /**
+   * Maneja los cambios en el formulario de nuevo cliente
+   */
+  const handleNewClientChange = (field: keyof Entidad, value: string | number | boolean) => {
+    setNewClientData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  /**
+   * Crea un nuevo cliente y lo selecciona automáticamente
+   */
+  const handleCreateNewClient = async () => {
+    try {
+      setNewClientLoading(true);
+      const response = await EntitiesService.postEntidad(newClientData);
+      
+      if (response.success && response.data) {
+        // Actualizar la lista de clientes
+        const updatedClients = await EntitiesService.getClients();
+        setClients(updatedClients);
+        
+        // Seleccionar automáticamente el nuevo cliente
+        setFormState(prev => ({
+          ...prev,
+          cliente: response.data!.id.toString()
+        }));
+        
+        // Cerrar el modal
+        handleCloseNewClientModal();
+      } else {
+        setNewClientError(response.message);
+      }
+    } catch (error) {
+      setNewClientError("Error al crear el cliente");
+    } finally {
+      setNewClientLoading(false);
+    }
+  };
+
   return (
     <div className={styles.CreateSaleForm}>
       <Text size="xl" color="neutral-primary">
@@ -685,10 +816,20 @@ export const CreateSaleForm = () => {
               variant="createSale"
               name="cliente"
               value={formState.cliente}
-              onChange={handleComboBoxChange("cliente")}
+              onChange={handleClientComboBoxChange}
+              onFilterTextChange={setClientSearchText}
               disabled={!isClienteEnabled()} // Habilitado solo para FACTURA o BOLETA
             />
           </div>
+          {shouldShowAddClientButton() && (
+            <Button 
+              size="tableItemSize" 
+              variant="tableItemStyle"
+              onClick={handleOpenNewClientModal}
+            >
+              Agregar nuevo cliente
+            </Button>
+          )}
         </div>
 
         {/** Fila 2: Fecha de emisión, Moneda y Tipo de cambio */}
@@ -1021,6 +1162,23 @@ export const CreateSaleForm = () => {
           Aceptar y nueva venta
         </Button>
       </div>
+
+      {/* Modal para agregar nuevo cliente */}
+       <Modal
+         isOpen={isNewClientModalOpen}
+         onClose={handleCloseNewClientModal}
+         title="Agregar Nuevo Cliente"
+       >
+        <FormEntidad
+          entidad={newClientData}
+          error={newClientError}
+          setError={setNewClientError}
+          loading={newClientLoading}
+          setLoading={setNewClientLoading}
+          onChange={handleNewClientChange}
+          onSubmit={handleCreateNewClient}
+        />
+      </Modal>
     </div>
   );
 };

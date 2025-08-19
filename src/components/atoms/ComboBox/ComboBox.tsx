@@ -61,6 +61,8 @@ export interface ComboBoxProps {
   value?: string | number;
   /** Función que se ejecuta cuando cambia la selección */
   onChange?: (value: string | number) => void;
+  /** Función que se ejecuta cuando cambia el texto de filtro */
+  onFilterTextChange?: (text: string) => void;
   /** Texto placeholder cuando no hay selección */
   placeholder?: string;
   /** Si el componente está deshabilitado */
@@ -85,6 +87,7 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
   options = [],
   value,
   onChange,
+  onFilterTextChange,
   placeholder = '',
   disabled = false,
   error = false,
@@ -181,6 +184,7 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setFilterText(text);
+    onFilterTextChange?.(text);
     if (!isOpen) {
       setIsOpen(true);
     }

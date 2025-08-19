@@ -2,16 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreatePurchaseForm.module.scss";
 
-import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader } from "@/components";
+import { Text, Input, ComboBox, Divider, Button, CloseIcon, Loader, Modal } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import { ProductService, WarehouseService } from "@/domains/maintainers/services";
 import { InventoryService } from "@/domains/inventory/services/InventoryService";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
-import type { Entidad } from "@/domains/maintainers/services/entitiesService";
+import type { Entidad, EntidadParcial } from "@/domains/maintainers/services/entitiesService";
 import type { Transaction } from "../../services/types";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
+import { FormEntidad } from "@/domains/maintainers/organisms/FormEntidad/FormEntidad";
 
 const TipoCompraEnum = {
   CONTADO: "contado",
@@ -163,6 +164,59 @@ export const CreatePurchaseForm = () => {
   // Estado para compras registradas (para comprobante afecto)
   const [comprasRegistradas, setComprasRegistradas] = useState<Transaction[]>([]);
 
+  // Estados para modal de nuevo proveedor
+  const [showNewProviderModal, setShowNewProviderModal] = useState(false);
+  const [providerSearchText, setProviderSearchText] = useState<string>("");
+  const [newProviderEntity, setNewProviderEntity] = useState<Partial<Entidad>>({});
+  const [newProviderError, setNewProviderError] = useState<string>("");
+  const [newProviderLoading, setNewProviderLoading] = useState(false);
+
+  // Estado para costos adicionales
+  const [costosAdicionales, setCostosAdicionales] = useState<string>("");
+
+  /**
+   * Distribuye los costos adicionales entre todos los items del detalle
+   * El costo adicional se divide entre la cantidad total de unidades
+   * @param items - Array de items del detalle de compra
+   * @param costoAdicional - Monto total a distribuir
+   * @returns Array de items con precios unitarios actualizados
+   */
+  const distribuirCostosAdicionales = (items: DetalleCompraItem[], costoAdicional: number): DetalleCompraItem[] => {
+    if (costoAdicional <= 0 || items.length === 0) {
+      return items;
+    }
+
+    // Calcular la cantidad total de todos los items
+    const cantidadTotal = items.reduce((total, item) => total + item.cantidad, 0);
+    
+    if (cantidadTotal === 0) {
+      return items;
+    }
+
+    // Calcular el costo adicional por unidad (dividir el total entre todas las unidades)
+    const costoAdicionalPorUnidad = costoAdicional / cantidadTotal;
+
+    // Aplicar el mismo costo adicional por unidad a todos los items
+    return items.map(item => {
+      const nuevoPrecioUnitario = item.precioUnitario + costoAdicionalPorUnidad;
+      
+      // Recalcular todos los valores basados en el nuevo precio unitario
+      const subtotal = item.cantidad * nuevoPrecioUnitario;
+      const baseGravado = subtotal / 1.18; // Asumiendo IGV del 18%
+      const igv = subtotal - baseGravado;
+      const total = subtotal;
+      
+      return {
+        ...item,
+        precioUnitario: nuevoPrecioUnitario,
+        subtotal,
+        baseGravado,
+        igv,
+        total
+      };
+    });
+  };
+
   // Obtener el correlativo al montar el componente
   useEffect(() => {
     const fetchCorrelativo = async () => {
@@ -293,6 +347,90 @@ export const CreatePurchaseForm = () => {
         [field]: String(value),
       }));
     };
+
+  // Maneja específicamente el cambio del ComboBox de proveedor
+  const handleProviderComboBoxChange = (value: string | number) => {
+    setFormState((prev) => ({
+      ...prev,
+      proveedor: String(value),
+    }));
+    // Limpiar el texto de búsqueda cuando se selecciona un proveedor
+    if (value) {
+      setProviderSearchText("");
+    }
+  };
+
+  // Función para obtener el texto de búsqueda del proveedor
+  const getProviderSearchText = (): string => {
+    return providerSearchText;
+  };
+
+  // Función para abrir el modal de nuevo proveedor
+  const handleOpenNewProviderModal = () => {
+    // Determinar el tipo de entidad basado en el tipo de comprobante
+    const tipoEntidad = formState.tipoComprobante === TipoComprobanteEnum.FACTURA ? "JURIDICA" : "NATURAL";
+    
+    // Pre-cargar los datos de la nueva entidad
+    const newEntity: Partial<Entidad> = {
+      tipo: tipoEntidad as "JURIDICA" | "NATURAL",
+      numeroDocumento: getProviderSearchText(),
+      esProveedor: true,
+      esCliente: false,
+      nombre: "",
+      apellidoPaterno: "",
+      apellidoMaterno: "",
+      razonSocial: "",
+      direccion: "",
+      telefono: ""
+    };
+    
+    setNewProviderEntity(newEntity);
+    setNewProviderError("");
+    setShowNewProviderModal(true);
+  };
+
+  // Función para cerrar el modal de nuevo proveedor
+  const handleCloseNewProviderModal = () => {
+    setShowNewProviderModal(false);
+  };
+
+  // Función para crear nuevo proveedor
+  const handleCreateNewProvider = async () => {
+    try {
+      setNewProviderLoading(true);
+      setNewProviderError("");
+      
+      const response = await EntitiesService.postEntidad(newProviderEntity as EntidadParcial);
+      
+      if (response.success) {
+        // Recargar la lista de proveedores
+        const proveedoresData = await EntitiesService.getSuppliers();
+        setProveedores(proveedoresData);
+        
+        // Cerrar el modal primero
+        setShowNewProviderModal(false);
+        
+        // Limpiar el texto de búsqueda
+        setProviderSearchText("");
+        
+        // Usar setTimeout para asegurar que el ComboBox se actualice con las nuevas opciones
+        // antes de seleccionar el nuevo proveedor
+        setTimeout(() => {
+          setFormState(prev => ({
+            ...prev,
+            proveedor: response.data!.id.toString()
+          }));
+        }, 100);
+      } else {
+        setNewProviderError(response.message || "Error al crear el proveedor");
+      }
+    } catch (error) {
+      console.error("Error al crear proveedor:", error);
+      setNewProviderError("Error al crear el proveedor");
+    } finally {
+      setNewProviderLoading(false);
+    }
+  };
 
   // Maneja específicamente el cambio de tipo de comprobante
   const handleTipoComprobanteChange = (value: string | number) => {
@@ -584,7 +722,14 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      const detallesAPI = detalleCompra.map((item) => ({
+      
+      // Aplicar costos adicionales si existen
+      let detalleConCostosAdicionales = [...detalleCompra];
+      if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
+        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+      }
+      
+      const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -633,7 +778,14 @@ export const CreatePurchaseForm = () => {
 
     try {
       setIsLoading(true);
-      const detallesAPI = detalleCompra.map((item) => ({
+      
+      // Aplicar costos adicionales si existen
+      let detalleConCostosAdicionales = [...detalleCompra];
+      if (costosAdicionales && parseFloat(costosAdicionales) > 0) {
+        detalleConCostosAdicionales = distribuirCostosAdicionales(detalleCompra, parseFloat(costosAdicionales));
+      }
+      
+      const detallesAPI = detalleConCostosAdicionales.map((item) => ({
         cantidad: item.cantidad,
         unidadMedida: item.unidadMedida.toUpperCase(),
         precioUnitario: item.precioUnitario,
@@ -803,10 +955,20 @@ export const CreatePurchaseForm = () => {
               variant="createSale"
               name="proveedor"
               value={formState.proveedor}
-              onChange={handleComboBoxChange("proveedor")}
+              onChange={handleProviderComboBoxChange}
+              onFilterTextChange={setProviderSearchText}
               disabled={!formState.tipoComprobante}
             />
           </div>
+          {providerSearchText || !formState.proveedor && (
+            <Button 
+              size="tableItemSize" 
+              variant="tableItemStyle"
+              onClick={handleOpenNewProviderModal}
+            >
+              Agregar nuevo proveedor
+            </Button>
+          )}
         </div>
 
         {/** Fila 4: Fecha de emisión, Moneda y Tipo de cambio */}
@@ -874,10 +1036,6 @@ export const CreatePurchaseForm = () => {
               onChange={handleComboBoxChange("tipoCompra")}
             />
           </div>
-        </div>
-
-        {/** Fila 5: Serie, Número y Fecha de vencimiento */}
-        <div className={styles.CreatePurchaseForm__FormRow}>
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--half"]}`}
           >
@@ -893,6 +1051,11 @@ export const CreatePurchaseForm = () => {
               onChange={handleComboBoxChange("tipoProductoCompra")}
             />
           </div>
+        </div>
+
+        {/** Fila 5: Serie, Número y Fecha de vencimiento */}
+        <div className={styles.CreatePurchaseForm__FormRow}>
+          
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
           >
@@ -935,6 +1098,21 @@ export const CreatePurchaseForm = () => {
               onChange={handleInputChange("fechaVencimiento")}
             />
           </div>
+           <div
+              className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--third"]}`}
+            >
+              <Text size="xs" color="neutral-primary">
+                Costos adicionales S/. (opcional)
+              </Text>
+              <Input
+                type="number"
+                size="xs"
+                variant="createSale"
+                value={costosAdicionales}
+                onChange={(e) => setCostosAdicionales(e.target.value)}
+                placeholder="0.00"
+              />
+            </div>
         </div>
       </div>
 
@@ -1058,6 +1236,15 @@ export const CreatePurchaseForm = () => {
                 gridTemplate="2.5fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1fr"
               />
               
+              {/* Mensaje informativo sobre costos adicionales */}
+              {costosAdicionales && parseFloat(costosAdicionales) > 0 && (
+                <div style={{ marginTop: '8px', marginBottom: '8px', padding: '8px', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #e9ecef' }}>
+                  <Text size="xs" color="neutral-secondary">
+                    A cada producto se le añadirá S/ {(parseFloat(costosAdicionales) / detalleCompra.reduce((sum, item) => sum + item.cantidad, 0)).toFixed(2)} por concepto de costos adicionales
+                  </Text>
+                </div>
+              )}
+              
               {/* Totales */}
               <div className={styles.CreatePurchaseForm__Totals}>
                 <div className={styles.CreatePurchaseForm__TotalsRow}>
@@ -1108,6 +1295,28 @@ export const CreatePurchaseForm = () => {
       </div>
 
       {isLoading && <Loader text="Procesando compra..." />}
+
+      {/* Modal para agregar nuevo proveedor */}
+      <Modal
+        isOpen={showNewProviderModal}
+        onClose={handleCloseNewProviderModal}
+        title="Agregar Nuevo Proveedor"
+      >
+        <FormEntidad
+          entidad={newProviderEntity as Entidad}
+          error={newProviderError}
+          setError={setNewProviderError}
+          loading={newProviderLoading}
+          setLoading={setNewProviderLoading}
+          onChange={(field, value) => {
+            setNewProviderEntity(prev => ({
+              ...prev,
+              [field]: value
+            }));
+          }}
+          onSubmit={handleCreateNewProvider}
+        />
+      </Modal>
     </div>
   );
 };

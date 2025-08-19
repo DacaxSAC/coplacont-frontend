@@ -69,6 +69,7 @@ export const FormCategory = ({
           Nombre de la categoría
         </Text>
         <Input
+          placeholder="Ingresa nombre de categoría"
           disabled={isEdit ? false : readOnly}
           size="xs"
           variant="createSale"
@@ -86,37 +87,13 @@ export const FormCategory = ({
         />
       </div>
 
-      {/* Descripcion */}
-      <div className={styles.FormCategory__FormField}>
-        <Text size="xs" color="neutral-primary">
-          Descripción
-        </Text>
-        <Input
-          size="xs"
-          variant="createSale"
-          value={
-            isCreate ? category.descripcion : categoryToUpdate.descripcion ?? ""
-          }
-          onChange={(e) => {
-            if (isEdit) {
-              setCategoryToUpdate({
-                ...categoryToUpdate,
-                descripcion: e.target.value,
-              });
-            } else {
-              onChange("descripcion", e.target.value);
-            }
-          }}
-          disabled={isEdit ? false : readOnly}
-        />
-      </div>
-
-      {/* Tipo */}
+       {/* Tipo */}
       <div className={styles.FormCategory__FormField}>
         <Text size="xs" color="neutral-primary">
           Tipo de categoría
         </Text>
         <ComboBox
+        placeholder="Selecciona tipo de categoría"
           size="xs"
           variant="createSale"
           value={
@@ -139,6 +116,34 @@ export const FormCategory = ({
           disabled={isEdit ? false : readOnly}
         />
       </div>
+
+      {/* Descripcion */}
+      <div className={styles.FormCategory__FormField}>
+        <Text size="xs" color="neutral-primary">
+          Descripción (opcional)
+        </Text>
+        <Input
+          placeholder="Ingresa descripción"
+          size="xs"
+          variant="createSale"
+          value={
+            isCreate ? category.descripcion : categoryToUpdate.descripcion ?? ""
+          }
+          onChange={(e) => {
+            if (isEdit) {
+              setCategoryToUpdate({
+                ...categoryToUpdate,
+                descripcion: e.target.value,
+              });
+            } else {
+              onChange("descripcion", e.target.value);
+            }
+          }}
+          disabled={isEdit ? false : readOnly}
+        />
+      </div>
+
+     
 
       {!readOnly || isEdit ? (
         <Button

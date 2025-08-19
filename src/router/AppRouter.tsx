@@ -15,6 +15,7 @@ import {
 } from '@/domains';
 import { AUTH_ROUTES, MAIN_ROUTES } from '@/router';
 import { MaintainersRouter } from '@/domains/maintainers';
+import { Dashboard } from '@/pages';
 
 /**
  * Componente principal de enrutamiento de la aplicación
@@ -35,6 +36,10 @@ export const AppRouter: React.FC = () => {
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
         <Route path={MAIN_ROUTES.HOME} element={<MainLayout />}>
+          {/* Ruta del Dashboard - página de inicio */}
+          <Route index element={<Dashboard />} />
+          
+          {/* Rutas de módulos */}
           <Route path={`${MAIN_ROUTES.MAINTAINERS}/*`} element={<MaintainersRouter />} />
           <Route path={`${MAIN_ROUTES.TRANSACTIONS}/*`} element={<TransactionsRouter />} />
           <Route path={`${MAIN_ROUTES.INVENTORY}/*`} element={<InventoryRouter />} />
