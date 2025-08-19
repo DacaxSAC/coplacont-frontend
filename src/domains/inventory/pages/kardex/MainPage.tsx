@@ -366,7 +366,19 @@ export const MainPage: React.FC = () => {
     return tableRows;
   };
 
-  const rows = generateTableRows();
+    const rows = kardexData.map((item) => ({
+    id: item.nComprobante,
+    cells: [
+      item.fecha,
+      <MovimientoTag movimiento={item.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
+      item.tComprob,
+      item.nComprobante,
+      formatNumber(item.cantidad),
+      formatNumber(item.costoUnitario),
+      formatNumber(item.costoTotal),
+      formatNumber(item.saldo),
+    ],
+  }));
 
   const reporterHeaders = [
     "Existencias finales",
