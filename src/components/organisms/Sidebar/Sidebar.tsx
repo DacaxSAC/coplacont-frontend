@@ -116,15 +116,19 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         {/* Dashboard - Página de inicio */}
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
-            <Link
-              to={MAIN_ROUTES.HOME}
-              className={`${styles.sectionTitle__title} ${isActiveLink(MAIN_ROUTES.HOME) ? styles.active : ''}`}
-              style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
-              <GoHomeFill />
-              Panel de control
-            </Link>
+            <GoHomeFill style={{color:'black'}}/>
+            <h3 className={styles.sectionTitle__title}>Panel de control</h3>
           </div>
+          <ul className={styles.menuList}>
+            <li>
+              <Link
+                to={MAIN_ROUTES.HOME}
+                className={isActiveLink(MAIN_ROUTES.HOME) ? styles.active : ''}
+              >
+                Panel de control
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <div className={styles.section}>
