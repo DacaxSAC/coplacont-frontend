@@ -1,10 +1,10 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
+import { ThemeContext } from "./ThemeContext";
 
-export const ThemeContext = createContext({
-  theme: "light",
-  toggleTheme: () => {}
-});
-
+/**
+ * Proveedor del contexto del tema
+ * Maneja el estado del tema y su persistencia en localStorage
+ */
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 

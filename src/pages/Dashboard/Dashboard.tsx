@@ -15,7 +15,7 @@ export const Dashboard: React.FC = () => {
 
   // Construir el nombre completo del usuario
   const userName = user?.persona 
-    ? `${user.persona.primerNombre} ${user.persona.primerApellido}`
+    ? user.persona.nombreEmpresa
     : user?.email || 'Usuario';
 
   /**

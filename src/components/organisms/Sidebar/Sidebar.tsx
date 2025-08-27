@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
 
   // Construir el nombre completo del usuario
   const userName = user?.persona 
-    ? `${user.persona.primerNombre} ${user.persona.primerApellido}`
+    ? user.persona.nombreEmpresa
     : user?.email || 'Usuario';
 
   // Obtener el rol principal del usuario con nombre descriptivo

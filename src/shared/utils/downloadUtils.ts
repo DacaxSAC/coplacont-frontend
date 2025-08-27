@@ -25,7 +25,7 @@ export const downloadFile = (blob: Blob, filename: string): void => {
 /**
  * Convierte datos a formato CSV
  */
-export const arrayToCSV = (data: Record<string, any>[]): string => {
+export const arrayToCSV = (data: Record<string, unknown>[]): string => {
   if (data.length === 0) return '';
   
   const headers = Object.keys(data[0]);
@@ -81,11 +81,11 @@ export const downloadExcelTemplate = (
 /**
  * Genera datos de ejemplo para plantillas
  */
-export const generateExampleData = (columns: ExcelColumn[], count: number = 1): Record<string, any>[] => {
+export const generateExampleData = (columns: ExcelColumn[], count: number = 1): Record<string, unknown>[] => {
   return Array.from({ length: count }, () => 
     columns.reduce((acc, col) => {
       acc[col.key] = col.example || '';
       return acc;
-    }, {} as Record<string, any>)
+    }, {} as Record<string, unknown>)
   );
 };

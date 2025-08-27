@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import styles from "./ThemeToggle.module.scss";
-import { ThemeContext } from "@/shared/context/ThemeProvider";
+import { ThemeContext } from "@/shared/context/ThemeContext";
 import { Logo } from "@/components";
 
 export const ThemeToggle = () => {

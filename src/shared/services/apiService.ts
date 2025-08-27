@@ -84,21 +84,26 @@ apiClient.interceptors.response.use(
 /**
  * Función helper para manejar errores de la API
  */
-export const handleApiError = (error: any): IApiError => {
-  if (error.response) {
+export const handleApiError = (error: unknown): IApiError => {
+  // Type guard para verificar si es un error de axios
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as { response: { data?: { message?: string; errors?: Record<string, string[]> }; status: number } };
     return {
-      message: error.response.data?.message || 'Error en el servidor',
-      status: error.response.status,
-      errors: error.response.data?.errors,
+      message: axiosError.response.data?.message || 'Error en el servidor',
+      status: axiosError.response.status,
+      errors: axiosError.response.data?.errors,
     };
-  } else if (error.request) {
+  } else if (error && typeof error === 'object' && 'request' in error) {
     return {
       message: 'No se pudo conectar con el servidor',
       status: 0,
     };
   } else {
+    const errorMessage = error && typeof error === 'object' && 'message' in error 
+      ? (error as { message: string }).message 
+      : 'Error inesperado';
     return {
-      message: error.message || 'Error inesperado',
+      message: errorMessage,
       status: 0,
     };
   }

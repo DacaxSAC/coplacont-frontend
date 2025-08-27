@@ -47,10 +47,12 @@ export const LoginPage: React.FC = () => {
         hasJwt: !!response.jwt,
         hasPersona: !!response.persona,
         hasRoles: !!response.roles,
-        message: response.message
+        message: response.message,
+        fullResponse: response
       });
 
-      if (response.success && response.email && response.jwt && response.persona && response.roles) {
+
+      if (response.success && response.email && response.jwt && response.roles) {
         console.log('Login exitoso, llamando a función login del contexto');
         // Usar el contexto para manejar el login
         login(response.email, response.jwt, response.persona, response.roles);

@@ -13,18 +13,18 @@ export interface ILoginRequest {
 }
 
 /**
- * Información de la persona del usuario
+ * Información de la empresa/persona jurídica del usuario
  */
 export interface IPersona {
   id: number;
-  primerNombre: string;
-  segundoNombre: string;
-  primerApellido: string;
-  segundoApellido: string;
-  fechaNacimiento: string;
-  telefono: string;
-  dni: string;
-  createdAt: string | null;
+  nombreEmpresa: string;
+  ruc: string;
+  razonSocial?: string;
+  telefono?: string;
+  direccion?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  habilitado: boolean;
 }
 
 /**

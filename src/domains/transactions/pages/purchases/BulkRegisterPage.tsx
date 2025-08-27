@@ -3,9 +3,23 @@ import { PageLayout, Button, Table  } from '@/components';
 import styles from './HomePurchasePage.module.scss';
 import { type TableRow } from '@/components/organisms/Table';
 
+/**
+ * Interfaz para las transacciones de compra
+ */
+interface Transaction {
+  id: number;
+  correlativo: string;
+  fecha: string;
+  comprobante: string;
+  serie: string;
+  numero: string;
+  total: string;
+  status?: string;
+}
+
 export const BulkRegisterPage: React.FC = () => {
   // Datos de ejemplo para simular las ventas/compras cargadas
-  const [transactions, setTransactions] = useState<any[]>([
+  const [transactions, setTransactions] = useState<Transaction[]>([
     { id: 1, correlativo: 'XXXXXXXXXXXXX', fecha: 'XXXXXXX', comprobante: 'XXXXXXXXXXXXXX', serie: 'XXXXXXXX', numero: 'XXXXXXXX', total: 'XXXXX' },
     { id: 2, correlativo: 'XXXXX XXXXXXXXX', fecha: 'XXXXXXX', comprobante: 'XXXXX@XXXXXX.XXX', serie: 'XX-XX-XXXX', numero: 'XXXXXXXX', total: 'XXXXX' },
     { id: 3, correlativo: 'XXXXX XXXXXXXXX', fecha: 'XXXXXXX', comprobante: 'XXXXX@XXXXXX.XXX', serie: 'XX-XX-XXXX', numero: 'XXXXXXXX', total: 'XXXXX' },
