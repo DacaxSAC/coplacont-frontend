@@ -26,7 +26,6 @@ export const LoginPage: React.FC = () => {
    */
   const handleLogin = async (formData: ILoginFormData) => {
     try {
-      console.log('Iniciando proceso de login desde LoginPage');
       setIsLoading(true);
       setLoginError('');
       
@@ -36,13 +35,12 @@ export const LoginPage: React.FC = () => {
         contrasena: formData.password
       };
       
-      console.log('Enviando solicitud de login al backend para:', formData.email);
-      
       // Llamada al servicio de autenticación
       const response = await AuthService.login(loginRequest);
       
       console.log('Respuesta del backend recibida:', {
         success: response.success,
+        nombre: response.nombre,
         hasEmail: !!response.email,
         hasJwt: !!response.jwt,
         hasPersona: !!response.persona,
@@ -55,7 +53,7 @@ export const LoginPage: React.FC = () => {
       if (response.success && response.email && response.jwt && response.roles) {
         console.log('Login exitoso, llamando a función login del contexto');
         // Usar el contexto para manejar el login
-        login(response.email, response.jwt, response.persona, response.roles);
+        login(response.nombre, response.email, response.jwt, response.persona, response.roles);
         
         console.log('Redirigiendo a página principal');
         // Redirigir a la página principal después del login exitoso

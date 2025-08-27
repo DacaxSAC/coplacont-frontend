@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
    * Función para realizar login
    * Guarda los datos en el estado y en localStorage
    */
-  const login = (email: string, jwt: string, persona: IPersona, roles: IRole[]) => {
+  const login = (nombre: string, email: string, jwt: string, persona: IPersona, roles: IRole[]) => {
     try {
       console.log('AuthProvider: Iniciando proceso de login', {
         email,
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
         userAgent: navigator.userAgent
       });
       
-      const userData: IAuthUser = { email, persona, roles };
+      const userData: IAuthUser = { nombre, email, persona, roles };
       
       // Verificar que localStorage esté disponible
       if (typeof Storage === 'undefined') {
@@ -177,17 +177,6 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
       } catch (storageError) {
         console.error('AuthProvider: Error al guardar en localStorage:', storageError);
       }
-      
-      // Verificar estado final después de un breve delay
-      setTimeout(() => {
-        console.log('AuthProvider: Estado final después del login', {
-          contextUser: user?.email,
-          contextToken: !!token,
-          contextIsAuthenticated: !!(user && token),
-          localStorageUser: localStorage.getItem('user'),
-          localStorageToken: localStorage.getItem('jwt')
-        });
-      }, 100);
       
     } catch (error) {
       console.error('AuthProvider: Error durante el login:', error);

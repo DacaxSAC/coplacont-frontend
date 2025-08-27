@@ -41,6 +41,7 @@ export interface IRole {
 export interface ILoginResponse {
   message: string;
   success: boolean;
+  nombre: string;
   email: string;
   jwt: string;
   persona: IPersona;
@@ -51,6 +52,7 @@ export interface ILoginResponse {
  * Información del usuario autenticado
  */
 export interface IAuthUser {
+  nombre: string;
   email: string;
   persona: IPersona;
   roles: IRole[];
@@ -145,7 +147,7 @@ export interface IAuthContextState {
   /** Indica si se está verificando la autenticación */
   isLoading: boolean;
   /** Función para realizar login */
-  login: (email: string, jwt: string, persona: IPersona, roles: IRole[]) => void;
+  login: (nombre: string, email: string, jwt: string, persona: IPersona, roles: IRole[]) => void;
   /** Función para realizar logout */
   logout: () => void;
 }
