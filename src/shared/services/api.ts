@@ -44,9 +44,18 @@ apiClient.interceptors.response.use(
   (error) => {
     // Manejar errores de autenticación
     if (error.response?.status === 401) {
-      // Token expirado o inválido
+      // Token expirado o inválido - limpiar todos los datos de autenticación
       localStorage.removeItem('jwt');
       localStorage.removeItem('user');
+      localStorage.removeItem('persona');
+      localStorage.removeItem('roles');
+      
+      // Limpiar también datos duplicados
+      const duplicateKeys = ['_token', 'auth_user', 'token', 'authToken'];
+      duplicateKeys.forEach(key => {
+        localStorage.removeItem(key);
+      });
+      
       // Redirigir al login si es necesario
       window.location.href = '/auth/login';
     }

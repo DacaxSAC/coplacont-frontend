@@ -13,14 +13,64 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   /**
+   * Función de debug para monitorear localStorage
+   */
+  const debugLocalStorage = (action: string) => {
+    const keys = ['jwt', 'user', 'persona', 'roles'];
+    const status = keys.map(key => ({
+      key,
+      exists: localStorage.getItem(key) !== null,
+      value: localStorage.getItem(key)?.substring(0, 50) + '...'
+    }));
+    console.log(`AuthProvider [${action}]:`, status);
+  };
+
+  /**
+   * Limpia datos duplicados o obsoletos del localStorage
+   */
+  const cleanupDuplicateData = () => {
+    try {
+      debugLocalStorage('ANTES de cleanup');
+      
+      // Solo limpiar claves duplicadas específicas, sin validaciones complejas
+      const duplicateKeys = ['_token', 'auth_user', 'token', 'authToken', 'access_token'];
+      const removed: string[] = [];
+      
+      duplicateKeys.forEach(key => {
+        try {
+          if (localStorage.getItem(key) !== null) {
+            localStorage.removeItem(key);
+            removed.push(key);
+          }
+        } catch (error) {
+          console.error(`AuthProvider: Error eliminando ${key}:`, error);
+        }
+      });
+      
+      if (removed.length > 0) {
+        console.log('AuthProvider: Claves duplicadas eliminadas:', removed);
+      }
+      
+      debugLocalStorage('DESPUÉS de cleanup');
+      
+    } catch (error) {
+      console.error('AuthProvider: Error al limpiar datos duplicados:', error);
+    }
+  };
+
+  /**
    * Verifica si hay datos de autenticación guardados al inicializar
    */
   useEffect(() => {
     const initializeAuth = () => {
       try {
+        console.log('AuthProvider: Inicializando autenticación...');
+        debugLocalStorage('INICIO de inicialización');
+        
         // Verificar si localStorage está disponible
         if (typeof Storage === 'undefined') {
           console.warn('localStorage no está disponible');
+          debugLocalStorage('localStorage NO disponible');
           setIsLoading(false);
           return;
         }
@@ -43,20 +93,30 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
           isProduction: import.meta.env.PROD
         });
 
-        if (savedToken && savedUser) {
+        if (savedToken && savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
           try {
             const parsedUser = JSON.parse(savedUser) as IAuthUser;
             
             // Si hay persona guardada por separado, la agregamos al usuario
-            if (savedPersona) {
-              const parsedPersona = JSON.parse(savedPersona) as IPersona;
-              parsedUser.persona = parsedPersona;
+            if (savedPersona && savedPersona !== 'undefined' && savedPersona !== 'null') {
+              try {
+                const parsedPersona = JSON.parse(savedPersona) as IPersona;
+                parsedUser.persona = parsedPersona;
+              } catch (personaParseError) {
+                console.error('Error al parsear persona:', personaParseError);
+                localStorage.removeItem('persona');
+              }
             }
             
             // Si hay roles guardados por separado, los agregamos al usuario
-            if (savedRoles) {
-              const parsedRoles = JSON.parse(savedRoles) as IRole[];
-              parsedUser.roles = parsedRoles;
+            if (savedRoles && savedRoles !== 'undefined' && savedRoles !== 'null') {
+              try {
+                const parsedRoles = JSON.parse(savedRoles) as IRole[];
+                parsedUser.roles = parsedRoles;
+              } catch (rolesParseError) {
+                console.error('Error al parsear roles:', rolesParseError);
+                localStorage.removeItem('roles');
+              }
             }
             
             setToken(savedToken);
@@ -92,6 +152,8 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Eliminado el efecto de focus que causaba problemas
+
   /**
    * Función para realizar login
    * Guarda los datos en el estado y en localStorage
@@ -116,6 +178,11 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
         return;
       }
       
+      debugLocalStorage('ANTES de login');
+      
+      // Limpiar datos duplicados antes de guardar
+      cleanupDuplicateData();
+      
       // Verificar estado actual antes de actualizar
       console.log('AuthProvider: Estado antes del login', {
         currentUser: user?.email,
@@ -136,6 +203,8 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('persona', JSON.stringify(persona));
         localStorage.setItem('roles', JSON.stringify(roles));
+        
+        debugLocalStorage('DESPUÉS de guardar en login');
         
         console.log('AuthProvider: Datos guardados, verificando...');
         
@@ -188,12 +257,21 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
    * Limpia el estado y el localStorage
    */
   const logout = () => {
+    debugLocalStorage('ANTES de logout');
+    
     setUser(null);
     setToken(null);
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
     localStorage.removeItem('persona');
     localStorage.removeItem('roles');
+    
+    debugLocalStorage('DESPUÉS de eliminar en logout');
+    
+    // Limpiar también cualquier dato duplicado
+    cleanupDuplicateData();
+    
+    debugLocalStorage('DESPUÉS de cleanup en logout');
   };
 
   const value: IAuthContextState = {
