@@ -1,6 +1,6 @@
 import { handleApiError } from "@/shared";
 import { transactionsApi } from "../api/transactionsApi";
-import type { RegisterSalePayload } from "./types";
+import type { RegisterSalePayload, RegisterPurchasePayload } from "./types";
 import type{ Transaction } from "./types";
 
 /**
@@ -14,6 +14,20 @@ export class TransactionsService {
    * @returns Promise con la respuesta del servidor
    */
   static async registerSale(payload: RegisterSalePayload) {
+    try {
+      const response = await transactionsApi.registerSale(payload);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Registra una nueva compra
+   * @param payload - Datos de la compra a registrar
+   * @returns Promise con la respuesta del servidor
+   */
+  static async registerPurchase(payload: RegisterPurchasePayload) {
     try {
       const response = await transactionsApi.registerSale(payload);
       return response.data;

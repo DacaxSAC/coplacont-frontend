@@ -392,23 +392,28 @@ export const CreateSaleForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
-        idInventario: item.idInventario,
+        idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const ventaData = {
-        correlativo: formState.correlativo,
+      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== '';
+      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== '';
+
+      const ventaData: any = {
         idPersona: getSelectedClientId() || 1,
         tipoOperacion: "venta",
-        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", 
         tipoComprobante: formState.tipoComprobante || "FACTURA",
-        fechaEmision: formState.fechaEmision || "2025-08-10",
+        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD",
         tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio),
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
-        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
         detalles: detallesAPI,
       };
+
+      // Solo agregar fechaVencimiento si es válida
+      if (fechaVencimientoValida) {
+        ventaData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+      }
 
       await TransactionsService.registerSale(ventaData);
 
@@ -432,23 +437,29 @@ export const CreateSaleForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
-        idInventario: item.idInventario,
+        idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const ventaData = {
+      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== '';
+      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== '';
+
+      const ventaData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
         tipoOperacion: "venta", // Valor fijo
-        tipoProductoVenta: formState.tipoProductoVenta || "mercaderia", // Tipo de producto/venta
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
+        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
         tipoCambio: formState.moneda === "sol" ? 1 : parseFloat(formState.tipoCambio), // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
-        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
         detalles: detallesAPI,
       };
+
+      // Solo agregar fechaVencimiento si es válida
+      if (fechaVencimientoValida) {
+        ventaData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+      }
 
       await TransactionsService.registerSale(ventaData);
 

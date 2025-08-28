@@ -12,7 +12,8 @@ export const transactionsApi = {
         tipoCambio: number;
         serie: string;
         numero: string;
-        fechaVencimiento: string;
+        fechaVencimiento?: string;
+        idComprobanteAfecto?: number;
         detalles: {
             cantidad: number;
             unidadMedida: string;
@@ -22,6 +23,7 @@ export const transactionsApi = {
             isc: number;
             total: number;
             descripcion: string;
+            idInventario?: number;
         }[];
     }) => apiClient.post(TRANSACTIONS_ENDPOINTS.REGISTRAR_VENTA, payload),
     getSales: ()  => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_VENTAS),

@@ -738,26 +738,36 @@ export const CreatePurchaseForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
-        idInventario: item.idInventario,
+        idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const compraData = {
-        correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
+      // Validar y formatear fechas
+      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
+      
+      const compraData: any = {
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
         tipoOperacion: "compra", // Valor fijo
-        tipoProductoCompra: formState.tipoProductoCompra || "mercaderia", // Tipo de producto/compra
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
+        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
         tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
-        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
-        ...(formState.idComprobanteAfecto && { idComprobanteAfecto: parseInt(formState.idComprobanteAfecto) }),
         detalles: detallesAPI,
       };
 
-      await TransactionsService.registerSale(compraData);
+      // Solo agregar fechaVencimiento si es válida
+      if (fechaVencimientoValida) {
+        compraData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+      }
+
+      // Solo agregar idComprobanteAfecto si existe
+      if (formState.idComprobanteAfecto) {
+        compraData.idComprobanteAfecto = parseInt(formState.idComprobanteAfecto);
+      }
+
+      await TransactionsService.registerPurchase(compraData);
 
       navigate(`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.PURCHASES}`);
     } catch (error) {
@@ -794,26 +804,37 @@ export const CreatePurchaseForm = () => {
         isc: item.isv, // Mapear isv a isc
         total: item.total,
         descripcion: item.descripcion,
-        idInventario: item.idInventario,
+        idInventario: Number(item.idInventario) || 1, // Asegurar que sea un número válido
       }));
 
-      const compraData = {
+      // Validar y formatear fechas
+      const fechaEmisionValida = formState.fechaEmision && formState.fechaEmision.trim() !== "";
+      const fechaVencimientoValida = formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
+      
+      const compraData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
         tipoOperacion: "compra", // Valor fijo
-        tipoProductoCompra: formState.tipoProductoCompra || "mercaderia", // Tipo de producto/compra
         tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
-        fechaEmision: formState.fechaEmision || "2025-08-10", // Usar valor del form o fake
+        fechaEmision: fechaEmisionValida ? new Date(formState.fechaEmision).toISOString() : new Date().toISOString(),
         moneda: formState.moneda === "sol" ? "PEN" : "USD", // Mapear moneda
         tipoCambio: formState.moneda === "sol" ? 1 : 3.75, // Tipo de cambio fake para dólares
         serie: formState.serie || "F001", // Usar valor del form o fake
         numero: formState.numero || "1234567890", // Usar valor del form o fake
-        fechaVencimiento: formState.fechaVencimiento || "2025-08-20", // Usar valor del form o fake
-        ...(formState.idComprobanteAfecto && { idComprobanteAfecto: parseInt(formState.idComprobanteAfecto) }),
         detalles: detallesAPI,
       };
 
-      await TransactionsService.registerSale(compraData);
+      // Solo agregar fechaVencimiento si es válida
+      if (fechaVencimientoValida) {
+        compraData.fechaVencimiento = new Date(formState.fechaVencimiento).toISOString();
+      }
+
+      // Solo agregar idComprobanteAfecto si existe
+      if (formState.idComprobanteAfecto) {
+        compraData.idComprobanteAfecto = parseInt(formState.idComprobanteAfecto);
+      }
+
+      await TransactionsService.registerPurchase(compraData);
 
       setFormState({
         correlativo: "",

@@ -21,7 +21,22 @@ export interface RegisterSalePayload {
   tipoCambio: number;
   serie: string;
   numero: string;
-  fechaVencimiento: string;
+  fechaVencimiento?: string; // Opcional
+  detalles: SaleDetail[];
+}
+
+export interface RegisterPurchasePayload {
+  correlativo: string;
+  idPersona: number;
+  tipoOperacion: string;
+  tipoComprobante: string;
+  fechaEmision: string;
+  moneda: string;
+  tipoCambio: number;
+  serie: string;
+  numero: string;
+  fechaVencimiento?: string; // Opcional
+  idComprobanteAfecto?: number; // Opcional para compras
   detalles: SaleDetail[];
 }
 
