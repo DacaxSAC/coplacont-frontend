@@ -329,9 +329,9 @@ export const CreateSaleForm = () => {
           if (item.producto === productoSeleccionado) {
             const nuevaCantidad = item.cantidad + cantidad;
             const nuevoSubtotal = nuevaCantidad * precioUnitario;
-            const nuevaBaseGravada = nuevoSubtotal / 1.18;
-            const nuevoIgv = nuevoSubtotal - nuevaBaseGravada;
-            const nuevoTotal = nuevoSubtotal;
+            const nuevaBaseGravada = nuevoSubtotal; // Base gravada es igual al subtotal (precio sin IGV)
+            const nuevoIgv = nuevoSubtotal * 0.18; // IGV como 18% directo del subtotal
+            const nuevoTotal = nuevoSubtotal + nuevoIgv; // Total incluye IGV
 
             return {
               ...item,
@@ -348,10 +348,10 @@ export const CreateSaleForm = () => {
     } else {
       // Si el producto no existe, agregarlo como nuevo
       const subtotal = cantidad * precioUnitario;
-      const baseGravado = subtotal / 1.18; // Base gravada (sin IGV)
-      const igv = subtotal - baseGravado; // IGV (18%)
+      const baseGravado = subtotal; // Base gravada es igual al subtotal (precio sin IGV)
+      const igv = subtotal * 0.18; // IGV como 18% directo del subtotal
       const isv = 0; // ISV por defecto 0
-      const total = subtotal;
+      const total = subtotal + igv; // Total incluye IGV
 
       const nuevoItem: DetalleVentaItem = {
         id: Date.now().toString(), // ID único temporal
