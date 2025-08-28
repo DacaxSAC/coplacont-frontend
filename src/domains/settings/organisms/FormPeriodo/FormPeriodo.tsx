@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./FormPeriodo.module.scss";
 import { Text, Input, Button, ComboBox } from "@/components";
 import type { ConfiguracionPeriodo, CreateConfiguracionPeriodoDto } from "../../types";
@@ -46,16 +46,31 @@ export const FormPeriodo = ({
       año: 'año' in periodo ? periodo.año : new Date().getFullYear(),
       fechaInicio: periodo.fechaInicio,
       fechaFin: periodo.fechaFin,
-      idPersona: user?.persona?.id || 1, // Obtener del contexto de usuario
+      idPersona: user?.persona?.id || 0, // Obtener del contexto de usuario
       observaciones: '',
     });
 
   const [isEdit, setIsEdit] = useState(false);
 
+  // Actualizar idPersona cuando cambie el usuario
+  useEffect(() => {
+    if (user?.persona?.id) {
+      setPeriodoToUpdate(prev => ({
+        ...prev,
+        idPersona: user.persona.id
+      }));
+    }
+  }, [user?.persona?.id]);
+
   /**
    * Maneja la actualización de un periodo existente
    */
   const handleUpdatePeriodo = async () => {
+    if (!user?.persona?.id) {
+      setError("Error: Usuario no autenticado o sin empresa asignada.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");

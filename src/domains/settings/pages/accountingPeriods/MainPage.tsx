@@ -24,9 +24,11 @@ import {
   formatPeriodoLabel,
   formatEstadoPeriodo,
 } from "../../types";
+import { useAuth } from "@/domains/auth/hooks";
 import { FormPeriodo } from "../../organisms/FormPeriodo";
 
 export const MainPage: React.FC = () => {
+  const { user } = useAuth();
   const [periodos, setPeriodos] = useState<ConfiguracionPeriodo[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
@@ -38,7 +40,7 @@ export const MainPage: React.FC = () => {
     año: new Date().getFullYear(),
     fechaInicio: "",
     fechaFin: "",
-    idPersona: 1, // TODO: Obtener del contexto de usuario
+    idPersona: user?.persona?.id || 0, // Obtener del contexto de usuario
     observaciones: "",
   });
 
@@ -121,6 +123,16 @@ export const MainPage: React.FC = () => {
     fetchPeriodos();
   }, []);
 
+  // Actualizar idPersona cuando cambie el usuario
+  useEffect(() => {
+    if (user?.persona?.id) {
+      setNewPeriodo(prev => ({
+        ...prev,
+        idPersona: user.persona.id
+      }));
+    }
+  }, [user?.persona?.id]);
+
   const handleStateChange = async (id: number, currentActive: boolean) => {
     try {
       setIsLoading(true);
@@ -140,6 +152,11 @@ export const MainPage: React.FC = () => {
   };
 
   const handleCreate = async () => {
+    if (!user?.persona?.id) {
+      setError("Error: Usuario no autenticado o sin empresa asignada.");
+      return;
+    }
+
     if (!newPeriodo.año) {
       setError("El año es obligatorio.");
       return;
