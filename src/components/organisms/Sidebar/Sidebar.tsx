@@ -34,7 +34,7 @@ import { useAuth } from "@/domains/auth";
  */
 const UserRoleType = {
   ADMIN: 'ADMIN',
-  CONTADOR: 'CONTADOR'
+  EMPRESA: 'EMPRESA'
 } as const;
 
 /**
@@ -42,7 +42,7 @@ const UserRoleType = {
  */
 const ROLE_DISPLAY_NAMES: Record<string, string> = {
   [UserRoleType.ADMIN]: 'Administrador del sistema',
-  [UserRoleType.CONTADOR]: 'Contador'
+  [UserRoleType.EMPRESA]: 'Empresa'
 };
 
 interface SidebarProps {}
