@@ -577,7 +577,7 @@ export const MainPage: React.FC = () => {
               <td>${reportes.inventarioInicialCostoTotal}</td>
               <td>-</td>
             </tr>
-            ${kardexData.map((movement, index) => {
+            ${kardexData.map((movement) => {
               let html = '';
               
               if (movement.tipo === "Salida" && movement.detallesSalida && movement.detallesSalida.length > 0) {
