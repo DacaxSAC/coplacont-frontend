@@ -8,7 +8,7 @@ import {
   Text,
   Divider,
   Button,
-  MovimientoTag
+  MovimientoTag,
 } from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { ProductService } from "@/domains/maintainers/services";
@@ -16,7 +16,7 @@ import { WarehouseService } from "@/domains/maintainers/services";
 import type { KardexMovement } from "../../services/types";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import { downloadFile } from "@/shared/utils/downloadUtils";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -88,15 +88,17 @@ export const MainPage: React.FC = () => {
       if (movement.tipo === "Salida") {
         if (movement.detallesSalida && movement.detallesSalida.length > 0) {
           movement.detallesSalida.forEach((detalle) => {
-            const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
-              ? detalle.costoTotalDeLote 
-              : detalle.cantidad * detalle.costoUnitarioDeLote;
+            const calculatedDetalleCostoTotal =
+              detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
+                ? detalle.costoTotalDeLote
+                : detalle.cantidad * detalle.costoUnitarioDeLote;
             costoTotal += calculatedDetalleCostoTotal;
           });
         } else {
-          const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
-            ? movement.costoTotal 
-            : movement.cantidad * movement.costoUnitario;
+          const calculatedCostoTotal =
+            movement.costoTotal && movement.costoTotal !== 0
+              ? movement.costoTotal
+              : movement.cantidad * movement.costoUnitario;
           costoTotal += calculatedCostoTotal;
         }
       }
@@ -134,7 +136,7 @@ export const MainPage: React.FC = () => {
           kardexResponse.inventarioInicialCostoTotal
         ),
       });
-      console.log('Kardex movements:', kardexResponse.movimientos);
+      console.log("Kardex movements:", kardexResponse.movimientos);
       // Debug: revisar valores específicos de los movimientos
       kardexResponse.movimientos.forEach((mov, index) => {
         console.log(`Movimiento ${index}:`, {
@@ -143,7 +145,7 @@ export const MainPage: React.FC = () => {
           cantidad: mov.cantidad,
           costoUnitario: mov.costoUnitario,
           costoTotal: mov.costoTotal,
-          calculado: mov.cantidad * mov.costoUnitario
+          calculado: mov.cantidad * mov.costoUnitario,
         });
       });
     } catch (error) {
@@ -267,112 +269,22 @@ export const MainPage: React.FC = () => {
    * Formatea un número para mostrar en la tabla
    */
   const formatNumber = (value: number | string) => {
-    const num = typeof value === 'string' ? parseFloat(value) : value;
-    const result = isNaN(num) ? '0.00' : num.toFixed(2);
+    const num = typeof value === "string" ? parseFloat(value) : value;
+    const result = isNaN(num) ? "0.00" : num.toFixed(2);
     // Debug: logging del formateo
     if (value === 22.5 || num === 22.5) {
-      console.log('FormatNumber debug:', { input: value, num, result });
+      console.log("FormatNumber debug:", { input: value, num, result });
     }
     return result;
-  };
-
-  /**
-   * Genera las filas de la tabla expandiendo movimientos de salida con detalles
-   */
-  const generateTableRows = () => {
-    const tableRows = [];
-    let currentSaldo = parseFloat(reportes.inventarioInicialCantidad.toString());
-    let currentCostoTotal = parseFloat(reportes.inventarioInicialCostoTotal.toString());
-
-    // Fila inicial de saldo
-    tableRows.push({
-      id: "manual-header",
-      cells: [
-        "-",
-        "Saldo inicial",
-        "-",
-        "-",
-        formatNumber(reportes.inventarioInicialCantidad),
-        formatNumber(reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad),
-        formatNumber(reportes.inventarioInicialCostoTotal),
-        "-",
-      ],
-    });
-
-    kardexData.forEach((movement, index) => {
-      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
-        // Para movimientos de salida con detalles, crear una fila por cada detalle
-        movement.detallesSalida.forEach((detalle, detalleIndex) => {
-          // Calcular costoTotal del detalle si es 0 o undefined
-          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
-            ? detalle.costoTotalDeLote 
-            : detalle.cantidad * detalle.costoUnitarioDeLote;
-          
-          // Calcular nuevo saldo después de este detalle
-          currentSaldo -= detalle.cantidad;
-          currentCostoTotal -= calculatedDetalleCostoTotal;
-
-          tableRows.push({
-            id: `${index}-detalle-${detalleIndex}`,
-            cells: [
-              movement.fecha,
-              <MovimientoTag movimiento="Salida" />,
-              movement.tComprob,
-              movement.nComprobante,
-              formatNumber(detalle.cantidad),
-              formatNumber(detalle.costoUnitarioDeLote),
-              formatNumber(calculatedDetalleCostoTotal),
-              formatNumber(currentSaldo),
-            ],
-          });
-        });
-      } else {
-        // Para movimientos sin detalles (entradas o salidas simples)
-        // Calcular costoTotal si es 0 o undefined
-        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
-          ? movement.costoTotal 
-          : movement.cantidad * movement.costoUnitario;
-        
-        // Debug: mostrar el cálculo
-        console.log(`Movimiento ${movement.fecha}:`, {
-          costoTotalOriginal: movement.costoTotal,
-          cantidad: movement.cantidad,
-          costoUnitario: movement.costoUnitario,
-          calculatedCostoTotal: calculatedCostoTotal
-        });
-
-        if (movement.tipo === 'Entrada') {
-          currentSaldo += movement.cantidad;
-          currentCostoTotal += calculatedCostoTotal;
-        } else {
-          currentSaldo -= movement.cantidad;
-          currentCostoTotal -= calculatedCostoTotal;
-        }
-
-        tableRows.push({
-          id: index.toString(),
-          cells: [
-            movement.fecha,
-            <MovimientoTag movimiento={movement.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
-            movement.tComprob,
-            movement.nComprobante,
-            formatNumber(movement.cantidad),
-            formatNumber(movement.costoUnitario),
-            formatNumber(calculatedCostoTotal),
-            formatNumber(currentSaldo),
-          ],
-        });
-      }
-    });
-
-    return tableRows;
   };
 
   const rows = kardexData.map((movement) => ({
     id: movement.nComprobante,
     cells: [
       movement.fecha,
-      <MovimientoTag movimiento={movement.tipo === 'Entrada' ? 'Entrada' : 'Salida'} />,
+      <MovimientoTag
+        movimiento={movement.tipo === "Entrada" ? "Entrada" : "Salida"}
+      />,
       movement.tComprob,
       movement.nComprobante,
       formatNumber(movement.cantidad),
@@ -380,7 +292,7 @@ export const MainPage: React.FC = () => {
       formatNumber(movement.costoTotal),
       formatNumber(movement.saldo),
     ],
-  }))
+  }));
 
   const reporterHeaders = [
     "Existencias finales",
@@ -414,16 +326,21 @@ export const MainPage: React.FC = () => {
 
     // Crear contenido CSV
     const csvContent = generateKardexCSV(kardexResponse, kardexData, reportes);
-    
+
     // Agregar BOM para UTF-8 para mejor compatibilidad con Excel
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
     // Generar nombre del archivo
-    const producto = kardexResponse.producto || 'producto';
-    const almacen = kardexResponse.almacen || 'almacen';
-    const filename = `kardex_${producto.replace(/\s+/g, '_')}_${almacen.replace(/\s+/g, '_')}_${selectedYear}.csv`;
-    
+    const producto = kardexResponse.producto || "producto";
+    const almacen = kardexResponse.almacen || "almacen";
+    const filename = `kardex_${producto.replace(/\s+/g, "_")}_${almacen.replace(
+      /\s+/g,
+      "_"
+    )}_${selectedYear}.csv`;
+
     downloadFile(blob, filename);
   };
 
@@ -440,103 +357,133 @@ export const MainPage: React.FC = () => {
 
     // Crear hoja de resumen
     const summaryData = [
-      ['REPORTE DE KARDEX'],
+      ["REPORTE DE KARDEX"],
       [],
-      ['Producto:', kardexResponse.producto],
-      ['Almacén:', kardexResponse.almacen],
-      ['Año:', selectedYear],
-      ['Fecha de Generación:', new Date().toLocaleDateString()],
+      ["Producto:", kardexResponse.producto],
+      ["Almacén:", kardexResponse.almacen],
+      ["Año:", selectedYear],
+      ["Fecha de Generación:", new Date().toLocaleDateString()],
       [],
-      ['RESUMEN'],
-      ['Existencias finales', 'Costo unitario final', 'Costo total final', 'Costo de ventas total'],
-       [
-         reportes.cantidadActual.toString(),
-         reportes.costoUnitarioFinal.toString(),
-         reportes.costoTotalFinal.toString(),
-         reportes.costoVentasTotal.toString()
-       ]
+      ["RESUMEN"],
+      [
+        "Existencias finales",
+        "Costo unitario final",
+        "Costo total final",
+        "Costo de ventas total",
+      ],
+      [
+        reportes.cantidadActual.toString(),
+        reportes.costoUnitarioFinal.toString(),
+        reportes.costoTotalFinal.toString(),
+        reportes.costoVentasTotal.toString(),
+      ],
     ];
 
     const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Resumen');
+    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, "Resumen");
 
     // Crear hoja de movimientos
     const movementsData = [
-      ['MOVIMIENTOS'],
+      ["MOVIMIENTOS"],
       [],
-      ['Fecha', 'Tipo', 'Tipo de comprobante', 'Cod de comprobante', 'Cantidad', 'Costo Unitario', 'Costo Total', 'Saldo']
+      [
+        "Fecha",
+        "Tipo",
+        "Tipo de comprobante",
+        "Cod de comprobante",
+        "Cantidad",
+        "Costo Unitario",
+        "Costo Total",
+        "Saldo",
+      ],
     ];
 
     // Agregar saldo inicial
-     movementsData.push([
-       '-',
-       'Saldo inicial',
-       '-',
-       '-',
-       reportes.inventarioInicialCantidad.toString(),
-       (reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad).toString(),
-       reportes.inventarioInicialCostoTotal.toString(),
-       '-'
-     ]);
+    movementsData.push([
+      "-",
+      "Saldo inicial",
+      "-",
+      "-",
+      reportes.inventarioInicialCantidad.toString(),
+      (
+        reportes.inventarioInicialCostoTotal /
+        reportes.inventarioInicialCantidad
+      ).toString(),
+      reportes.inventarioInicialCostoTotal.toString(),
+      "-",
+    ]);
 
     // Agregar movimientos con detalles expandidos
-    let currentSaldo = parseFloat(reportes.inventarioInicialCantidad.toString());
-    let currentCostoTotal = parseFloat(reportes.inventarioInicialCostoTotal.toString());
+    let currentSaldo = parseFloat(
+      reportes.inventarioInicialCantidad.toString()
+    );
+    let currentCostoTotal = parseFloat(
+      reportes.inventarioInicialCostoTotal.toString()
+    );
 
-    kardexData.forEach(movement => {
-      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
-        movement.detallesSalida.forEach(detalle => {
-          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
-            ? detalle.costoTotalDeLote 
-            : detalle.cantidad * detalle.costoUnitarioDeLote;
-          
+    kardexData.forEach((movement) => {
+      if (
+        movement.tipo === "Salida" &&
+        movement.detallesSalida &&
+        movement.detallesSalida.length > 0
+      ) {
+        movement.detallesSalida.forEach((detalle) => {
+          const calculatedDetalleCostoTotal =
+            detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
+              ? detalle.costoTotalDeLote
+              : detalle.cantidad * detalle.costoUnitarioDeLote;
+
           currentSaldo -= detalle.cantidad;
           currentCostoTotal -= calculatedDetalleCostoTotal;
-          
+
           movementsData.push([
-             movement.fecha,
-             movement.tipo,
-             movement.tComprob,
-             movement.nComprobante,
-             detalle.cantidad.toString(),
-             detalle.costoUnitarioDeLote.toString(),
-             calculatedDetalleCostoTotal.toString(),
-             currentSaldo.toString()
-           ]);
+            movement.fecha,
+            movement.tipo,
+            movement.tComprob,
+            movement.nComprobante,
+            detalle.cantidad.toString(),
+            detalle.costoUnitarioDeLote.toString(),
+            calculatedDetalleCostoTotal.toString(),
+            currentSaldo.toString(),
+          ]);
         });
       } else {
-        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
-          ? movement.costoTotal 
-          : movement.cantidad * movement.costoUnitario;
-        
-        if (movement.tipo === 'Entrada') {
+        const calculatedCostoTotal =
+          movement.costoTotal && movement.costoTotal !== 0
+            ? movement.costoTotal
+            : movement.cantidad * movement.costoUnitario;
+
+        if (movement.tipo === "Entrada") {
           currentSaldo += movement.cantidad;
           currentCostoTotal += calculatedCostoTotal;
         } else {
           currentSaldo -= movement.cantidad;
           currentCostoTotal -= calculatedCostoTotal;
         }
-        
+
         movementsData.push([
-           movement.fecha,
-           movement.tipo,
-           movement.tComprob,
-           movement.nComprobante,
-           movement.cantidad.toString(),
-           movement.costoUnitario.toString(),
-           calculatedCostoTotal.toString(),
-           currentSaldo.toString()
-         ]);
+          movement.fecha,
+          movement.tipo,
+          movement.tComprob,
+          movement.nComprobante,
+          movement.cantidad.toString(),
+          movement.costoUnitario.toString(),
+          calculatedCostoTotal.toString(),
+          currentSaldo.toString(),
+        ]);
       }
     });
 
     const movementsWorksheet = XLSX.utils.aoa_to_sheet(movementsData);
-    XLSX.utils.book_append_sheet(workbook, movementsWorksheet, 'Movimientos');
+    XLSX.utils.book_append_sheet(workbook, movementsWorksheet, "Movimientos");
 
     // Generar nombre del archivo
-    const producto = kardexResponse.producto || 'producto';
-    const almacen = kardexResponse.almacen || 'almacen';
-    const filename = `kardex_${producto.replace(/\s+/g, '_')}_${almacen.replace(/\s+/g, '_')}_${selectedYear}.xlsx`;
+    const producto = kardexResponse.producto || "producto";
+    const almacen = kardexResponse.almacen || "almacen";
+    const filename = `kardex_${producto.replace(/\s+/g, "_")}_${almacen.replace(
+      /\s+/g,
+      "_"
+    )}_${selectedYear}.xlsx`;
 
     // Escribir el archivo
     XLSX.writeFile(workbook, filename);
@@ -555,7 +502,9 @@ export const MainPage: React.FC = () => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Reporte de Kardex - ${kardexResponse.producto} - ${kardexResponse.almacen} - ${selectedYear}</title>
+        <title>Reporte de Kardex - ${kardexResponse.producto} - ${
+      kardexResponse.almacen
+    } - ${selectedYear}</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 20px; }
           h1 { text-align: center; margin-bottom: 30px; }
@@ -621,14 +570,56 @@ export const MainPage: React.FC = () => {
               <td>-</td>
               <td>-</td>
               <td>${reportes.inventarioInicialCantidad}</td>
-              <td>${(reportes.inventarioInicialCostoTotal / reportes.inventarioInicialCantidad).toFixed(2)}</td>
+              <td>${(
+                reportes.inventarioInicialCostoTotal /
+                reportes.inventarioInicialCantidad
+              ).toFixed(2)}</td>
               <td>${reportes.inventarioInicialCostoTotal}</td>
               <td>-</td>
             </tr>
-            ${generateTableRows().slice(1).map(row => `
+            ${kardexData.map((movement, index) => {
+              let html = '';
+              
+              if (movement.tipo === "Salida" && movement.detallesSalida && movement.detallesSalida.length > 0) {
+                // Para movimientos de salida con detalles, crear una fila por cada detalle
+                movement.detallesSalida.forEach((detalle) => {
+                  const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
+                    ? detalle.costoTotalDeLote
+                    : detalle.cantidad * detalle.costoUnitarioDeLote;
+                  
+                  html += `
             <tr>
-              ${row.cells.map(cell => `<td>${cell}</td>`).join('')}
-            </tr>`).join('')}
+              <td>${movement.fecha}</td>
+              <td>Salida</td>
+              <td>${movement.tComprob}</td>
+              <td>${movement.nComprobante}</td>
+              <td>${formatNumber(detalle.cantidad)}</td>
+              <td>${formatNumber(detalle.costoUnitarioDeLote)}</td>
+              <td>${formatNumber(calculatedDetalleCostoTotal)}</td>
+              <td>${formatNumber(movement.saldo)}</td>
+            </tr>`;
+                });
+              } else {
+                // Para movimientos sin detalles (entradas o salidas simples)
+                const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0
+                  ? movement.costoTotal
+                  : movement.cantidad * movement.costoUnitario;
+                
+                html += `
+            <tr>
+              <td>${movement.fecha}</td>
+              <td>${movement.tipo}</td>
+              <td>${movement.tComprob}</td>
+              <td>${movement.nComprobante}</td>
+              <td>${formatNumber(movement.cantidad)}</td>
+              <td>${formatNumber(movement.costoUnitario)}</td>
+              <td>${formatNumber(calculatedCostoTotal)}</td>
+              <td>${formatNumber(movement.saldo)}</td>
+            </tr>`;
+              }
+              
+              return html;
+            }).join('')}
           </tbody>
         </table>
       </body>
@@ -636,7 +627,7 @@ export const MainPage: React.FC = () => {
     `;
 
     // Abrir nueva ventana e imprimir
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(htmlContent);
       printWindow.document.close();
@@ -648,50 +639,65 @@ export const MainPage: React.FC = () => {
   /**
    * Genera el contenido CSV para el kardex incluyendo detalles de salida expandidos
    */
-  const generateKardexCSV = (response: any, movements: KardexMovement[], reportData: any) => {
-    let csv = '';
-    let currentSaldo = parseFloat(reportData.inventarioInicialCantidad.toString());
-    
+  const generateKardexCSV = (
+    response: any,
+    movements: KardexMovement[],
+    reportData: any
+  ) => {
+    let csv = "";
+    let currentSaldo = parseFloat(
+      reportData.inventarioInicialCantidad.toString()
+    );
+
     // Información del reporte
     csv += `Reporte de Kardex\n`;
     csv += `Producto:,${response.producto}\n`;
     csv += `Almacén:,${response.almacen}\n`;
     csv += `Año:,${selectedYear}\n`;
     csv += `Fecha de generación:,${new Date().toLocaleDateString()}\n\n`;
-    
+
     // Resumen
     csv += `RESUMEN\n`;
     csv += `Existencias finales,Costo unitario final,Costo total final,Costo de ventas total\n`;
     csv += `${reportData.cantidadActual},${reportData.costoUnitarioFinal},${reportData.costoTotalFinal},${reportData.costoVentasTotal}\n\n`;
-    
+
     // Movimientos
     csv += `MOVIMIENTOS\n`;
     csv += `Fecha,Tipo,Tipo de comprobante,Cod de comprobante,Cantidad,Costo Unitario,Costo Total,Saldo\n`;
-    
+
     // Saldo inicial
-    csv += `-,Saldo inicial,-,-,${reportData.inventarioInicialCantidad},${reportData.inventarioInicialCostoTotal / reportData.inventarioInicialCantidad},${reportData.inventarioInicialCostoTotal},-\n`;
-    
+    csv += `-,Saldo inicial,-,-,${reportData.inventarioInicialCantidad},${
+      reportData.inventarioInicialCostoTotal /
+      reportData.inventarioInicialCantidad
+    },${reportData.inventarioInicialCostoTotal},-\n`;
+
     // Movimientos con detalles expandidos
-    movements.forEach(movement => {
-      if (movement.tipo === 'Salida' && movement.detallesSalida && movement.detallesSalida.length > 0) {
+    movements.forEach((movement) => {
+      if (
+        movement.tipo === "Salida" &&
+        movement.detallesSalida &&
+        movement.detallesSalida.length > 0
+      ) {
         // Para movimientos de salida con detalles, crear una fila por cada detalle
         movement.detallesSalida.forEach((detalle) => {
           // Calcular costoTotal del detalle si es 0 o undefined
-          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0 
-            ? detalle.costoTotalDeLote 
-            : detalle.cantidad * detalle.costoUnitarioDeLote;
-          
+          const calculatedDetalleCostoTotal =
+            detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
+              ? detalle.costoTotalDeLote
+              : detalle.cantidad * detalle.costoUnitarioDeLote;
+
           currentSaldo -= detalle.cantidad;
           csv += `${movement.fecha},${movement.tipo},${movement.tComprob},${movement.nComprobante},${detalle.cantidad},${detalle.costoUnitarioDeLote},${calculatedDetalleCostoTotal},${currentSaldo}\n`;
         });
       } else {
         // Para movimientos sin detalles (entradas o salidas simples)
         // Calcular costoTotal si es 0 o undefined
-        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0 
-          ? movement.costoTotal 
-          : movement.cantidad * movement.costoUnitario;
+        const calculatedCostoTotal =
+          movement.costoTotal && movement.costoTotal !== 0
+            ? movement.costoTotal
+            : movement.cantidad * movement.costoUnitario;
 
-        if (movement.tipo === 'Entrada') {
+        if (movement.tipo === "Entrada") {
           currentSaldo += movement.cantidad;
         } else {
           currentSaldo -= movement.cantidad;
@@ -699,7 +705,7 @@ export const MainPage: React.FC = () => {
         csv += `${movement.fecha},${movement.tipo},${movement.tComprob},${movement.nComprobante},${movement.cantidad},${movement.costoUnitario},${calculatedCostoTotal},${currentSaldo}\n`;
       }
     });
-    
+
     return csv;
   };
 
@@ -709,71 +715,76 @@ export const MainPage: React.FC = () => {
 
   return (
     <PageLayout
-      title="Kardex (Método de valuación PROMEDIO PONDERADO)"
+      title="Kardex"
       subtitle="Muestra el detalle de movimientos y saldos del producto seleccionado."
     >
       <section className={styles.MainPage}>
-          <div className={styles.MainPage__FilterContainer}>
-            <div className={styles.MainPage__Filter}>
-              <Text size="xs" color="neutral-primary">
-                Año
-              </Text>
-              <ComboBox
-                options={yearOptions}
-                size="xs"
-                variant="createSale"
-                value={selectedYear}
-                onChange={(v) => setSelectedYear(v as string)}
-                placeholder="Seleccionar año"
-              />
-            </div>
-            {!isDirectLoad && (
-              <>
-                <div className={styles.MainPage__Filter}>
-                  <Text size="xs" color="neutral-primary">
-                    Almacen
-                  </Text>
-                  <ComboBox
-                    options={warehouseOptions}
-                    size="xs"
-                    variant="createSale"
-                    value={selectedWarehouseId}
-                    onChange={(v) => setSelectedWarehouseId(v as string)}
-                    placeholder="Seleccionar almacen"
-                  />
-                </div>
-                <div className={styles.MainPage__Filter}>
-                  <Text size="xs" color="neutral-primary">
-                    Producto
-                  </Text>
-                  <ComboBox
-                    options={productOptions}
-                    size="xs"
-                    variant="createSale"
-                    value={selectedProductId}
-                    onChange={(v) => setSelectedProductId(v as string)}
-                    placeholder="Seleccionar producto"
-                  />
-                </div>
-              </>
-            )}
+        <div className={styles.MainPage__FilterContainer}>
+          <div className={styles.MainPage__Filter}>
+            <Text size="xs" color="neutral-primary">
+              Año
+            </Text>
+            <ComboBox
+              options={yearOptions}
+              size="xs"
+              variant="createSale"
+              value={selectedYear}
+              onChange={(v) => setSelectedYear(v as string)}
+              placeholder="Seleccionar año"
+            />
           </div>
+          {!isDirectLoad && (
+            <>
+              <div className={styles.MainPage__Filter}>
+                <Text size="xs" color="neutral-primary">
+                  Almacen
+                </Text>
+                <ComboBox
+                  options={warehouseOptions}
+                  size="xs"
+                  variant="createSale"
+                  value={selectedWarehouseId}
+                  onChange={(v) => setSelectedWarehouseId(v as string)}
+                  placeholder="Seleccionar almacen"
+                />
+              </div>
+              <div className={styles.MainPage__Filter}>
+                <Text size="xs" color="neutral-primary">
+                  Producto
+                </Text>
+                <ComboBox
+                  options={productOptions}
+                  size="xs"
+                  variant="createSale"
+                  value={selectedProductId}
+                  onChange={(v) => setSelectedProductId(v as string)}
+                  placeholder="Seleccionar producto"
+                />
+              </div>
+            </>
+          )}
+        </div>
 
         <Divider />
         {kardexData.length > 0 && kardexResponse && (
-           <div className={styles.MainPage__ReportInfo}>
-             <div>
-                <Text size="sm" color="neutral-primary">
-                  Reporte para: {kardexResponse.producto} -{" "}
-                  {kardexResponse.almacen} - Año {selectedYear}
-                </Text>
-                <Text size="xs" color="neutral-secondary">
-                  Generado el:{" "}
-                  {new Date().toLocaleDateString()}
-                </Text>
-              </div>
+          <div className={styles.MainPage__ReportInfo}>
+            <div>
+              <Text size="sm" color="neutral-primary">
+                Reporte para: {kardexResponse.producto} -{" "}
+                {kardexResponse.almacen} - Año {selectedYear}
+              </Text>
+              <Text size="xs" color="neutral-secondary">
+                Generado el: {new Date().toLocaleDateString()}
+              </Text>
+            </div>
 
-            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.25rem'}}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "0.25rem",
+              }}
+            >
               <Button
                 size="small"
                 variant="primary"
@@ -800,8 +811,8 @@ export const MainPage: React.FC = () => {
                 Exportar como PDF
               </Button>
             </div>
-           </div>
-         )}
+          </div>
+        )}
 
         {error && (
           <div className={styles.MainPage__Error}>
