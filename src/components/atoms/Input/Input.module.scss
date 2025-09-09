@@ -72,7 +72,7 @@
 
   &--disabled {
     background-color: $neutral-4;
-    color: $neutral-2;
+    color: var(--text-color);
     cursor: not-allowed;
     opacity: 0.6;
 
