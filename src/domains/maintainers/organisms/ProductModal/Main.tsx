@@ -138,19 +138,6 @@ export const Main: React.FC<CreateProductModalProps> = ({
           />
         </div>
 
-        <div className={styles.formField}>
-          <Text size="xs" color="neutral-primary">
-            Descripción (opcional)
-          </Text>
-          <Input
-            placeholder="Ingresa descripción"
-            size="xs"
-            variant="createSale"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-          />
-        </div>
-
         {!isService && (
           <div className={styles.formField}>
             <Text size="xs" color="neutral-primary">
@@ -178,6 +165,19 @@ export const Main: React.FC<CreateProductModalProps> = ({
             value={categoriaId}
             onChange={(v) => setCategoriaId(v as string)}
             placeholder="Seleccionar"
+          />
+        </div>
+
+        <div className={styles.formField}>
+          <Text size="xs" color="neutral-primary">
+            Descripción (opcional)
+          </Text>
+          <Input
+            placeholder="Ingresa descripción"
+            size="xs"
+            variant="createSale"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
           />
         </div>
 

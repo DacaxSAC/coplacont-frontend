@@ -19,7 +19,6 @@ type FormWarehouseProps = {
 export const FormWarehouse = ({
   warehouse,
   error,
-  //setError,
   loading,
   setLoading,
   readOnly = false,
@@ -58,12 +57,12 @@ export const FormWarehouse = ({
         </Text>
       )}
 
-      {/* Tipo de Entidad */}
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
-          Nombre del almacen
+          Nombre de almacén
         </Text>
         <Input
+          placeholder="Ingresa nombre de almacén"
           disabled={isEdit? false : readOnly}
           size="xs"
           variant="createSale"
@@ -84,9 +83,10 @@ export const FormWarehouse = ({
       {/* Número de Documento */}
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
-          Ubicación del almacen
+          Ubicación de almacén
         </Text>
         <Input
+          placeholder="Ingresa ubicación de almacén"
           disabled={isEdit? false : readOnly}
           size="xs"
           variant="createSale"
@@ -106,9 +106,10 @@ export const FormWarehouse = ({
 
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
-          Responsable
+          Responsable de almacén
         </Text>
         <Input
+          placeholder="Ingresa responsable de almacén"
           size="xs"
           variant="createSale"
           value={isCreate ? warehouse.responsable : warehouseToUpdate.responsable ?? ""
@@ -133,6 +134,7 @@ export const FormWarehouse = ({
           Telefono (Opcional)
         </Text>
         <Input
+          placeholder="Ingresa telefono"
           size="xs"
           variant="createSale"
           value={isCreate ? warehouse.telefono : warehouseToUpdate.telefono ?? "" }
@@ -156,12 +158,13 @@ export const FormWarehouse = ({
           disabled={isEdit ? false : readOnly}
         />
       </div>
-      {/* Telefono */}
+      {/* Dirección */}
       <div className={styles.FormWarehouse__FormField}>
         <Text size="xs" color="neutral-primary">
           Descripción (Opcional)
         </Text>
         <Input
+          placeholder="Ingresa descripción"
           size="xs"
           variant="createSale"
           value={isCreate ? warehouse.descripcion : warehouseToUpdate.descripcion ?? "" 
