@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         {/* Dashboard - Página de inicio */}
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
-            <GoHomeFill style={{color:'black'}}/>
+            <GoHomeFill style={{color:'var(--text-color)'}}/>
             <h3 className={styles.sectionTitle__title}>Panel de control</h3>
           </div>
           <ul className={styles.menuList}>

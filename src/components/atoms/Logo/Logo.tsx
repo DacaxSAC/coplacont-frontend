@@ -76,7 +76,7 @@ export const Logo = ({
         height={height || size} 
         style={{
           display: 'block',
-          objectFit: 'contain'
+          objectFit: 'contain',
         }}
       />
     </div>
