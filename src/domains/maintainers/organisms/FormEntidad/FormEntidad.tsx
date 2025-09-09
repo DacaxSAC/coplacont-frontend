@@ -65,6 +65,7 @@ export const FormEntidad = ({
             { label: "JURIDICA", value: "JURIDICA" },
             { label: "NATURAL", value: "NATURAL" },
           ]}
+          placeholder='Selecciona tipo de entidad'
           size="xs"
           variant="createSale"
           value={entidad.tipo}
@@ -77,6 +78,7 @@ export const FormEntidad = ({
       <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">Número de Documento</Text>
         <Input
+          placeholder='Ingresa número de documento'
           disabled={readOnly || !entidad.tipo}
           size="xs"
           variant="createSale"
@@ -88,8 +90,9 @@ export const FormEntidad = ({
       {/* Razon Social o Datos Naturales */}
       {entidad.tipo === "JURIDICA" && (
         <div className={styles.FormEntidad__FormField}>
-          <Text size="xs" color="neutral-primary">Razon Social</Text>
+          <Text size="xs" color="neutral-primary">Razón Social</Text>
           <Input
+            placeholder='Ingresa razón social'
             size="xs"
             variant="createSale"
             value={isEdit ? entidadToUpdate.razonSocial ?? "" : entidad.razonSocial ?? ""}
@@ -113,6 +116,7 @@ export const FormEntidad = ({
           <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">Nombre</Text>
             <Input
+              placeholder='Ingresa nombre'
               size="xs"
               variant="createSale"
               value={isEdit ? entidadToUpdate.nombre ?? "" : entidad.nombre ?? ""}
@@ -132,6 +136,7 @@ export const FormEntidad = ({
           <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">Apellido Paterno</Text>
             <Input
+              placeholder='Ingresa apellido paterno'
               size="xs"
               variant="createSale"
               value={isEdit ? entidadToUpdate.apellidoPaterno ?? "" : entidad.apellidoPaterno ?? ""}
@@ -151,6 +156,7 @@ export const FormEntidad = ({
           <div className={styles.FormEntidad__FormField}>
             <Text size="xs" color="neutral-primary">Apellido Materno</Text>
             <Input
+              placeholder='Ingresa apellido materno'
               size="xs"
               variant="createSale"
               value={isEdit ? entidadToUpdate.apellidoMaterno?? "" : entidad.apellidoMaterno ?? ""}
@@ -174,6 +180,7 @@ export const FormEntidad = ({
       <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">Direccion (opcional)</Text>
         <Input
+          placeholder='Ingresa dirección'
           size="xs"
           variant="createSale"
           value={isEdit?entidadToUpdate.direccion:entidad.direccion}
@@ -195,6 +202,7 @@ export const FormEntidad = ({
       <div className={styles.FormEntidad__FormField}>
         <Text size="xs" color="neutral-primary">Telefono (opcional)</Text>
         <Input
+          placeholder='Ingresa telefono'
           size="xs"
           variant="createSale"
           value={isEdit ? entidadToUpdate.telefono ?? "" : entidad.telefono ?? ""}
