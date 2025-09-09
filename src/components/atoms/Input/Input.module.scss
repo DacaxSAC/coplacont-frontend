@@ -170,12 +170,12 @@
     }
 
     &:focus {
-      border-color: $primary-blue;
+      border-color: var(--color-blue);
       box-shadow: none; // Mantener un look más limpio en esta variante
     }
 
     &:hover:not(:disabled) {
-      border-color: $primary-blue;
+      border-color: var(--color-blue);
     }
   }
 }

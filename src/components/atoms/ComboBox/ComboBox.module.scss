@@ -73,7 +73,7 @@
     left: 0;
     right: 0;
     background: $bg-color;
-    border: 1px solid $neutral-3;
+    border: 1px solid var(--border-input);
     border-radius: $border-radius-md;
     box-shadow: $box-shadow-lg;
     z-index: $z-index-dropdown;
@@ -128,7 +128,7 @@
   }
 
   &:hover:not(&--disabled) {
-    border-color: $primary-blue;
+    border-color: var(--color-blue);;
   }
 
   &:focus-within {

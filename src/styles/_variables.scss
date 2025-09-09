@@ -45,6 +45,7 @@ $warning-color: #F3CB26;
   --text-color-card-skills: #{$neutral-2}; // #3A3A3A
   --border-color: #{$neutral-3};
   --border-input: #{$border-light};
+  --color-blue:#{$primary-blue};
 
   // Tema oscuro automático basado en preferencias del sistema
   @media (prefers-color-scheme: dark) {
@@ -58,6 +59,7 @@ $warning-color: #F3CB26;
     --text-color-card-skills: #{$neutral-3}; // #DBD9D9
     --border-color: #{$neutral-2};
     --border-input: #{$border-dark};
+    --color-blue:#{$secondary-blue}; 
   }
 }
 
@@ -73,6 +75,8 @@ $warning-color: #F3CB26;
   --text-color-card-skills: #{$neutral-2};
   --border-color: #{$neutral-3};
   --border-input: #{$border-light};
+
+  --color-blue:#{$primary-blue};
 }
 
 :root[data-theme="dark"] {
@@ -86,6 +90,7 @@ $warning-color: #F3CB26;
   --text-color-card-skills: #{$neutral-3};
   --border-color: #{$neutral-2};
   --border-input: #{$border-dark};
+  --color-blue:#{$secondary-blue};   
 }
 
 // Variables Sass para compatibilidad con código existente
@@ -99,6 +104,7 @@ $bg-card-v2: var(--bg-card-v2);
 $text-color-card-skills: var(--text-color-card-skills);
 $border-color: var(--border-color);
 $border-input: var(--border-input);
+$color-blue: var(--color-blue);
 
 
 // Color de botón neutro
