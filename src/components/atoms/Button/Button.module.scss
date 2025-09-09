@@ -57,7 +57,7 @@
   &--tableItemStyle {
     background-color: $bg-color;
     color: $text-color;
-    border: 1px solid $border-color;
+    border: 1px solid  var(--border-color);
     &:hover{
       background-color: $bg-color-secondary;
     }

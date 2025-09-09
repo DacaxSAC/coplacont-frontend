@@ -3,7 +3,7 @@
 .tableWrapper {
   flex: 1;
   background: $bg-color;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $border-radius-xl;
   overflow: hidden;
   box-shadow: $box-shadow-sm;
@@ -26,7 +26,7 @@
 .actionsColumn {
   width: 80px;
   flex-shrink: 0;
-  border-left: 1px solid $border-color;
+  border-left: 1px solid var(--border-color);
   background: $bg-color;
   overflow-y: auto;
   box-sizing: border-box;
@@ -44,7 +44,7 @@
   display: grid;
   grid-template-columns: var(--grid-template, 1fr);
   align-items: center;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid  var(--border-color);
   
 
   &:first-child {
@@ -66,7 +66,7 @@
   overflow-y: hidden;
   font-size: $font-size-xs;
   color: $text-color;
-  border-right: 1px solid $border-color;
+  border-right: 1px solid  var(--border-color);
   height: 36px;
   display: flex;
   align-items: center;
@@ -95,7 +95,7 @@
 }
 
 .iconButton {
-  border: 1px solid $border-color;
+  border: 1px solid  var(--border-color);
   background: transparent;
   padding: 6px 8px;
   border-radius: $border-radius-md;
