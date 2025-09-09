@@ -166,7 +166,7 @@ export const MainPage: React.FC = () => {
               sale.serie,
               sale.numero,
               sale.fechaEmision,
-              sale.fechaVencimiento,
+              sale.fechaVencimiento !== null ? sale.fechaVencimiento : "No especificado",
               sale.moneda,
               sale.tipoCambio,
               sale.totales?.totalGeneral.toString(),

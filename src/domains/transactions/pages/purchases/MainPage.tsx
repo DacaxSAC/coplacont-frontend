@@ -173,7 +173,7 @@ export const MainPage: React.FC = () => {
               purchase.serie,
               purchase.numero,
               purchase.fechaEmision,
-              purchase.fechaVencimiento,
+              purchase.fechaVencimiento !== null ? purchase.fechaVencimiento : "No especificado",
               purchase.moneda,
               purchase.tipoCambio,
               purchase.totales.totalGeneral.toString(),

@@ -110,13 +110,13 @@
       transition: all 0.2s ease;
 
       &:hover {
-        box-shadow: 0px 0px 1.5px 0px #00000040;
-        background-color: #0038690D;
+        box-shadow: 0px 0px 1.5px 0px var(--border-input);
+        background-color: var(--border-input);
       }
 
       &.active {
-        box-shadow: 0px 0px 1.5px 0px #00000040;
-        background-color: #0038690D;
+        box-shadow: 0px 0px 1.5px 0px var(--border-input);
+        background-color: var(--border-input);
       }
     }
   }
