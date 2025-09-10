@@ -74,7 +74,7 @@
   // -----------------------------------------------------------------------------
 
   &--color-primary {
-    color: $primary-blue;
+    color: var(--color-blue);
   }
 
   &--color-secondary {

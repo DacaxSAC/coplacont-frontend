@@ -56,10 +56,6 @@
     font-size: $font-size-lg;
   }
 
-  // -----------------------------------------------------------------------------
-  // ESTADOS
-  // -----------------------------------------------------------------------------
-
   &--error {
     border-color: $danger-color;
     box-shadow: $box-shadow-error;
@@ -108,37 +104,18 @@
   position: relative;
   display: flex;
   width: 100%;
-  // Aplicar todos los estilos visuales del input al contenedor
-  border: 1px solid $neutral-3;
-  border-radius: $border-radius-xl;
-  background-color: #0038690D;
+  background-color: transparent;
+  border-radius: $border-radius-lg;
   transition: all 0.2s ease;
   
-  &:hover {
-    border-color: $primary-blue;
-  }
-  
-  &:focus-within {
-    border-color: $primary-blue;
-    box-shadow: $box-shadow-focus;
-  }
-  
-  // Estados para el contenedor
-  &.inputContainer--error {
-    border-color: $danger-color;
-    box-shadow: $box-shadow-error;
-    
-    &:focus-within {
-      border-color: $danger-color;
-      box-shadow: $box-shadow-error;
-    }
-  }
   
   &.inputContainer--disabled {
     background-color: $neutral-4;
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  
 }
 
 .endAdornment {
@@ -162,8 +139,6 @@
     background-color: transparent;
     border:  0.5px solid  var(--border-input);
     border-radius: $border-radius-lg;
-    //padding: $spacing-sm $spacing-md;
-    // Removido font-size para permitir que las variantes de tamaño funcionen
 
     &::placeholder {
       opacity: 0.6;
@@ -180,19 +155,3 @@
   }
 }
 
-.inputContainer {
-  &.inputContainer--createSale {
-    border: 1px solid $neutral-3;
-    border-radius: $border-radius-md;
-    background-color: transparent;
-
-    &:hover {
-      border-color: $primary-blue;
-    }
-
-    &:focus-within {
-      border-color: $primary-blue;
-      box-shadow: none; // Mantener consistencia con el input --createSale
-    }
-  }
-}

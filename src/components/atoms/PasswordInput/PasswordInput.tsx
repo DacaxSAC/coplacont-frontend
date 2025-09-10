@@ -53,6 +53,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <Input
+      variant='createSale'
       {...inputProps}
       type={isPasswordVisible ? 'text' : 'password'}
       placeholder={placeholder}

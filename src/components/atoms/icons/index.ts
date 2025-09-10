@@ -13,3 +13,5 @@ export * from './CheckIcon';
 export * from './NoDataIcon';
 export * from './MantenedoresIcon';
 export * from './MovimientosIcon';
+export * from './SunIcon';
+export * from './MoonIcon';
