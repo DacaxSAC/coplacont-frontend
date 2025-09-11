@@ -1,10 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from './MainPage.module.scss';
-import { PageLayout, Button, Table, Text, ComboBox, Modal, Loader, Input } from "@/components";
+import styles from "./MainPage.module.scss";
+import {
+  PageLayout,
+  Button,
+  Table,
+  Text,
+  ComboBox,
+  Modal,
+  Loader,
+  Input,
+} from "@/components";
 import { InventoryService } from "../../services/InventoryService";
 import { InventoryLotService } from "../../services/InventoryLotService";
-import { ProductService, WarehouseService } from "@/domains/maintainers/services";
+import {
+  ProductService,
+  WarehouseService,
+} from "@/domains/maintainers/services";
 import { MAIN_ROUTES, INVENTORY_ROUTES } from "@/router";
 import type { InventoryItem } from "../../services/types";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
@@ -14,7 +26,7 @@ export const MainPage: React.FC = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [almacenFilter, setAlmacenFilter] = useState(""); // filtro almacén
   const [productoFilter, setProductoFilter] = useState(""); // filtro producto
-  
+
   // Estados para el modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,7 +48,7 @@ export const MainPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchInventory();
@@ -67,29 +79,41 @@ export const MainPage: React.FC = () => {
     { label: "Todos", value: "" },
     ...Array.from(
       new Map(
-        inventory.map((i) => [i.almacen.id, { label: `${i.almacen.id} - ${i.almacen.nombre}`, value: String(i.almacen.id) }])
+        inventory.map((i) => [
+          i.almacen.id,
+          {
+            label: `${i.almacen.id} - ${i.almacen.nombre}`,
+            value: String(i.almacen.id),
+          },
+        ])
       ).values()
-    )
+    ),
   ];
 
   const productOptions = [
     { label: "Todos", value: "" },
     ...Array.from(
       new Map(
-        inventory.map((i) => [i.producto.codigo, { label: `${i.producto.codigo} - ${i.producto.descripcion}`, value: i.producto.codigo }])
+        inventory.map((i) => [
+          i.producto.codigo,
+          {
+            label: `${i.producto.codigo} - ${i.producto.descripcion}`,
+            value: i.producto.codigo,
+          },
+        ])
       ).values()
-    )
+    ),
   ];
 
   // Opciones para el modal
   const modalProductOptions = products.map((product) => ({
     label: `${product.codigo} - ${product.nombre}`,
-    value: product.id.toString()
+    value: product.id.toString(),
   }));
 
   const modalWarehouseOptions = warehouses.map((warehouse) => ({
     label: `${warehouse.id} - ${warehouse.nombre}`,
-    value: warehouse.id.toString()
+    value: warehouse.id.toString(),
   }));
 
   // 🔹 Filtrar inventario por almacén y producto (código o nombre)
@@ -97,13 +121,19 @@ export const MainPage: React.FC = () => {
     return inventory.filter((i) => {
       const matchAlmacen =
         almacenFilter === "" ||
-        String(i.almacen.id).toLowerCase().includes(almacenFilter.toLowerCase()) ||
+        String(i.almacen.id)
+          .toLowerCase()
+          .includes(almacenFilter.toLowerCase()) ||
         i.almacen.nombre.toLowerCase().includes(almacenFilter.toLowerCase());
 
       const matchProducto =
         productoFilter === "" ||
-        i.producto.codigo.toLowerCase().includes(productoFilter.toLowerCase()) ||
-        i.producto.descripcion.toLowerCase().includes(productoFilter.toLowerCase());
+        i.producto.codigo
+          .toLowerCase()
+          .includes(productoFilter.toLowerCase()) ||
+        i.producto.descripcion
+          .toLowerCase()
+          .includes(productoFilter.toLowerCase());
 
       return matchAlmacen && matchProducto;
     });
@@ -130,11 +160,13 @@ export const MainPage: React.FC = () => {
         size="tableItemSize"
         variant="tableItemStyle"
         onClick={() => {
-          navigate(`${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}?inventoryId=${i.id}`);
+          navigate(
+            `${MAIN_ROUTES.INVENTORY}${INVENTORY_ROUTES.KARDEX}?inventoryId=${i.id}`
+          );
         }}
       >
         Ver KARDEX
-      </Button>
+      </Button>,
     ],
   }));
 
@@ -165,39 +197,41 @@ export const MainPage: React.FC = () => {
     try {
       setLoading(true);
       setError("");
-      
+
       const stockValue = selectedStock ? parseInt(selectedStock) : 0;
       const priceValue = selectedPrice ? parseFloat(selectedPrice) : 0;
-      
+
       // Crear el payload con stockActual inicial
       const payload = {
         idAlmacen: parseInt(selectedWarehouse),
         idProducto: parseInt(selectedProduct),
-        stockActual: stockValue
+        stockActual: stockValue,
       };
-      
+
       // Llamar al servicio para crear el inventario
       const inventoryResponse = await InventoryService.createInventory(payload);
-      
+
       // Si hay stock inicial, crear un lote con el precio
       if (stockValue > 0 && priceValue > 0) {
         const lotPayload = {
           idInventario: parseInt(inventoryResponse.id),
-          fechaIngreso: new Date().toISOString().split('T')[0],
+          fechaIngreso: new Date().toISOString().split("T")[0],
           cantidadInicial: stockValue,
           cantidadActual: stockValue,
           costoUnitario: priceValue,
         };
-        
+
         await InventoryLotService.createInventoryLot(lotPayload);
       }
-      
+
       // Cerrar modal y refrescar inventario
       handleCloseModal();
       await fetchInventory();
     } catch (error) {
       console.error("Error al agregar producto al almacén:", error);
-      setError("No se pudo agregar el producto al almacén. Inténtalo de nuevo.");
+      setError(
+        "No se pudo agregar el producto al almacén. Inténtalo de nuevo."
+      );
     } finally {
       setLoading(false);
     }
@@ -242,7 +276,7 @@ export const MainPage: React.FC = () => {
         </div>
       </section>
       <Table headers={headers} rows={rows} gridTemplate={gridTemplate} />
-      
+
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -251,8 +285,8 @@ export const MainPage: React.FC = () => {
         loading={loading}
         buttonText="Cerrar"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div>
             <Text size="xs" color="neutral-primary">
               Almacén
             </Text>
@@ -278,39 +312,41 @@ export const MainPage: React.FC = () => {
               placeholder="Seleccionar"
             />
           </div>
-          
+
           <div>
             <Text size="xs" color="neutral-primary">
               Stock Inicial
             </Text>
             <Input
-               type="number"
-               value={selectedStock}
-               onChange={(e) => setSelectedStock(e.target.value)}
-               placeholder="Ingresa el stock inicial"
-             />
+              type="number"
+              size="xs"
+              variant="createSale"
+              value={selectedStock}
+              onChange={(e) => setSelectedStock(e.target.value)}
+              placeholder="Ingresa el stock inicial"
+            />
           </div>
-          
+
           <div>
             <Text size="xs" color="neutral-primary">
               Precio
             </Text>
             <Input
-               type="number"
-               value={selectedPrice}
-               onChange={(e) => setSelectedPrice(e.target.value)}
-               placeholder="Ingresa el precio unitario"
-             />
+              type="number"
+              size="xs"
+              variant="createSale"
+              value={selectedPrice}
+              onChange={(e) => setSelectedPrice(e.target.value)}
+              placeholder="Ingresa el precio unitario"
+            />
           </div>
-          
 
-          
           {error && (
             <Text size="xs" color="danger">
               {error}
             </Text>
           )}
-          
+
           <Button
             onClick={handleSaveProductToWarehouse}
             size="large"
@@ -320,7 +356,7 @@ export const MainPage: React.FC = () => {
           </Button>
         </div>
       </Modal>
-                  {loading && <Loader text="Procesando..." />}
+      {loading && <Loader text="Procesando..." />}
     </PageLayout>
   );
 };

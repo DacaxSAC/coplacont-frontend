@@ -92,7 +92,7 @@ export const LoginForm: React.FC<ILoginFormProps> = ({
         errorMessage={validationErrors.email}
         required
         autoComplete="email"
-        placeholder="ejemplo@correo.com"
+        placeholder="Ingresa tu correo"
         disabled={isLoading}
       />
 

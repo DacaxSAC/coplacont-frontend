@@ -47,7 +47,7 @@ export const FormField: React.FC<FormFieldProps> = ({
       case 'combobox':
         return <ComboBox id={id} error={error} {...(props as ComboBoxProps)} />;
       default:
-        return <Input variant='createSale' id={id} type={type} error={error} {...(props as InputProps)} />;
+        return <Input placeholder='Ingresa tu correo' variant='createSale' id={id} type={type} error={error} {...(props as InputProps)} />;
     }
   };
 
