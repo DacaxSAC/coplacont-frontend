@@ -127,3 +127,164 @@ export const formatEstadoPeriodo = (estado: EstadoPeriodo): string => {
   const option = ESTADO_PERIODO_OPTIONS.find(opt => opt.value === estado);
   return option?.label || estado;
 };
+
+// ============================================================================
+// TIPOS PARA USUARIOS Y EMPRESAS
+// ============================================================================
+
+/**
+ * Interfaz para datos de empresa/persona
+ */
+export interface Persona {
+  id: number;
+  nombreEmpresa: string;
+  ruc: string;
+  razonSocial: string;
+  telefono?: string;
+  direccion?: string;
+  habilitado: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Interfaz para usuario
+ */
+export interface User {
+  id: number;
+  nombre: string;
+  email: string;
+  habilitado: boolean;
+  esPrincipal: boolean;
+  persona?: Persona;
+  roles?: string[];
+  resetPasswordToken?: string;
+}
+
+/**
+ * DTO para crear empresa con usuario principal
+ */
+export interface CreateEmpresaConUsuarioDto {
+  // Datos de la empresa
+  nombreEmpresa: string;
+  ruc: string;
+  razonSocial: string;
+  telefono?: string;
+  direccion?: string;
+  
+  // Datos del usuario principal
+  nombreUsuario: string;
+  emailUsuario: string;
+  idRol: number;
+  esPrincipal?: boolean;
+}
+
+/**
+ * Interfaz para respuesta de empresa con usuario
+ */
+export interface EmpresaConUsuario {
+  persona: Persona;
+  usuario: {
+    id: number;
+    nombre: string;
+    email: string;
+    passwordPlano: string;
+  };
+}
+
+/**
+ * DTO para crear usuario para empresa existente
+ */
+export interface CreateUserForPersonaDto {
+  nombre: string;
+  email: string;
+  idRol: number;
+  esPrincipal?: boolean;
+}
+
+/**
+ * DTO para actualizar usuario
+ */
+export interface UpdateUserDto {
+  nombre?: string;
+  email?: string;
+  habilitado?: boolean;
+  esPrincipal?: boolean;
+  persona?: {
+    nombreEmpresa?: string;
+    ruc?: string;
+    razonSocial?: string;
+    telefono?: string;
+    direccion?: string;
+  };
+}
+
+/**
+ * Interfaz parcial para formularios de empresa
+ */
+export interface EmpresaParcial {
+  id?: number;
+  nombreEmpresa: string;
+  ruc: string;
+  razonSocial: string;
+  telefono?: string;
+  direccion?: string;
+  nombreUsuario: string;
+  emailUsuario: string;
+  idRol: number;
+  esPrincipal?: boolean;
+}
+
+/**
+ * Opciones para roles (esto debería venir del backend)
+ */
+export const ROLE_OPTIONS: SelectOption[] = [
+  { value: 1, label: 'Administrador' },
+  { value: 2, label: 'Contador' },
+  { value: 3, label: 'Usuario' }
+];
+
+/**
+ * Opciones para filtros de estado de usuarios
+ */
+export const USER_STATUS_OPTIONS: SelectOption[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'active', label: 'Activos' },
+  { value: 'inactive', label: 'Inactivos' }
+];
+
+// ============================================================================
+// TIPOS PARA RESPUESTA DEL CONTROLADOR DE PERSONAS
+// ============================================================================
+
+/**
+ * Usuario dentro de la respuesta de persona
+ */
+export interface UserInPersonaResponse {
+  id: number;
+  nombre: string;
+  email: string;
+  habilitado: boolean;
+  esPrincipal: boolean;
+  roles: string[];
+  createdAt: string;
+  persona?: Persona; // Agregado para compatibilidad con la tabla existente
+}
+
+/**
+ * Persona con usuarios asociados (respuesta del nuevo controlador)
+ */
+export interface PersonaWithUsersResponse {
+  id: number;
+  nombreEmpresa: string;
+  ruc: string;
+  razonSocial: string;
+  telefono?: string;
+  direccion?: string;
+  habilitado: boolean;
+  createdAt: string;
+  updatedAt: string;
+  totalUsuarios: number;
+  usuariosActivos: number;
+  usuarios: UserInPersonaResponse[];
+}
