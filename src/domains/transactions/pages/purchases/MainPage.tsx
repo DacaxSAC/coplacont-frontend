@@ -170,12 +170,10 @@ export const MainPage: React.FC = () => {
             cells: [
               purchase.correlativo,
               purchase.tipoComprobante,
-              purchase.serie,
-              purchase.numero,
+              purchase.entidad.tipo === 'JURIDICA' ? purchase.entidad.razonSocial : purchase.entidad.nombreCompleto,
+              purchase.serie + " - " + purchase.numero,
               purchase.fechaEmision,
               purchase.fechaVencimiento !== null ? purchase.fechaVencimiento : "No especificado",
-              purchase.moneda,
-              purchase.tipoCambio,
               purchase.totales.totalGeneral.toString(),
               <Button 
                 size="tableItemSize" 
@@ -194,17 +192,15 @@ export const MainPage: React.FC = () => {
   const headers = [
     "Correlativo",
     "Tipo Comprobante",
-    "Serie",
-    "Número",
+    "Proveedor",
+    "Serie y Número",
     "Fecha Emisión",
     "Fecha Vencimiento",
-    "Moneda",
-    "Tipo Cambio",
     "Total General",
     "Acciones",
   ];
 
-  const gridTemplate = "0.8fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.8fr 0.8fr 1fr 1fr";
+  const gridTemplate = "0.6fr 0.8fr 1fr 0.8fr 1fr 1fr 1fr 1fr";
 
   return (
     <PageLayout
@@ -371,11 +367,11 @@ export const MainPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '16px' }}>
                 <div>
                   <Text size="sm" weight={500}>Número de Documento:</Text>
-                  <Text size="sm">{selectedPurchase.persona.numeroDocumento}</Text>
+                  <Text size="sm">{selectedPurchase.persona.razonSocial}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Razón Social:</Text>
-                  <Text size="sm">{selectedPurchase.persona.razonSocial || selectedPurchase.persona.nombreCompleto}</Text>
+                  <Text size="sm">{selectedPurchase.persona.razonSocial || selectedPurchase.persona.direccion}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Tipo de Comprobante:</Text>

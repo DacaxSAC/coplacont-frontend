@@ -63,7 +63,15 @@ export interface Transaction {
   fechaVencimiento: string;
   totales: TransactionTotals;
   detalles: Detail[];
-  persona: Entidad;
+  entidad: Entidad;
+  persona: Persona;
+}
+
+export interface Persona {
+  id: number;
+  razonSocial: string;
+  telefono: string;
+  direccion: string;
 }
 
 export interface Detail{
