@@ -29,7 +29,7 @@ import { useAuth } from "@/domains/auth";
  * Tipos de roles de usuario
  */
 const UserRoleType = {
-  ADMIN: "ADMINISTRADOR DEL SISTEMA",
+  ADMIN: "ADMIN",
   EMPRESA: "EMPRESA",
 } as const;
 
@@ -56,13 +56,12 @@ export const Sidebar: React.FC<SidebarProps> = () => {
   // Obtener el rol real del usuario (para condiciones)
   const userRoleType =
     user?.roles && user.roles.length > 0 ? user.roles[0].nombre : "";
-
+  
   // Obtener el rol principal del usuario con nombre descriptivo (para mostrar)
   const userRole =
     user?.roles && user.roles.length > 0
       ? ROLE_DISPLAY_NAMES[user.roles[0].nombre] || user.roles[0].nombre
       : "Sin rol";
-
   /**
    * Determina si un enlace está activo basándose en la ruta actual
    * @param path - La ruta del enlace a verificar
@@ -128,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         </div>
 
         {/* Transacciones - Compras y Ventas */}
-        {userRoleType === UserRoleType.EMPRESA && (
+        {userRoleType === "EMPRESA" && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <TransaccionesIcon />
@@ -168,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         )}
 
         {/* Inventario - Gestión de stock */}
-        {userRoleType === UserRoleType.EMPRESA && (
+        {userRoleType === "EMPRESA" && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <InventarioIcon />
@@ -215,7 +214,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         )}
 
         {/* Estados Financieros - Análisis financiero */}
-        {userRoleType === UserRoleType.EMPRESA && (
+        {userRoleType === "EMPRESA" && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <EstadosFinancierosIcon />
@@ -285,7 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         )}
 
         {/* Mantenedores - Gestión de entidades */}
-        {userRoleType === UserRoleType.EMPRESA && (
+        {userRoleType === "EMPRESA" && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               <MantenedoresIcon />
@@ -373,7 +372,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
             <h3 className={styles.sectionTitle__title}>Configuración</h3>
           </div>
           <ul className={styles.menuList}>
-            {userRole.toUpperCase() === UserRoleType.EMPRESA && (
+            {userRoleType === "EMPRESA" && (
               <>
                 <li>
                   <Link
@@ -419,7 +418,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                 </li>
               </>
             )}
-            {userRole.toUpperCase() === UserRoleType.ADMIN && (
+            {userRoleType === "ADMIN" && (
               <li>
                 <Link
                   to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
