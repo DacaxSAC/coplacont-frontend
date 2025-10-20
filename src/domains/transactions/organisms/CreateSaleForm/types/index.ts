@@ -62,6 +62,7 @@ const tipoProductoVentaOptions = [
 const tipoComprobanteOptions = [
   { value: TipoComprobanteEnum.FACTURA, label: "Factura" },
   { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
+  { value: TipoComprobanteEnum.NOTA_SALIDA, label: "Nota de Salida" },
   //{ value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
   //{ value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
 ];

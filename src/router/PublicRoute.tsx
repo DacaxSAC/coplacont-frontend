@@ -10,7 +10,7 @@ import { MAIN_ROUTES } from './routes';
  * Redirige a la página principal si el usuario ya está autenticado
  */
 export const PublicRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading }= useAuth();
 
   if (isLoading) {
     return <Loader />

@@ -42,8 +42,7 @@ const TipoProductoCompraEnum = {
 const TipoComprobanteEnum = {
   FACTURA: "FACTURA",
   BOLETA: "BOLETA",
-  NOTA_CREDITO: "nc",
-  NOTA_DEBITO: "nd",
+  NOTA_ENTRADA: "NOTA DE ENTRADA"
 } as const;
 
 const MonedaEnum = {
@@ -121,8 +120,7 @@ const tipoProductoCompraOptions = [
 const tipoComprobanteOptions = [
   { value: TipoComprobanteEnum.FACTURA, label: "Factura" },
   { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
-  //{ value: TipoComprobanteEnum.NOTA_CREDITO, label: "Nota de Crédito" },
-  //{ value: TipoComprobanteEnum.NOTA_DEBITO, label: "Nota de Débito" },
+  { value: TipoComprobanteEnum.NOTA_ENTRADA, label: "Nota de Entrada" },
 ];
 
 const monedaOptions = [
@@ -182,6 +180,7 @@ export const CreatePurchaseForm = () => {
   const [comprasRegistradas, setComprasRegistradas] = useState<Transaction[]>(
     []
   );
+  console.log(comprasRegistradas);
 
   // Estados para modal de nuevo proveedor
   const [showNewProviderModal, setShowNewProviderModal] = useState(false);
@@ -477,12 +476,12 @@ export const CreatePurchaseForm = () => {
   };
 
   // Maneja el cambio de comprobante afecto
-  const handleComprobanteAfectoChange = (value: string | number) => {
-    setFormState((prev) => ({
-      ...prev,
-      idComprobanteAfecto: String(value),
-    }));
-  };
+  //const handleComprobanteAfectoChange = (value: string | number) => {
+  //  setFormState((prev) => ({
+  //    ...prev,
+  //    idComprobanteAfecto: String(value),
+  //  }));
+  //};
 
   // Maneja el cambio de producto seleccionado
   const handleProductoChange = (value: string | number) => {
@@ -642,20 +641,19 @@ export const CreatePurchaseForm = () => {
   };
 
   // Función para determinar si debe mostrarse el combo de comprobante afecto
-  const shouldShowComprobanteAfecto = (): boolean => {
-    return (
-      formState.tipoComprobante === TipoComprobanteEnum.NOTA_CREDITO ||
-      formState.tipoComprobante === TipoComprobanteEnum.NOTA_DEBITO
-    );
-  };
+  //const shouldShowComprobanteAfecto = (): boolean => {
+  //  return (
+  //    formState.tipoComprobante === TipoComprobanteEnum.NOTA_ENTRADA
+  //  );
+  //};
 
   // Función para obtener las opciones de comprobantes afectos
-  const getComprobantesAfectosOptions = () => {
-    return comprasRegistradas.map((compra) => ({
-      value: compra.idComprobante.toString(),
-      label: `${compra.serie}-${compra.numero} - ${compra.fechaEmision}`,
-    }));
-  };
+  //const getComprobantesAfectosOptions = () => {
+  //  return comprasRegistradas.map((compra) => ({
+  //    value: compra.idComprobante.toString(),
+  //    label: `${compra.serie}-${compra.numero} - ${compra.fechaEmision}`,
+  //  }));
+  //};
 
   // Función para obtener las opciones de productos del inventario
   // Filtra los productos que ya están en el detalle de compra para el almacén seleccionado
@@ -1017,7 +1015,7 @@ export const CreatePurchaseForm = () => {
           </div>
 
           {/* Mostrar combo de Comprobante afecto solo para notas de crédito y débito */}
-          {shouldShowComprobanteAfecto() && (
+          {/**shouldShowComprobanteAfecto() && (
             <div
               className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--full"]}`}
             >
@@ -1033,7 +1031,7 @@ export const CreatePurchaseForm = () => {
                 onChange={handleComprobanteAfectoChange}
               />
             </div>
-          )}
+          )*/}
 
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--proveedor"]}`}

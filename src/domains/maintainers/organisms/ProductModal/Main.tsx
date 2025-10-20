@@ -90,6 +90,7 @@ export const Main: React.FC<CreateProductModalProps> = ({
     { label: 'Unidad', value: 'unidad' },
     { label: 'Kilogramo', value: 'kg' },
     { label: 'Litro', value: 'litro' },
+    { label: 'Tonelada', value: 'tonelada' },
   ]
 
   const handleSubmit = async () => {

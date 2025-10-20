@@ -142,7 +142,8 @@ export const CreateSaleForm = () => {
   const isClienteEnabled = (): boolean => {
     return (
       formState.tipoComprobante === TipoComprobanteEnum.FACTURA ||
-      formState.tipoComprobante === TipoComprobanteEnum.BOLETA
+      formState.tipoComprobante === TipoComprobanteEnum.BOLETA ||
+      formState.tipoComprobante === TipoComprobanteEnum.NOTA_SALIDA
     );
   };
 

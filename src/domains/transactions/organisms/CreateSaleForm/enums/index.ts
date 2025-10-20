@@ -11,6 +11,7 @@ const TipoProductoVentaEnum = {
 const TipoComprobanteEnum = {
   FACTURA: "FACTURA",
   BOLETA: "BOLETA",
+  NOTA_SALIDA: "NOTA DE SALIDA",
   NOTA_CREDITO: "nc",
   NOTA_DEBITO: "nd",
 } as const;

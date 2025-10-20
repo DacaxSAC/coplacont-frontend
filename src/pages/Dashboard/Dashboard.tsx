@@ -18,6 +18,8 @@ export const Dashboard: React.FC = () => {
     ? user.persona.nombreEmpresa
     : user?.email || 'Usuario';
 
+  const userRole= user?.roles[0].nombre;
+
   /**
    * Configuración de las tarjetas del dashboard
    */
@@ -97,7 +99,8 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        {/* Grid de tarjetas principales */}
+        { userRole !== 'ADMIN' &&
+          <>
         <div className={styles.cardsGrid}>
           {dashboardCards.map((card, index) => (
             <div key={index} className={styles.card}>
@@ -130,7 +133,6 @@ export const Dashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Sección de accesos rápidos */}
         <div className={styles.quickAccessSection}>
           <Text size="xl" weight={600} color="neutral-primary" className={styles.sectionTitle}>
             Accesos Rápidos
@@ -166,6 +168,8 @@ export const Dashboard: React.FC = () => {
             </button>
           </div>
         </div>
+        </>
+        }
       </div>
     </PageLayout>
   );
