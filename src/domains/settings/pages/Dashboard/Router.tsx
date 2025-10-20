@@ -13,5 +13,3 @@ export const Router: React.FC = () => {
     </Routes>
   );
 };
-
-export default Router;

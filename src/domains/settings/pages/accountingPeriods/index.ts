@@ -1,3 +1,3 @@
 export { MainPage } from "./MainPage";
 
-export { Router } from "./Router";
+export { Router as AccountingPeriodRouter } from "./Router";

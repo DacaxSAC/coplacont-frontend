@@ -1,2 +1,2 @@
 export { MainPage } from './MainPage';
-export { Router } from './Router';
+export { Router as ValuationMethodsRouter} from './Router';
