@@ -38,7 +38,7 @@ export const MainPage: React.FC = () => {
     año: new Date().getFullYear(),
     fechaInicio: "",
     fechaFin: "",
-    idPersona: user?.persona?.id || 0, // Obtener del contexto de usuario
+    idPersona: user?.persona?.id || 0,
     observaciones: "",
   });
 
