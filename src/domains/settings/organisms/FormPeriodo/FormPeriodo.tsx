@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./FormPeriodo.module.scss";
-import { Text, Input, Button, ComboBox } from "@/components";
+import { Text, Input, Button } from "@/components";
 import type { ConfiguracionPeriodo, CreateConfiguracionPeriodoDto } from "../../types";
-import {
-  MetodoValoracion,
-  ESTADO_PERIODO_OPTIONS,
-  METODO_VALORACION_OPTIONS,
-  formatMetodoValoracion,
-  formatEstadoPeriodo,
-} from "../../types";
 import { PeriodosApi } from "../../api";
 import { useAuth } from "@/domains/auth";
 

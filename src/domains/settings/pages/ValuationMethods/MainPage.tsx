@@ -13,9 +13,6 @@ import {
 import { MetodoValoracion, METODO_VALORACION_OPTIONS, formatMetodoValoracion } from '../../types';
 import styles from './MainPage.module.scss';
 
-/**
- * Interfaz para la configuración de métodos de valoración
- */
 interface ValuationMethodConfig {
   id: number;
   metodo: MetodoValoracion;
@@ -52,6 +49,7 @@ export const MainPage: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
   const [isCreate, setIsCreate] = useState(false);
+  console.log(isCreate);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');

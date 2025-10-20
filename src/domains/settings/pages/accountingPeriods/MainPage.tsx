@@ -19,10 +19,8 @@ import type {
   CreateConfiguracionPeriodoDto,
 } from "../../types";
 import {
-  EstadoPeriodo,
   ESTADO_PERIODO_OPTIONS,
   formatPeriodoLabel,
-  formatEstadoPeriodo,
 } from "../../types";
 import { useAuth } from "@/domains/auth/hooks";
 import { FormPeriodo } from "../../organisms/FormPeriodo";
