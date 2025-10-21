@@ -17,9 +17,11 @@ import type { KardexMovement } from "../../services/types";
 import type { Product, Warehouse } from "@/domains/maintainers/types";
 import { downloadFile } from "@/shared/utils/downloadUtils";
 import * as XLSX from "xlsx";
+import { useAuth } from "@/domains/auth";
 
 export const MainPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
@@ -27,6 +29,7 @@ export const MainPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>(
     new Date().getFullYear().toString()
   );
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [kardexData, setKardexData] = useState<KardexMovement[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -182,10 +185,26 @@ export const MainPage: React.FC = () => {
             parseInt(selectedWarehouseId),
             parseInt(selectedProductId)
           );
+        
+        // Calcular fechas de inicio y fin basadas en el año y mes seleccionados
+        let startDate: string;
+        let endDate: string;
+        
+        if (selectedMonth) {
+          // Si hay un mes seleccionado, usar solo ese mes
+          const daysInMonth = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
+          startDate = `${selectedYear}-${selectedMonth}-01`;
+          endDate = `${selectedYear}-${selectedMonth}-${daysInMonth.toString().padStart(2, '0')}`;
+        } else {
+          // Si no hay mes seleccionado, usar todo el año
+          startDate = `${selectedYear}-01-01`;
+          endDate = `${selectedYear}-12-31`;
+        }
+        
         const kardexResponse = await InventoryService.getKardexMovements(
           parseInt(inventario.id),
-          `${selectedYear}-01-01`,
-          `${selectedYear}-12-31`
+          startDate,
+          endDate
         );
         setKardexData(kardexResponse.movimientos);
         setKardexResponse(kardexResponse);
@@ -216,7 +235,7 @@ export const MainPage: React.FC = () => {
     };
 
     fetchKardexMovements();
-  }, [selectedProductId, selectedWarehouseId, selectedYear]);
+  }, [selectedProductId, selectedWarehouseId, selectedYear, selectedMonth]);
 
   // Efecto para recargar kardex cuando cambia el año en modo directo
   useEffect(() => {
@@ -235,6 +254,23 @@ export const MainPage: React.FC = () => {
       value: year.toString(),
     };
   });
+
+  // Generar opciones de meses
+  const monthOptions = [
+    { label: "Todo el año", value: "" },
+    { label: "Enero", value: "01" },
+    { label: "Febrero", value: "02" },
+    { label: "Marzo", value: "03" },
+    { label: "Abril", value: "04" },
+    { label: "Mayo", value: "05" },
+    { label: "Junio", value: "06" },
+    { label: "Julio", value: "07" },
+    { label: "Agosto", value: "08" },
+    { label: "Septiembre", value: "09" },
+    { label: "Octubre", value: "10" },
+    { label: "Noviembre", value: "11" },
+    { label: "Diciembre", value: "12" },
+  ];
 
   // Opciones para el ComboBox de productos
   const productOptions = [
@@ -345,145 +381,527 @@ export const MainPage: React.FC = () => {
   };
 
   /**
-   * Exporta los datos del kardex a Excel (.xlsx)
+   * Exporta los datos del kardex a Excel (.xlsx) según el formato FORMATO 13.1
+   * "REGISTRO DE INVENTARIO PERMANENTE VALORIZADO - DETALLE DEL INVENTARIO VALORIZADO"
    */
   const handleExportToExcel = () => {
-    if (!kardexResponse || !kardexData.length) {
+    if (!kardexResponse || !kardexData.length || !user?.persona) {
       return;
     }
 
     // Crear un nuevo libro de trabajo
     const workbook = XLSX.utils.book_new();
 
-    // Crear hoja de resumen
-    const summaryData = [
-      ["REPORTE DE KARDEX"],
+    // Obtener información de la empresa del usuario autenticado
+    const empresa = user.persona;
+    const periodo = selectedMonth 
+      ? `${selectedMonth.toUpperCase()} ${selectedYear}`
+      : selectedYear;
+
+    // Obtener el producto seleccionado para mostrar su código
+    const selectedProduct = products.find(p => p.id.toString() === selectedProductId);
+    const codigoProducto = selectedProduct?.codigo || "001";
+
+    // Función para separar serie y número del comprobante
+    const parseComprobante = (nComprobante: string) => {
+      if (!nComprobante || !nComprobante.includes('-')) {
+        return { serie: "", numero: nComprobante || "" };
+      }
+      const parts = nComprobante.split('-');
+      return {
+        serie: parts[0] || "",
+        numero: parts[1] || ""
+      };
+    };
+
+    // Crear los datos del reporte según FORMATO 13.1
+    const reportData = [
+      // Título del formato
+      ["FORMATO 13.1: \"REGISTRO DE INVENTARIO PERMANENTE VALORIZADO - DETALLE DEL INVENTARIO VALORIZADO\""],
       [],
-      ["Producto:", kardexResponse.producto],
-      ["Almacén:", kardexResponse.almacen],
-      ["Año:", selectedYear],
-      ["Fecha de Generación:", new Date().toLocaleDateString()],
+      // Información de cabecera
+      ["PERIODO:", "", "", "", periodo],
+      ["RUC:", "", "", "", empresa.ruc],
+      ["APELLIDOS Y NOMBRES, DENOMINACIÓN O RAZÓN SOCIAL:", "", "", "", empresa.razonSocial || empresa.nombreEmpresa],
+      ["ESTABLECIMIENTO (1):", "", "", "", `${kardexResponse.almacen}`],
+      ["CÓDIGO DE LA EXISTENCIA:", "", "", "", codigoProducto],
+      ["TIPO (TABLA 5):", "", "", "", "✓"],
+      ["DESCRIPCIÓN:", "", "", "", kardexResponse.producto],
+      ["CÓDIGO DE LA UNIDAD DE MEDIDA (TABLA 6):", "", "", "", "✓"],
+      ["MÉTODO DE VALUACIÓN:", "", "", "", "PEPS"],
       [],
-      ["RESUMEN"],
+      // Encabezados de la tabla
       [
-        "Existencias finales",
-        "Costo unitario final",
-        "Costo total final",
-        "Costo de ventas total",
+        "DOCUMENTO DE TRASLADO, COMPROBANTE DE PAGO, DOCUMENTO INTERNO O SIMILAR",
+        "",
+        "",
+        "",
+        "TIPO DE OPERACIÓN (TABLA 12)",
+        "ENTRADAS",
+        "",
+        "",
+        "SALIDAS",
+        "",
+        "",
+        "SALDO FINAL",
+        "",
+        ""
       ],
       [
-        reportes.cantidadActual.toString(),
-        reportes.costoUnitarioFinal.toString(),
-        reportes.costoTotalFinal.toString(),
-        reportes.costoVentasTotal.toString(),
-      ],
+        "FECHA",
+        "TIPO (TABLA 10)",
+        "SERIE",
+        "NÚMERO",
+        "",
+        "CANTIDAD",
+        "COSTO UNITARIO",
+        "COSTO TOTAL",
+        "CANTIDAD",
+        "COSTO UNITARIO",
+        "COSTO TOTAL",
+        "CANTIDAD",
+        "COSTO UNITARIO",
+        "COSTO TOTAL"
+      ]
     ];
 
-    const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, "Resumen");
+    // Calcular saldo inicial
+    let saldoCantidad = parseFloat(reportes.inventarioInicialCantidad.toString());
+    let saldoCostoTotal = parseFloat(reportes.inventarioInicialCostoTotal.toString());
+    let saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
 
-    // Crear hoja de movimientos
-    const movementsData = [
-      ["MOVIMIENTOS"],
-      [],
-      [
-        "Fecha",
-        "Tipo",
-        "Tipo de comprobante",
-        "Cod de comprobante",
-        "Cantidad",
-        "Costo Unitario",
-        "Costo Total",
-        "Saldo",
-      ],
-    ];
+    // Agregar fila de saldo inicial si existe
+    if (saldoCantidad > 0) {
+      reportData.push([
+        "-",
+        "", // TIPO (TABLA 10) vacío
+        "-",
+        "-",
+        "-",
+        "", // Entrada cantidad
+        "", // Entrada costo unitario
+        "", // Entrada costo total
+        "", // Salida cantidad
+        "", // Salida costo unitario
+        "", // Salida costo total
+        saldoCantidad.toFixed(2),
+        saldoCostoUnitario.toFixed(4),
+        saldoCostoTotal.toFixed(2)
+      ]);
+    }
 
-    // Agregar saldo inicial
-    movementsData.push([
-      "-",
-      "Saldo inicial",
-      "-",
-      "-",
-      reportes.inventarioInicialCantidad.toString(),
-      (
-        reportes.inventarioInicialCostoTotal /
-        reportes.inventarioInicialCantidad
-      ).toString(),
-      reportes.inventarioInicialCostoTotal.toString(),
-      "-",
-    ]);
-
-    // Agregar movimientos con detalles expandidos
-    let currentSaldo = parseFloat(
-      reportes.inventarioInicialCantidad.toString()
-    );
-    let currentCostoTotal = parseFloat(
-      reportes.inventarioInicialCostoTotal.toString()
-    );
-
+    // Procesar movimientos
     kardexData.forEach((movement) => {
-      if (
-        movement.tipo === "Salida" &&
-        movement.detallesSalida &&
-        movement.detallesSalida.length > 0
-      ) {
+      const comprobante = parseComprobante(movement.nComprobante || "");
+      
+      if (movement.tipo === "Salida" && movement.detallesSalida && movement.detallesSalida.length > 0) {
+        // Para salidas con detalles, crear una fila por cada detalle
         movement.detallesSalida.forEach((detalle) => {
-          const calculatedDetalleCostoTotal =
-            detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
-              ? detalle.costoTotalDeLote
-              : detalle.cantidad * detalle.costoUnitarioDeLote;
+          const calculatedDetalleCostoTotal = detalle.costoTotalDeLote && detalle.costoTotalDeLote !== 0
+            ? detalle.costoTotalDeLote
+            : detalle.cantidad * detalle.costoUnitarioDeLote;
 
-          currentSaldo -= detalle.cantidad;
-          currentCostoTotal -= calculatedDetalleCostoTotal;
+          // Actualizar saldo
+          saldoCantidad -= detalle.cantidad;
+          saldoCostoTotal -= calculatedDetalleCostoTotal;
+          saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
 
-          movementsData.push([
+          reportData.push([
             movement.fecha,
-            movement.tipo,
-            movement.tComprob,
-            movement.nComprobante,
-            detalle.cantidad.toString(),
-            detalle.costoUnitarioDeLote.toString(),
-            calculatedDetalleCostoTotal.toString(),
-            currentSaldo.toString(),
+            "", // TIPO (TABLA 10) vacío
+            comprobante.serie,
+            comprobante.numero,
+            movement.tComprob || "", // Tipo de operación
+            "", // Entrada cantidad
+            "", // Entrada costo unitario
+            "", // Entrada costo total
+            detalle.cantidad.toFixed(2), // Salida cantidad
+            detalle.costoUnitarioDeLote.toFixed(4), // Salida costo unitario
+            calculatedDetalleCostoTotal.toFixed(2), // Salida costo total
+            saldoCantidad.toFixed(2),
+            saldoCostoUnitario.toFixed(4),
+            saldoCostoTotal.toFixed(2)
           ]);
         });
       } else {
-        const calculatedCostoTotal =
-          movement.costoTotal && movement.costoTotal !== 0
-            ? movement.costoTotal
-            : movement.cantidad * movement.costoUnitario;
+        // Para entradas y salidas simples
+        const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0
+          ? movement.costoTotal
+          : movement.cantidad * movement.costoUnitario;
+
+        let entradaCantidad = "", entradaCostoUnitario = "", entradaCostoTotal = "";
+        let salidaCantidad = "", salidaCostoUnitario = "", salidaCostoTotal = "";
 
         if (movement.tipo === "Entrada") {
-          currentSaldo += movement.cantidad;
-          currentCostoTotal += calculatedCostoTotal;
+          // Actualizar saldo para entrada
+          saldoCantidad += movement.cantidad;
+          saldoCostoTotal += calculatedCostoTotal;
+          saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
+
+          entradaCantidad = movement.cantidad.toFixed(2);
+          entradaCostoUnitario = movement.costoUnitario.toFixed(4);
+          entradaCostoTotal = calculatedCostoTotal.toFixed(2);
         } else {
-          currentSaldo -= movement.cantidad;
-          currentCostoTotal -= calculatedCostoTotal;
+          // Actualizar saldo para salida
+          saldoCantidad -= movement.cantidad;
+          saldoCostoTotal -= calculatedCostoTotal;
+          saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
+
+          salidaCantidad = movement.cantidad.toFixed(2);
+          salidaCostoUnitario = movement.costoUnitario.toFixed(4);
+          salidaCostoTotal = calculatedCostoTotal.toFixed(2);
         }
 
-        movementsData.push([
+        reportData.push([
           movement.fecha,
-          movement.tipo,
-          movement.tComprob,
-          movement.nComprobante,
-          movement.cantidad.toString(),
-          movement.costoUnitario.toString(),
-          calculatedCostoTotal.toString(),
-          currentSaldo.toString(),
+          "", // TIPO (TABLA 10) vacío
+          comprobante.serie,
+          comprobante.numero,
+          movement.tComprob || "", // Tipo de operación
+          entradaCantidad,
+          entradaCostoUnitario,
+          entradaCostoTotal,
+          salidaCantidad,
+          salidaCostoUnitario,
+          salidaCostoTotal,
+          saldoCantidad.toFixed(2),
+          saldoCostoUnitario.toFixed(4),
+          saldoCostoTotal.toFixed(2)
         ]);
       }
     });
 
-    const movementsWorksheet = XLSX.utils.aoa_to_sheet(movementsData);
-    XLSX.utils.book_append_sheet(workbook, movementsWorksheet, "Movimientos");
+    // Agregar fila de totales
+    const totalEntradas = kardexData
+      .filter(m => m.tipo === "Entrada")
+      .reduce((sum, m) => sum + (m.costoTotal || m.cantidad * m.costoUnitario), 0);
+    
+    const totalSalidas = kardexData
+      .filter(m => m.tipo === "Salida")
+      .reduce((sum, m) => {
+        if (m.detallesSalida && m.detallesSalida.length > 0) {
+          return sum + m.detallesSalida.reduce((detSum, det) => 
+            detSum + (det.costoTotalDeLote || det.cantidad * det.costoUnitarioDeLote), 0);
+        }
+        return sum + (m.costoTotal || m.cantidad * m.costoUnitario);
+      }, 0);
+
+    reportData.push([
+      "",
+      "",
+      "",
+      "",
+      "TOTALES",
+      "",
+      "",
+      totalEntradas.toFixed(2),
+      "",
+      "",
+      totalSalidas.toFixed(2),
+      "",
+      "",
+      ""
+    ]);
+
+    // Crear la hoja de trabajo
+    const worksheet = XLSX.utils.aoa_to_sheet(reportData);
+
+    // Configurar anchos de columna
+    const colWidths = [
+      { wch: 12 }, // Fecha
+      { wch: 15 }, // Tipo
+      { wch: 8 },  // Serie
+      { wch: 12 }, // Número
+      { wch: 15 }, // Tipo operación
+      { wch: 12 }, // Entrada cantidad
+      { wch: 15 }, // Entrada costo unitario
+      { wch: 15 }, // Entrada costo total
+      { wch: 12 }, // Salida cantidad
+      { wch: 15 }, // Salida costo unitario
+      { wch: 15 }, // Salida costo total
+      { wch: 12 }, // Saldo cantidad
+      { wch: 15 }, // Saldo costo unitario
+      { wch: 15 }  // Saldo costo total
+    ];
+    worksheet['!cols'] = colWidths;
+
+    // Configurar celdas combinadas para los encabezados de secciones
+    const merges = [
+      // ENTRADAS (columnas F, G, H - índices 5, 6, 7)
+      { s: { r: 12, c: 5 }, e: { r: 12, c: 7 } },
+      // SALIDAS (columnas I, J, K - índices 8, 9, 10)
+      { s: { r: 12, c: 8 }, e: { r: 12, c: 10 } },
+      // SALDO FINAL (columnas L, M, N - índices 11, 12, 13)
+      { s: { r: 12, c: 11 }, e: { r: 12, c: 13 } }
+    ];
+    worksheet['!merges'] = merges;
+
+    // Aplicar bordes gruesos a las secciones usando un enfoque que funciona con XLSX
+    const startRow = 13; // Fila de encabezados de secciones (0-indexed)
+    const endRow = reportData.length - 1;
+
+    // Función para aplicar bordes gruesos a un rango
+    const applyThickBorders = (startCol: number, endCol: number) => {
+      // Aplicar bordes a todas las celdas del rango
+      for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+          const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!worksheet[cellRef]) {
+            worksheet[cellRef] = { t: 's', v: '' };
+          }
+          if (!worksheet[cellRef].s) {
+            worksheet[cellRef].s = {};
+          }
+          if (!worksheet[cellRef].s.border) {
+            worksheet[cellRef].s.border = {};
+          }
+
+          // Aplicar bordes exteriores gruesos
+          if (col === startCol) {
+            worksheet[cellRef].s.border.left = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (col === endCol) {
+            worksheet[cellRef].s.border.right = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (row === startRow) {
+            worksheet[cellRef].s.border.top = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (row === endRow) {
+            worksheet[cellRef].s.border.bottom = { style: "thick", color: { rgb: "000000" } };
+          }
+
+          // Aplicar bordes internos finos
+          if (col > startCol && col < endCol) {
+            worksheet[cellRef].s.border.left = { style: "thin", color: { rgb: "000000" } };
+            worksheet[cellRef].s.border.right = { style: "thin", color: { rgb: "000000" } };
+          }
+          if (row > startRow && row < endRow) {
+            worksheet[cellRef].s.border.top = { style: "thin", color: { rgb: "000000" } };
+            worksheet[cellRef].s.border.bottom = { style: "thin", color: { rgb: "000000" } };
+          }
+        }
+      }
+    };
+
+    // Aplicar bordes gruesos a cada sección
+    applyThickBorders(5, 7);   // ENTRADAS (columnas F, G, H)
+    applyThickBorders(8, 10);  // SALIDAS (columnas I, J, K)
+    applyThickBorders(11, 13); // SALDO FINAL (columnas L, M, N)
+
+    // Agregar la hoja al libro
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Kardex Valorizado");
+
+    // ========== CREAR SEGUNDA HOJA SIMPLIFICADA (FORMATO 12.1) ==========
+    
+    // Crear los datos del reporte simplificado según FORMATO 12.1
+    const simplifiedReportData = [
+      // Título del formato
+      ["FORMATO 12.1: \"REGISTRO DEL INVENTARIO PERMANENTE EN UNIDADES FÍSICAS- DETALLE DEL INVENTARIO PERMANENTE EN UNIDADES FÍSICAS\""],
+      [],
+      // Información de cabecera
+      ["PERIODO:", "", "", "", "", "", periodo],
+      ["RUC:", "", "", "", "", "", empresa.ruc],
+      ["APELLIDOS Y NOMBRES, DENOMINACIÓN O RAZÓN SOCIAL:", "", "", "", "", "", empresa.razonSocial || empresa.nombreEmpresa],
+      ["ESTABLECIMIENTO (1):", "", "", "", "", "", `${kardexResponse.almacen}`],
+      ["CÓDIGO DE LA EXISTENCIA:", "", "", "", "", "", codigoProducto],
+      ["TIPO (TABLA 5):", "", "", "", "", "", "✓"],
+      ["DESCRIPCIÓN:", "", "", "", "", "", kardexResponse.producto],
+      ["CÓDIGO DE LA UNIDAD DE MEDIDA (TABLA 6):", "", "", "", "", "", "✓"],
+      [],
+      // Encabezados de la tabla simplificada
+      [
+        "DOCUMENTO DE TRASLADO, COMPROBANTE DE PAGO, DOCUMENTO INTERNO O SIMILAR",
+        "",
+        "",
+        "",
+        "TIPO DE OPERACIÓN (TABLA 12)",
+        "ENTRADAS",
+        "SALIDAS",
+        "SALDO FINAL"
+      ],
+      [
+        "FECHA",
+        "TIPO (TABLA 10)",
+        "SERIE",
+        "NÚMERO",
+        "",
+        "",
+        "",
+        ""
+      ]
+    ];
+
+    // Calcular saldo inicial en cantidades
+    let saldoCantidadSimplificado = parseFloat(reportes.inventarioInicialCantidad.toString());
+
+    // Agregar fila de saldo inicial si existe
+    if (saldoCantidadSimplificado > 0) {
+      simplifiedReportData.push([
+        "-",
+        "", // TIPO (TABLA 10) vacío
+        "-",
+        "-",
+        "-",
+        "", // Entrada cantidad
+        "", // Salida cantidad
+        saldoCantidadSimplificado.toFixed(2) // Saldo cantidad
+      ]);
+    }
+
+    // Procesar movimientos para la hoja simplificada
+    kardexData.forEach((movement) => {
+      const comprobante = parseComprobante(movement.nComprobante || "");
+      
+      if (movement.tipo === "Salida" && movement.detallesSalida && movement.detallesSalida.length > 0) {
+        // Para salidas con detalles, crear una fila por cada detalle
+        movement.detallesSalida.forEach((detalle) => {
+          // Actualizar saldo
+          saldoCantidadSimplificado -= detalle.cantidad;
+
+          simplifiedReportData.push([
+            movement.fecha,
+            "", // TIPO (TABLA 10) vacío
+            comprobante.serie,
+            comprobante.numero,
+            movement.tComprob || "", // Tipo de operación
+            "", // Entrada cantidad
+            detalle.cantidad.toFixed(2), // Salida cantidad
+            saldoCantidadSimplificado.toFixed(2) // Saldo cantidad
+          ]);
+        });
+      } else {
+        // Para entradas y salidas simples
+        let entradaCantidad = "", salidaCantidad = "";
+
+        if (movement.tipo === "Entrada") {
+          // Actualizar saldo para entrada
+          saldoCantidadSimplificado += movement.cantidad;
+          entradaCantidad = movement.cantidad.toFixed(2);
+        } else {
+          // Actualizar saldo para salida
+          saldoCantidadSimplificado -= movement.cantidad;
+          salidaCantidad = movement.cantidad.toFixed(2);
+        }
+
+        simplifiedReportData.push([
+          movement.fecha,
+          "", // TIPO (TABLA 10) vacío
+          comprobante.serie,
+          comprobante.numero,
+          movement.tComprob || "", // Tipo de operación
+          entradaCantidad,
+          salidaCantidad,
+          saldoCantidadSimplificado.toFixed(2)
+        ]);
+      }
+    });
+
+    // Agregar fila de totales para la hoja simplificada
+    const totalEntradasCantidad = kardexData
+      .filter(m => m.tipo === "Entrada")
+      .reduce((sum, m) => sum + m.cantidad, 0);
+    
+    const totalSalidasCantidad = kardexData
+      .filter(m => m.tipo === "Salida")
+      .reduce((sum, m) => {
+        if (m.detallesSalida && m.detallesSalida.length > 0) {
+          return sum + m.detallesSalida.reduce((detSum, det) => detSum + det.cantidad, 0);
+        }
+        return sum + m.cantidad;
+      }, 0);
+
+    simplifiedReportData.push([
+      "",
+      "",
+      "",
+      "",
+      "TOTALES",
+      totalEntradasCantidad.toFixed(2),
+      totalSalidasCantidad.toFixed(2),
+      ""
+    ]);
+
+    // Crear la hoja de trabajo simplificada
+    const simplifiedWorksheet = XLSX.utils.aoa_to_sheet(simplifiedReportData);
+
+    // Configurar anchos de columna para la hoja simplificada
+    const simplifiedColWidths = [
+      { wch: 12 }, // Fecha
+      { wch: 15 }, // Tipo
+      { wch: 8 },  // Serie
+      { wch: 12 }, // Número
+      { wch: 20 }, // Tipo operación
+      { wch: 15 }, // Entrada cantidad
+      { wch: 15 }, // Salida cantidad
+      { wch: 15 }  // Saldo cantidad
+    ];
+    simplifiedWorksheet['!cols'] = simplifiedColWidths;
+
+    // Configurar celdas combinadas para los encabezados de la hoja simplificada
+    const simplifiedMerges = [
+      // Título principal
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+      // Documento de traslado header
+      { s: { r: 11, c: 0 }, e: { r: 11, c: 3 } }
+    ];
+    simplifiedWorksheet['!merges'] = simplifiedMerges;
+
+    // Aplicar bordes a la hoja simplificada
+    const simplifiedStartRow = 12; // Fila de encabezados (0-indexed)
+    const simplifiedEndRow = simplifiedReportData.length - 1;
+
+    // Función para aplicar bordes a la hoja simplificada
+    const applySimplifiedBorders = () => {
+      for (let row = simplifiedStartRow; row <= simplifiedEndRow; row++) {
+        for (let col = 0; col <= 7; col++) {
+          const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+          if (!simplifiedWorksheet[cellRef]) {
+            simplifiedWorksheet[cellRef] = { t: 's', v: '' };
+          }
+          if (!simplifiedWorksheet[cellRef].s) {
+            simplifiedWorksheet[cellRef].s = {};
+          }
+          if (!simplifiedWorksheet[cellRef].s.border) {
+            simplifiedWorksheet[cellRef].s.border = {};
+          }
+
+          // Aplicar bordes exteriores
+          if (col === 0) {
+            simplifiedWorksheet[cellRef].s.border.left = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (col === 7) {
+            simplifiedWorksheet[cellRef].s.border.right = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (row === simplifiedStartRow) {
+            simplifiedWorksheet[cellRef].s.border.top = { style: "thick", color: { rgb: "000000" } };
+          }
+          if (row === simplifiedEndRow) {
+            simplifiedWorksheet[cellRef].s.border.bottom = { style: "thick", color: { rgb: "000000" } };
+          }
+
+          // Aplicar bordes internos finos
+          if (col > 0 && col < 7) {
+            simplifiedWorksheet[cellRef].s.border.left = { style: "thin", color: { rgb: "000000" } };
+            simplifiedWorksheet[cellRef].s.border.right = { style: "thin", color: { rgb: "000000" } };
+          }
+          if (row > simplifiedStartRow && row < simplifiedEndRow) {
+            simplifiedWorksheet[cellRef].s.border.top = { style: "thin", color: { rgb: "000000" } };
+            simplifiedWorksheet[cellRef].s.border.bottom = { style: "thin", color: { rgb: "000000" } };
+          }
+        }
+      }
+    };
+
+    // Aplicar bordes a la hoja simplificada
+    applySimplifiedBorders();
+
+    // Agregar la hoja simplificada al libro
+    XLSX.utils.book_append_sheet(workbook, simplifiedWorksheet, "Kardex Unidades Físicas");
 
     // Generar nombre del archivo
     const producto = kardexResponse.producto || "producto";
     const almacen = kardexResponse.almacen || "almacen";
-    const filename = `kardex_${producto.replace(/\s+/g, "_")}_${almacen.replace(
-      /\s+/g,
-      "_"
-    )}_${selectedYear}.xlsx`;
+    const filename = `kardex_completo_${producto.replace(/\s+/g, "_")}_${almacen.replace(/\s+/g, "_")}_${selectedYear}${selectedMonth ? `_${selectedMonth}` : ""}.xlsx`;
 
     // Escribir el archivo
     XLSX.writeFile(workbook, filename);
@@ -731,6 +1149,19 @@ export const MainPage: React.FC = () => {
               value={selectedYear}
               onChange={(v) => setSelectedYear(v as string)}
               placeholder="Seleccionar año"
+            />
+          </div>
+          <div className={styles.MainPage__Filter}>
+            <Text size="xs" color="neutral-primary">
+              Mes
+            </Text>
+            <ComboBox
+              options={monthOptions}
+              size="xs"
+              variant="createSale"
+              value={selectedMonth}
+              onChange={(v) => setSelectedMonth(v as string)}
+              placeholder="Seleccionar mes"
             />
           </div>
           {!isDirectLoad && (
