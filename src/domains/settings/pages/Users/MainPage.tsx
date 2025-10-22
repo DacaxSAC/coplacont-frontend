@@ -23,6 +23,8 @@ import type {
 import { USER_STATUS_OPTIONS } from "../../types";
 import { usersApi } from "../../api/usersApi/api";
 import { FormUser } from "../../organisms/FormUser/FormUser";
+import { FormCompany } from "../../organisms/FormCompany/FormCompany";
+import { UserManagement } from "../../organisms/UserManagement/UserManagement";
 
 export const MainPage: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -31,6 +33,7 @@ export const MainPage: React.FC = () => {
   const [personas, setPersonas] = useState<PersonaWithUsersResponse[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isView, setIsView] = useState(false);
+  console.log(isView);
   const [isCreate, setIsCreate] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,27 +52,6 @@ export const MainPage: React.FC = () => {
 
   const [selectedPersona, setSelectedPersona] =
     useState<PersonaWithUsersResponse | null>(null);
-
-  /**
-   * Mapea PersonaWithUsersResponse a EmpresaParcial para el formulario
-   */
-  const mapPersonaToEmpresaParcial = (persona: PersonaWithUsersResponse): EmpresaParcial => {
-    // Obtener el usuario principal o el primero disponible
-    const usuarioPrincipal = persona.usuarios.find(u => u.esPrincipal) || persona.usuarios[0];
-    
-    return {
-      id: persona.id,
-      nombreEmpresa: persona.nombreEmpresa,
-      ruc: persona.ruc,
-      razonSocial: persona.razonSocial,
-      telefono: persona.telefono || '',
-      direccion: persona.direccion || '',
-      nombreUsuario: usuarioPrincipal?.nombre || '',
-      emailUsuario: usuarioPrincipal?.email || '',
-      idRol: 1, // Valor por defecto, se puede ajustar según la lógica de negocio
-      esPrincipal: usuarioPrincipal?.esPrincipal || false,
-    };
-  };
 
   /**
    * Maneja los cambios en los campos del formulario
@@ -187,6 +169,26 @@ export const MainPage: React.FC = () => {
     }
   };
 
+  const handleTogglePersonaStatus = async (persona: PersonaWithUsersResponse) => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      // Alternar entre habilitar y deshabilitar según el estado actual
+      if (persona.habilitado) {
+        await usersApi.disablePersona(persona.id);
+      } else {
+        await usersApi.enablePersona(persona.id);
+      }
+      
+      await fetchUsers(); // Recargar la lista para reflejar los cambios
+    } catch (error) {
+      setError(`Error al ${persona.habilitado ? 'desactivar' : 'activar'} la empresa. Inténtalo de nuevo.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -245,8 +247,8 @@ export const MainPage: React.FC = () => {
             <Button
               size="tableItemSize"
               variant="tableItemStyle"
-              onClick={() => {
-              }}
+              onClick={() => handleTogglePersonaStatus(persona)}
+              disabled={loading}
             >
               {persona.habilitado ? <CloseIcon /> : <CheckIcon />}
             </Button>
@@ -333,26 +335,47 @@ export const MainPage: React.FC = () => {
           setIsOpen(false);
           setError("");
         }}
-        title={isCreate ? "Agregar nueva empresa" : "Detalles del usuario"}
+        title={isCreate ? "Agregar nueva empresa" : `Gestión de ${selectedPersona?.nombreEmpresa || 'empresa'}`}
         description={
           isCreate
             ? "Ingresa los datos para registrar una nueva empresa con su usuario principal."
-            : "Información detallada del usuario y empresa."
+            : "Administra los datos de la empresa y gestiona sus usuarios."
         }
         loading={loading}
         buttonText="Cerrar"
       >
-        {<FormUser
-          persona={isView && selectedPersona ? mapPersonaToEmpresaParcial(selectedPersona) : newPersona}
-          error={error}
-          loading={loading}
-          setError={setError}
-          setLoading={setLoading}
-          onChange={handlePersonaChange}
-          onSubmit={handleCreate}
-          readOnly={isView}
-          isCreate={isCreate}
-        />}
+        {isCreate ? (
+          <FormUser
+            persona={newPersona}
+            error={error}
+            loading={loading}
+            setError={setError}
+            setLoading={setLoading}
+            onChange={handlePersonaChange}
+            onSubmit={handleCreate}
+            readOnly={false}
+            isCreate={true}
+          />
+        ) : (
+          selectedPersona && (
+            <div className={styles.managementContainer}>
+              <FormCompany
+                persona={selectedPersona}
+                error={error}
+                setError={setError}
+                loading={loading}
+                setLoading={setLoading}
+                readOnly={false}
+                onUpdate={fetchUsers}
+              />
+              
+              <UserManagement
+                persona={selectedPersona}
+                onUpdate={fetchUsers}
+              />
+            </div>
+          )
+        )}
       </Modal>
     </PageLayout>
   );

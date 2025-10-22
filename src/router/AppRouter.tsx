@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage, RecoveryPasswordPage, NewPasswordPage } from '@/domains/auth';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
+import { RoleBasedRoute } from '@/components';
 
 import { MainLayout } from '../components';
 import {  
@@ -19,7 +20,7 @@ import { Dashboard } from '@/pages';
 
 /**
  * Componente principal de enrutamiento de la aplicación
- * Define todas las rutas disponibles y su configuración
+ * Define todas las rutas disponibles y su configuración con protección basada en roles
  */
 export const AppRouter: React.FC = () => {
   return (
@@ -36,17 +37,51 @@ export const AppRouter: React.FC = () => {
       {/* Rutas privadas */}
       <Route element={<ProtectedRoute />}>
         <Route path={MAIN_ROUTES.HOME} element={<MainLayout />}>
-          {/* Ruta del Dashboard - página de inicio */}
-          <Route index element={<Dashboard />} />
+          {/* Ruta del Dashboard - disponible para ADMIN y EMPRESA */}
+          <Route index element={
+            <RoleBasedRoute>
+              <Dashboard />
+            </RoleBasedRoute>
+          } />
           
-          {/* Rutas de módulos */}
-          <Route path={`${MAIN_ROUTES.MAINTAINERS}/*`} element={<MaintainersRouter />} />
-          <Route path={`${MAIN_ROUTES.TRANSACTIONS}/*`} element={<TransactionsRouter />} />
-          <Route path={`${MAIN_ROUTES.INVENTORY}/*`} element={<InventoryRouter />} />
-          <Route path={`${MAIN_ROUTES.ACCOUNTING}/*`} element={<AccountingRouter />} />
-          <Route path={`${MAIN_ROUTES.FINANCIAL_CLOSING}/*`} element={<FinancialClosingRouter />} />
-          <Route path={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}/*`} element={<FinancialStatementsRouter />} />
-          <Route path={`${MAIN_ROUTES.SETTINGS}/*`} element={<SettingsRouter />} />
+          {/* Rutas de módulos - disponibles para EMPRESA, restringidas para ADMIN */}
+          <Route path={`${MAIN_ROUTES.MAINTAINERS}/*`} element={
+            <RoleBasedRoute>
+              <MaintainersRouter />
+            </RoleBasedRoute>
+          } />
+          <Route path={`${MAIN_ROUTES.TRANSACTIONS}/*`} element={
+            <RoleBasedRoute>
+              <TransactionsRouter />
+            </RoleBasedRoute>
+          } />
+          <Route path={`${MAIN_ROUTES.INVENTORY}/*`} element={
+            <RoleBasedRoute>
+              <InventoryRouter />
+            </RoleBasedRoute>
+          } />
+          <Route path={`${MAIN_ROUTES.ACCOUNTING}/*`} element={
+            <RoleBasedRoute>
+              <AccountingRouter />
+            </RoleBasedRoute>
+          } />
+          <Route path={`${MAIN_ROUTES.FINANCIAL_CLOSING}/*`} element={
+            <RoleBasedRoute>
+              <FinancialClosingRouter />
+            </RoleBasedRoute>
+          } />
+          <Route path={`${MAIN_ROUTES.FINANCIAL_STATEMENTS}/*`} element={
+            <RoleBasedRoute>
+              <FinancialStatementsRouter />
+            </RoleBasedRoute>
+          } />
+          
+          {/* Rutas de configuración - con protección específica por subruta */}
+          <Route path={`${MAIN_ROUTES.SETTINGS}/*`} element={
+            <RoleBasedRoute>
+              <SettingsRouter />
+            </RoleBasedRoute>
+          } />
         </Route>
       </Route>
 

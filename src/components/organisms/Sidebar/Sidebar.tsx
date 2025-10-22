@@ -25,17 +25,11 @@ import {
 } from "@/router/routes";
 import { useAuth } from "@/domains/auth";
 
-/**
- * Tipos de roles de usuario
- */
 const UserRoleType = {
   ADMIN: "ADMIN",
   EMPRESA: "EMPRESA",
 } as const;
 
-/**
- * Mapeo de roles a nombres descriptivos
- */
 const ROLE_DISPLAY_NAMES: Record<string, string> = {
   [UserRoleType.ADMIN]: "Administrador del sistema",
   [UserRoleType.EMPRESA]: "Empresa",
@@ -48,25 +42,18 @@ export const Sidebar: React.FC<SidebarProps> = () => {
   const location = useLocation();
   const { logout, user } = useAuth();
 
-  // Construir el nombre completo del usuario
   const userName = user?.persona
     ? user.persona.nombreEmpresa
     : user?.email || "Usuario";
 
-  // Obtener el rol real del usuario (para condiciones)
   const userRoleType =
     user?.roles && user.roles.length > 0 ? user.roles[0].nombre : "";
-  
-  // Obtener el rol principal del usuario con nombre descriptivo (para mostrar)
+
   const userRole =
     user?.roles && user.roles.length > 0
       ? ROLE_DISPLAY_NAMES[user.roles[0].nombre] || user.roles[0].nombre
       : "Sin rol";
-  /**
-   * Determina si un enlace está activo basándose en la ruta actual
-   * @param path - La ruta del enlace a verificar
-   * @returns true si el enlace está activo
-   */
+
   const isActiveLink = (path: string): boolean => {
     if (path === MAIN_ROUTES.HOME) {
       return location.pathname === "/";
@@ -107,7 +94,6 @@ export const Sidebar: React.FC<SidebarProps> = () => {
       </div>
 
       <nav className={styles.navigation}>
-        
         {/* Dashboard - Página de inicio */}
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
@@ -390,20 +376,6 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                 </li>
                 <li>
                   <Link
-                    to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.VALUATION_METHODS}`}
-                    className={
-                      isActiveLink(
-                        `${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.VALUATION_METHODS}`
-                      )
-                        ? styles.active
-                        : ""
-                    }
-                  >
-                    Métodos de Valoración
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.PARAMS}`}
                     className={
                       isActiveLink(
@@ -419,20 +391,36 @@ export const Sidebar: React.FC<SidebarProps> = () => {
               </>
             )}
             {userRoleType === "ADMIN" && (
-              <li>
-                <Link
-                  to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
-                  className={
-                    isActiveLink(
-                      `${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`
-                    )
-                      ? styles.active
-                      : ""
-                  }
-                >
-                  Usuarios y Roles
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link
+                    to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`}
+                    className={
+                      isActiveLink(
+                        `${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.USERS}`
+                      )
+                        ? styles.active
+                        : ""
+                    }
+                  >
+                    Usuarios y Roles
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.VALUATION_METHODS}`}
+                    className={
+                      isActiveLink(
+                        `${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.VALUATION_METHODS}`
+                      )
+                        ? styles.active
+                        : ""
+                    }
+                  >
+                    Métodos de Valoración
+                  </Link>
+                </li>
+              </>
             )}
           </ul>
         </div>

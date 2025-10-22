@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { PageLayout } from '@/components';
-import {
-  Table,
-  Button,
-  StateTag,
-  Modal,
-  Text,
-  Input,
+import styles from './MainPage.module.scss';
+import { 
+  PageLayout, 
+  Table, 
+  Button, 
+  Modal, 
+  StateTag, 
+  Input, 
+  Text, 
   ComboBox,
-  Loader,
+  Loader
 } from '@/components';
 import { MetodoValoracion, METODO_VALORACION_OPTIONS, formatMetodoValoracion } from '../../types';
-import styles from './MainPage.module.scss';
 
 interface ValuationMethodConfig {
   id: number;
@@ -55,7 +55,7 @@ export const MainPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   
-  const [selectedMethod, setSelectedMethod] = useState<ValuationMethodConfig | null>(null);
+  const [selectedMethod] = useState<ValuationMethodConfig | null>(null);
   const [newMethod, setNewMethod] = useState<{
     metodo: MetodoValoracion;
     descripcion: string;
@@ -65,27 +65,6 @@ export const MainPage: React.FC = () => {
     descripcion: '',
     activo: true
   });
-
-  /**
-   * Maneja el cambio de estado de un método de valoración
-   */
-  const handleStatusChange = async (id: number, currentStatus: boolean) => {
-    try {
-      setIsLoading(true);
-      // Aquí iría la llamada a la API
-      setMethods(prev => 
-        prev.map(method => 
-          method.id === id 
-            ? { ...method, activo: !currentStatus, fechaActualizacion: new Date().toISOString().split('T')[0] }
-            : method
-        )
-      );
-    } catch (error) {
-      console.error('Error al cambiar estado del método:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   /**
    * Maneja la creación de un nuevo método
@@ -157,59 +136,22 @@ export const MainPage: React.FC = () => {
     cells: [
       formatMetodoValoracion(method.metodo),
       method.descripcion,
-      <StateTag key={`status-${method.id}`} state={method.activo} />,
-      method.fechaCreacion,
-      method.fechaActualizacion,
-      <div key={`actions-${method.id}`} style={{ display: 'flex', gap: '8px' }}>
-        <Button
-          size="tableItemSize"
-          variant="tableItemStyle"
-          onClick={() => {
-            setSelectedMethod(method);
-            setIsView(true);
-            setIsOpen(true);
-          }}
-        >
-          Ver detalles
-        </Button>
-        <Button
-          size="tableItemSize"
-          variant="tableItemStyle"
-          onClick={() => handleStatusChange(method.id, method.activo)}
-        >
-          {method.activo ? 'Desactivar' : 'Activar'}
-        </Button>
-      </div>
+      <StateTag key={`status-${method.id}`} state={method.activo} />
     ]
   }));
 
   const headers = [
     'Método',
     'Descripción',
-    'Estado',
-    'Fecha Creación',
-    'Fecha Actualización',
-    'Acciones'
+    'Estado'
   ];
   
-  const gridTemplate = '1fr 2fr 0.8fr 1fr 1fr 1.2fr';
+  const gridTemplate = '1fr 2fr 0.8fr';
 
   return (
     <PageLayout
       title="Métodos de Valoración"
       subtitle="Configuración de métodos de valoración de inventario"
-      header={
-        <Button
-          size="large"
-          onClick={() => {
-            setIsOpen(true);
-            setIsView(false);
-            setIsCreate(true);
-          }}
-        >
-          + Agregar método
-        </Button>
-      }
     >
       {/* Filtros */}
       <section className={styles.MainPage}>

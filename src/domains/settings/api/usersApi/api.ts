@@ -38,6 +38,12 @@ export const usersApi = {
     apiClient.patch(USERSENDPOINTS.DISABLE_USER.replace(':id', String(id))),
 
   /**
+   * Activa un usuario
+   */
+  enableUser: (id: number) => 
+    apiClient.patch(USERSENDPOINTS.ENABLE_USER.replace(':id', String(id))),
+
+  /**
    * Crea una empresa con usuario principal
    */
   createEmpresaConUsuario: (payload: CreateEmpresaConUsuarioDto) => 
@@ -66,4 +72,22 @@ export const usersApi = {
    */
   getPersonaWithUsers: (id: number) => 
     apiClient.get<PersonaWithUsersResponse>(USERSENDPOINTS.GET_PERSONA_WITH_USERS.replace(':id', String(id))),
+
+  /**
+   * Desactiva una persona/empresa y todos sus usuarios asociados (nuevo controlador)
+   */
+  disablePersona: (id: number) => 
+    apiClient.patch(USERSENDPOINTS.DISABLE_PERSONA.replace(':id', String(id))),
+
+  /**
+   * Actualiza los datos de una persona/empresa
+   */
+  updatePersona: (id: number, payload: { nombreEmpresa?: string; ruc?: string; razonSocial?: string; telefono?: string; direccion?: string }) => 
+    apiClient.patch<PersonaWithUsersResponse>(USERSENDPOINTS.UPDATE_PERSONA.replace(':id', String(id)), payload),
+
+  /**
+   * Activa una persona/empresa y todos sus usuarios asociados
+   */
+  enablePersona: (id: number) => 
+    apiClient.patch(USERSENDPOINTS.ENABLE_PERSONA.replace(':id', String(id))),
 }

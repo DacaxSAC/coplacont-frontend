@@ -926,7 +926,7 @@ export const MainPage: React.FC = () => {
     // Función auxiliar para parsear comprobante
     const parseComprobante = (tComprob: string, nComprobante: string) => {
       if (!nComprobante) return { serie: "", numero: "" };
-      
+      console.log(tComprob);
       // Si nComprobante ya contiene el formato completo (ej: "F00-000")
       const parts = nComprobante.split("-");
       
@@ -1314,7 +1314,7 @@ export const MainPage: React.FC = () => {
    */
   const parseComprobante = (tComprob: string, nComprobante: string) => {
     if (!nComprobante) return { serie: "", numero: "" };
-    
+    console.log(tComprob);
     // Si nComprobante ya contiene el formato completo (ej: "F00-000")
     const parts = nComprobante.split("-");
     
