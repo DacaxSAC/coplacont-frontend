@@ -40,7 +40,7 @@ export class ValuationMethodsService {
    */
   static async deactivateMethod() {
     // Al desactivar, establecemos PROMEDIO como método predeterminado
-    return this.updateMetodoValoracion('PROMEDIO' as MetodoValoracion);
+    return this.updateMetodoValoracion('promedio' as MetodoValoracion);
   }
 
   /**
