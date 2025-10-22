@@ -925,10 +925,10 @@ export const MainPage: React.FC = () => {
 
     // Función auxiliar para parsear comprobante
     const parseComprobante = (tComprob: string, nComprobante: string) => {
-      if (!tComprob || !nComprobante) return { serie: "", numero: "" };
+      if (!nComprobante) return { serie: "", numero: "" };
       
-      const comprobante = `${tComprob}-${nComprobante}`;
-      const parts = comprobante.split("-");
+      // Si nComprobante ya contiene el formato completo (ej: "F00-000")
+      const parts = nComprobante.split("-");
       
       if (parts.length >= 2) {
         return {
@@ -937,7 +937,8 @@ export const MainPage: React.FC = () => {
         };
       }
       
-      return { serie: "", numero: comprobante };
+      // Si no tiene guión, devolver el número completo en numero y serie vacía
+      return { serie: "", numero: nComprobante };
     };
 
     // Crear contenido HTML para imprimir con ambos formatos
@@ -1054,7 +1055,7 @@ export const MainPage: React.FC = () => {
                         <td></td>
                         <td>${serie}</td>
                         <td>${numero}</td>
-                        <td></td>
+                        <td>${movement.tipo.toUpperCase()}</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -1083,7 +1084,7 @@ export const MainPage: React.FC = () => {
                         <td></td>
                         <td>${serie}</td>
                         <td>${numero}</td>
-                        <td></td>
+                        <td>${movement.tipo.toUpperCase()}</td>
                         <td>${movement.cantidad}</td>
                         <td>${movement.costoUnitario.toFixed(2)}</td>
                         <td>${calculatedCostoTotal.toFixed(2)}</td>
@@ -1106,7 +1107,7 @@ export const MainPage: React.FC = () => {
                         <td></td>
                         <td>${serie}</td>
                         <td>${numero}</td>
-                        <td></td>
+                        <td>${movement.tipo.toUpperCase()}</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -1224,7 +1225,7 @@ export const MainPage: React.FC = () => {
                           <td></td>
                           <td>${serie}</td>
                           <td>${numero}</td>
-                          <td></td>
+                          <td>${movement.tipo.toUpperCase()}</td>
                           <td></td>
                           <td>${detalle.cantidad}</td>
                           <td>${saldoCantidadSimple}</td>
@@ -1239,7 +1240,7 @@ export const MainPage: React.FC = () => {
                           <td></td>
                           <td>${serie}</td>
                           <td>${numero}</td>
-                          <td></td>
+                          <td>${movement.tipo.toUpperCase()}</td>
                           <td>${movement.cantidad}</td>
                           <td></td>
                           <td>${saldoCantidadSimple}</td>
@@ -1252,7 +1253,7 @@ export const MainPage: React.FC = () => {
                           <td></td>
                           <td>${serie}</td>
                           <td>${numero}</td>
-                          <td></td>
+                          <td>${movement.tipo.toUpperCase()}</td>
                           <td></td>
                           <td>${movement.cantidad}</td>
                           <td>${saldoCantidadSimple}</td>
@@ -1312,10 +1313,10 @@ export const MainPage: React.FC = () => {
    * Función auxiliar para parsear comprobante
    */
   const parseComprobante = (tComprob: string, nComprobante: string) => {
-    if (!tComprob || !nComprobante) return { serie: "", numero: "" };
+    if (!nComprobante) return { serie: "", numero: "" };
     
-    const comprobante = `${tComprob}-${nComprobante}`;
-    const parts = comprobante.split("-");
+    // Si nComprobante ya contiene el formato completo (ej: "F00-000")
+    const parts = nComprobante.split("-");
     
     if (parts.length >= 2) {
       return {
@@ -1324,7 +1325,8 @@ export const MainPage: React.FC = () => {
       };
     }
     
-    return { serie: "", numero: comprobante };
+    // Si no tiene guión, devolver el número completo en numero y serie vacía
+    return { serie: "", numero: nComprobante };
   };
 
   /**
@@ -1390,7 +1392,7 @@ export const MainPage: React.FC = () => {
           
           const saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
 
-          csv += `${movement.fecha},,${serie},${numero},,,,${detalle.cantidad},${detalle.costoUnitarioDeLote.toFixed(2)},${calculatedDetalleCostoTotal.toFixed(2)},${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},,,,${detalle.cantidad},${detalle.costoUnitarioDeLote.toFixed(2)},${calculatedDetalleCostoTotal.toFixed(2)},${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
         });
       } else {
         const calculatedCostoTotal = movement.costoTotal && movement.costoTotal !== 0
@@ -1403,14 +1405,14 @@ export const MainPage: React.FC = () => {
           
           const saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
 
-          csv += `${movement.fecha},,${serie},${numero},,${movement.cantidad},${movement.costoUnitario.toFixed(2)},${calculatedCostoTotal.toFixed(2)},,,${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},${movement.cantidad},${movement.costoUnitario.toFixed(2)},${calculatedCostoTotal.toFixed(2)},,,${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
         } else {
           saldoCantidad -= movement.cantidad;
           saldoCostoTotal -= calculatedCostoTotal;
           
           const saldoCostoUnitario = saldoCantidad > 0 ? saldoCostoTotal / saldoCantidad : 0;
 
-          csv += `${movement.fecha},,${serie},${numero},,,,${movement.cantidad},${movement.costoUnitario.toFixed(2)},${calculatedCostoTotal.toFixed(2)},${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},,,,${movement.cantidad},${movement.costoUnitario.toFixed(2)},${calculatedCostoTotal.toFixed(2)},${saldoCantidad},${saldoCostoUnitario.toFixed(2)},${saldoCostoTotal.toFixed(2)}\n`;
         }
       }
     });
@@ -1463,15 +1465,15 @@ export const MainPage: React.FC = () => {
       if (movement.tipo === "Salida" && movement.detallesSalida && movement.detallesSalida.length > 0) {
         movement.detallesSalida.forEach((detalle) => {
           saldoCantidadSimple -= detalle.cantidad;
-          csv += `${movement.fecha},,${serie},${numero},,${detalle.cantidad},${saldoCantidadSimple}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},,${detalle.cantidad},${saldoCantidadSimple}\n`;
         });
       } else {
         if (movement.tipo === "Entrada") {
           saldoCantidadSimple += movement.cantidad;
-          csv += `${movement.fecha},,${serie},${numero},,${movement.cantidad},,${saldoCantidadSimple}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},${movement.cantidad},,${saldoCantidadSimple}\n`;
         } else {
           saldoCantidadSimple -= movement.cantidad;
-          csv += `${movement.fecha},,${serie},${numero},,,${movement.cantidad},${saldoCantidadSimple}\n`;
+          csv += `${movement.fecha},,${serie},${numero},${movement.tipo.toUpperCase()},,${movement.cantidad},${saldoCantidadSimple}\n`;
         }
       }
     });
