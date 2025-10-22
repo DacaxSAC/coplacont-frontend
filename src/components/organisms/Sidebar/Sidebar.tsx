@@ -316,7 +316,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                       : ""
                   }
                 >
-                  Productos y servicios
+                  Productos
                 </Link>
               </li>
               <li>
