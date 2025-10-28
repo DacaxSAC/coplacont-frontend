@@ -30,7 +30,7 @@ export const MainPage: React.FC = () => {
   const [methods, setMethods] = useState<ValuationMethodConfig[]>([
     {
       id: 1,
-      metodo: MetodoValoracion.promedio,
+      metodo: MetodoValoracion.PROMEDIO,
       descripcion: 'Método de valoración por promedio ponderado',
       activo: true,
       fechaCreacion: '2024-01-15',
@@ -38,7 +38,7 @@ export const MainPage: React.FC = () => {
     },
     {
       id: 2,
-      metodo: MetodoValoracion.fifo,
+      metodo: MetodoValoracion.FIFO,
       descripcion: 'Método de valoración FIFO (Primero en Entrar, Primero en Salir)',
       activo: true,
       fechaCreacion: '2024-01-15',
@@ -61,7 +61,7 @@ export const MainPage: React.FC = () => {
     descripcion: string;
     activo: boolean;
   }>({
-    metodo: MetodoValoracion.promedio,
+    metodo: MetodoValoracion.PROMEDIO,
     descripcion: '',
     activo: true
   });
@@ -113,7 +113,7 @@ export const MainPage: React.FC = () => {
    */
   const resetForm = () => {
     setNewMethod({
-      metodo: MetodoValoracion.promedio,
+      metodo: MetodoValoracion.PROMEDIO,
       descripcion: '',
       activo: true
     });

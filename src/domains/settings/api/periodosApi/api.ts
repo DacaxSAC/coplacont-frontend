@@ -6,8 +6,7 @@ import type {
   UpdateConfiguracionPeriodoDto,
   UpdateMetodoValoracionDto,
   PeriodosResponse,
-  PeriodoFilters,
-  ConfiguracionPeriodoResponse
+  PeriodoFilters
 } from '../../types';
 
 /**
@@ -43,12 +42,6 @@ export const Api = {
    */
   deletePeriodo: (id: number) => 
     apiClient.delete(ENDPOINTS.DELETE_PERIODO.replace(':id', String(id))),
-
-  /**
-   * Obtiene la configuración del período actual
-   */
-  getConfiguracion: () => 
-    apiClient.get<ConfiguracionPeriodoResponse>(ENDPOINTS.GET_CONFIGURACION),
 
   /**
    * Actualiza el método de valoración en la configuración del período activo
