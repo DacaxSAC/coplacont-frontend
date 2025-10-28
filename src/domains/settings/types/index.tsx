@@ -2,8 +2,8 @@
  * Métodos de valoración disponibles
  */
 export const MetodoValoracion = {
-  PROMEDIO: 'PROMEDIO',
-  FIFO: 'FIFO'
+  promedio: 'promedio',
+  fifo: 'fifo'
 } as const;
 
 export type MetodoValoracion = typeof MetodoValoracion[keyof typeof MetodoValoracion];
@@ -91,6 +91,17 @@ export interface PeriodosResponse {
 }
 
 /**
+ * Interfaz para respuesta de configuración de período
+ */
+export interface ConfiguracionPeriodoResponse {
+  metodoValoracion: MetodoValoracion;
+  duracionMeses: number;
+  mesInicio: number;
+  diasLimiteRetroactivo: number;
+  recalculoAutomaticoKardex: boolean;
+}
+
+/**
  * Interfaz para opciones de select
  */
 export interface SelectOption {
@@ -102,8 +113,8 @@ export interface SelectOption {
  * Constantes para opciones de select
  */
 export const METODO_VALORACION_OPTIONS: SelectOption[] = [
-  { value: MetodoValoracion.PROMEDIO, label: 'Promedio Ponderado' },
-  { value: MetodoValoracion.FIFO, label: 'FIFO (Primero en Entrar, Primero en Salir)' }
+  { value: MetodoValoracion.promedio, label: 'Promedio Ponderado' },
+  { value: MetodoValoracion.fifo, label: 'FIFO (Primero en Entrar, Primero en Salir)' }
 ];
 
 export const ESTADO_PERIODO_OPTIONS: SelectOption[] = [
