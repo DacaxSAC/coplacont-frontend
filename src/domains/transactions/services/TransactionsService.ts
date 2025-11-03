@@ -51,13 +51,13 @@ export class TransactionsService {
 
 
   /**
-   * Obtiene el siguiente número de correlativo para una operación
-   * @param tipoOperacion - Tipo de operación (VENTA o COMPRA)
+   * Obtiene el siguiente correlativo para un tipo de operación
+   * @param idTipoOperacion - ID del tipo de operación (1 para venta, 2 para compra)
    * @returns Promise con el número de correlativo
    */
-  static async getCorrelative(tipoOperacion: 'venta' | 'compra'): Promise<{ correlativo: string }> {
+  static async getCorrelative(idTipoOperacion: number): Promise<{ correlativo: string }> {
     try {
-      const response = await transactionsApi.getSiguienteCorrelative(tipoOperacion);
+      const response = await transactionsApi.getSiguienteCorrelative(idTipoOperacion);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

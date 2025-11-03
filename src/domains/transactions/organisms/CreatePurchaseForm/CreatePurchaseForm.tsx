@@ -14,6 +14,7 @@ import {
 } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
+import { TablaService } from "../../services/TablaService";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import {
   ProductService,
@@ -25,7 +26,7 @@ import type {
   Entidad,
   EntidadParcial,
 } from "@/domains/maintainers/services/entitiesService";
-import type { Transaction } from "../../services/types";
+import type { Transaction, TablaDetalleResponse } from "../../services/types";
 import { MAIN_ROUTES, TRANSACTIONS_ROUTES, COMMON_ROUTES } from "@/router";
 import { FormEntidad } from "@/domains/maintainers/organisms/FormEntidad/FormEntidad";
 
@@ -117,11 +118,7 @@ const tipoProductoCompraOptions = [
   //{ value: TipoProductoCompraEnum.SERVICIO, label: "Servicio" },
 ];
 
-const tipoComprobanteOptions = [
-  { value: TipoComprobanteEnum.FACTURA, label: "Factura" },
-  { value: TipoComprobanteEnum.BOLETA, label: "Boleta" },
-  { value: TipoComprobanteEnum.NOTA_ENTRADA, label: "Nota de Entrada" },
-];
+// Remove unused tipoComprobanteOptions since we now use dynamic data from API
 
 const monedaOptions = [
   { value: MonedaEnum.SOL, label: "Sol" },
@@ -171,6 +168,7 @@ export const CreatePurchaseForm = () => {
   const [almacenes, setAlmacenes] = useState<Warehouse[]>([]);
   console.log(almacenes);
   const [inventarioProductos, setInventarioProductos] = useState<any[]>([]);
+  const [tiposComprobante, setTiposComprobante] = useState<TablaDetalleResponse[]>([]);
 
   // Estado para tipo de cambio automático
   const [tipoCambioAutomatico, setTipoCambioAutomatico] = useState<string>("");
@@ -244,7 +242,7 @@ export const CreatePurchaseForm = () => {
   };
   const fetchCorrelativo = async () => {
     try {
-      const response = await TransactionsService.getCorrelative("compra");
+      const response = await TransactionsService.getCorrelative(2); // 2 = COMPRA
       setFormState((prev) => ({
         ...prev,
         correlativo: response.correlativo,
@@ -323,6 +321,20 @@ export const CreatePurchaseForm = () => {
     };
 
     loadComprasRegistradas();
+  }, []);
+
+  // Cargar tipos de comprobante al montar el componente
+  useEffect(() => {
+    const loadTiposComprobante = async () => {
+      try {
+        const tiposComprobanteData = await TablaService.getTiposComprobante();
+        setTiposComprobante(tiposComprobanteData);
+      } catch (error) {
+        console.error("Error al cargar tipos de comprobante:", error);
+      }
+    };
+
+    loadTiposComprobante();
   }, []);
 
   // Obtener tipo de cambio automático cuando cambia la moneda
@@ -796,9 +808,10 @@ export const CreatePurchaseForm = () => {
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
       const compraData: any = {
+        correlativo: formState.correlativo,
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
-        tipoOperacion: "compra", // Valor fijo
-        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
+        idTipoOperacion: 13, // 02-COMPRA según tabla 12
+        idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
           : new Date().toISOString(),
@@ -875,8 +888,8 @@ export const CreatePurchaseForm = () => {
       const compraData: any = {
         correlativo: formState.correlativo, // Usar valor del form o fake
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
-        tipoOperacion: "compra", // Valor fijo
-        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
+        idTipoOperacion: 2, // 02-COMPRA según tabla 12
+        idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
           : new Date().toISOString(),
@@ -1006,7 +1019,10 @@ export const CreatePurchaseForm = () => {
             </Text>
             <ComboBox
               size="xs"
-              options={tipoComprobanteOptions}
+              options={tiposComprobante.map(tipo => ({
+                value: tipo.idTablaDetalle.toString(),
+                label: `${tipo.codigo} - ${tipo.descripcion}`
+              }))}
               variant="createSale"
               name="tipoComprobante"
               value={formState.tipoComprobante}

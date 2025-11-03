@@ -150,7 +150,9 @@ export const MainPage: React.FC = () => {
         };
         
         const expectedType = docTypeMap[documentType];
-        const actualType = purchase.tipoComprobante?.toUpperCase();
+        const actualType = typeof purchase.tipoComprobante === 'string' 
+          ? purchase.tipoComprobante.toUpperCase()
+          : purchase.tipoComprobante?.descripcion?.toUpperCase();
         const matches = actualType === expectedType;
         
         return matches;
@@ -200,14 +202,21 @@ export const MainPage: React.FC = () => {
           ({
             id: idx + 1,
             cells: [
-              purchase.correlativo,
-              purchase.tipoComprobante,
-              purchase.entidad.tipo === 'JURIDICA' ? purchase.entidad.razonSocial : purchase.entidad.nombreCompleto,
-              purchase.serie + "-" + purchase.numero,
-              purchase.fechaEmision,
-              purchase.fechaVencimiento !== null ? purchase.fechaVencimiento : "No especificado",
-              purchase.totales.totalGeneral.toString(),
+              purchase.correlativo || 'N/A',
+              typeof purchase.tipoComprobante === 'string' 
+                ? purchase.tipoComprobante 
+                : purchase.tipoComprobante?.descripcion || 'N/A',
+              purchase.entidad?.tipo === 'JURIDICA' 
+                ? (purchase.entidad?.razonSocial || 'N/A')
+                : (purchase.entidad?.nombreCompleto || 'N/A'),
+              `${purchase.serie || ''}-${purchase.numero || ''}`,
+              purchase.fechaEmision || 'N/A',
+              purchase.fechaVencimiento !== null && purchase.fechaVencimiento !== undefined 
+                ? purchase.fechaVencimiento 
+                : "No especificado",
+              purchase.totales?.totalGeneral?.toString() || '0',
               <Button 
+                key={`btn-${purchase.idComprobante}`}
                 size="tableItemSize" 
                 variant="tableItemStyle"
                 onClick={() => handleOpenDetailModal(purchase)}
@@ -402,7 +411,7 @@ export const MainPage: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         title={`Detalle de Compra - ${selectedPurchase?.numero || ''}`}
-        description={`${selectedPurchase?.persona?.razonSocial || ''} - ${selectedPurchase?.fechaEmision || ''}`}
+        description={`${selectedPurchase?.entidad?.razonSocial || selectedPurchase?.entidad?.nombreCompleto || ''} - ${selectedPurchase?.fechaEmision || ''}`}
       >
         {selectedPurchase && (
           <div>
@@ -414,27 +423,31 @@ export const MainPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '16px' }}>
                 <div>
                   <Text size="sm" weight={500}>Número de Documento:</Text>
-                  <Text size="sm">{selectedPurchase.persona.razonSocial}</Text>
+                  <Text size="sm">{selectedPurchase.entidad?.numeroDocumento || 'N/A'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Razón Social:</Text>
-                  <Text size="sm">{selectedPurchase.persona.razonSocial || selectedPurchase.persona.direccion}</Text>
+                  <Text size="sm">{selectedPurchase.entidad?.razonSocial || selectedPurchase.entidad?.nombreCompleto || 'N/A'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Tipo de Comprobante:</Text>
-                  <Text size="sm">{selectedPurchase.tipoComprobante}</Text>
+                  <Text size="sm">
+                    {typeof selectedPurchase.tipoComprobante === 'string' 
+                      ? selectedPurchase.tipoComprobante 
+                      : selectedPurchase.tipoComprobante?.descripcion || 'N/A'}
+                  </Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Serie - Número:</Text>
-                  <Text size="sm">{selectedPurchase.serie} - {selectedPurchase.numero}</Text>
+                  <Text size="sm">{selectedPurchase.serie || ''} - {selectedPurchase.numero || ''}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Fecha de Emisión:</Text>
-                  <Text size="sm">{selectedPurchase.fechaEmision}</Text>
+                  <Text size="sm">{selectedPurchase.fechaEmision || 'N/A'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Tipo de Cambio:</Text>
-                  <Text size="sm">{selectedPurchase.tipoCambio}</Text>
+                  <Text size="sm">{selectedPurchase.tipoCambio || 'N/A'}</Text>
                 </div>
               </div>
             </div>
@@ -455,18 +468,18 @@ export const MainPage: React.FC = () => {
                     'ISC',
                     'Total'
                   ]}
-                  rows={selectedPurchase.detalles.map((detalle, index) => ({
+                  rows={selectedPurchase.detalles?.map((detalle, index) => ({
                     id: index.toString(),
                     cells: [
-                      detalle.cantidad,
-                      detalle.descripcion,
-                      `S/ ${detalle.precioUnitario}`,
-                      `S/ ${detalle.subtotal}`,
-                      `S/ ${detalle.igv}`,
-                      `S/ ${detalle.isc}`,
-                      `S/ ${detalle.total}`
+                      detalle.cantidad || '0',
+                      detalle.descripcion || 'N/A',
+                      `S/ ${detalle.precioUnitario || '0'}`,
+                      `S/ ${detalle.subtotal || '0'}`,
+                      `S/ ${detalle.igv || '0'}`,
+                      `S/ ${detalle.isc || '0'}`,
+                      `S/ ${detalle.total || '0'}`
                     ]
-                  } as TableRow))}
+                  } as TableRow)) || []}
                   gridTemplate="80px 1fr 120px 120px 100px 100px 120px"
                 />
               </div>
@@ -480,15 +493,15 @@ export const MainPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '12px' }}>
                 <div>
                   <Text size="sm" weight={500}>Total Gravada:</Text>
-                  <Text size="sm">S/ {selectedPurchase.totales.totalGravada}</Text>
+                  <Text size="sm">S/ {selectedPurchase.totales?.totalGravada || '0'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>IGV:</Text>
-                  <Text size="sm">S/ {selectedPurchase.totales.totalIgv}</Text>
+                  <Text size="sm">S/ {selectedPurchase.totales?.totalIgv || '0'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Total General:</Text>
-                  <Text size="sm" weight={600}>S/ {selectedPurchase.totales.totalGeneral}</Text>
+                  <Text size="sm" weight={600}>S/ {selectedPurchase.totales?.totalGeneral || '0'}</Text>
                 </div>
               </div>
             </div>

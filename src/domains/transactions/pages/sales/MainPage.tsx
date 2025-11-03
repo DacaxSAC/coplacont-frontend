@@ -143,7 +143,10 @@ export const MainPage: React.FC = () => {
           'nota-credito': 'NOTA_CREDITO',
           'nota-debito': 'NOTA_DEBITO'
         };
-        return sale.tipoComprobante?.toUpperCase() === docTypeMap[documentType]?.toUpperCase();
+        const tipoComprobanteStr = typeof sale.tipoComprobante === 'string' 
+          ? sale.tipoComprobante 
+          : sale.tipoComprobante?.descripcion || '';
+        return tipoComprobanteStr.toUpperCase() === docTypeMap[documentType]?.toUpperCase();
       });
     }
 
@@ -189,14 +192,21 @@ export const MainPage: React.FC = () => {
           ({
             id: idx + 1,
             cells: [
-              sale.correlativo,
-              sale.tipoComprobante,
-              sale.entidad.tipo === 'JURIDICA' ? sale.entidad.razonSocial : sale.entidad.nombreCompleto,
-              sale.serie + "-" + sale.numero,
-              sale.fechaEmision,
-              sale.fechaVencimiento !== null ? sale.fechaVencimiento : "No especificado",
-              sale.totales?.totalGeneral.toString(),
+              sale.correlativo || 'N/A',
+              typeof sale.tipoComprobante === 'string' 
+                ? sale.tipoComprobante 
+                : sale.tipoComprobante?.descripcion || 'N/A',
+              sale.entidad?.tipo === 'JURIDICA' 
+                ? (sale.entidad?.razonSocial || 'N/A')
+                : (sale.entidad?.nombreCompleto || 'N/A'),
+              `${sale.serie || ''}-${sale.numero || ''}`,
+              sale.fechaEmision || 'N/A',
+              sale.fechaVencimiento !== null && sale.fechaVencimiento !== undefined 
+                ? sale.fechaVencimiento 
+                : "No especificado",
+              sale.totales?.totalGeneral?.toString() || '0',
               <Button 
+                key={`btn-${sale.idComprobante}`}
                 size='tableItemSize' 
                 variant='tableItemStyle'
                 onClick={() => handleOpenDetailModal(sale)}
@@ -411,7 +421,11 @@ export const MainPage: React.FC = () => {
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Tipo de Comprobante:</Text>
-                  <Text size="sm">{selectedSale.tipoComprobante}</Text>
+                  <Text size="sm">
+                    {typeof selectedSale.tipoComprobante === 'string' 
+                      ? selectedSale.tipoComprobante 
+                      : selectedSale.tipoComprobante?.descripcion || 'N/A'}
+                  </Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Serie - Número:</Text>

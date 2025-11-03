@@ -54,7 +54,7 @@ export interface Transaction {
   idComprobante: number;
   correlativo: string;
   tipoOperacion: 'venta' | 'compra';
-  tipoComprobante: string;
+  tipoComprobante: string | TablaDetalleResponse;
   fechaEmision: string;
   moneda: string;
   tipoCambio: string;
@@ -96,4 +96,24 @@ export interface PurchasesApiResponse {
   success: boolean;
   message: string;
   data: Transaction[];
+}
+
+export interface TablaDetalleResponse {
+  idTablaDetalle: number;
+  codigo: string;
+  descripcion: string;
+  activo: boolean;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+}
+
+export interface TablaResponse {
+  idTabla: number;
+  numeroTabla: number;
+  nombre: string;
+  descripcion: string;
+  activo: boolean;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+  detalles: TablaDetalleResponse[];
 }

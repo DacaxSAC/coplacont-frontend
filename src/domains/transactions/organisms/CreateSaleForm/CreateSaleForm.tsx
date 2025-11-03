@@ -14,6 +14,7 @@ import {
 } from "@/components";
 import { Table, type TableRow } from "@/components/organisms/Table";
 import { TransactionsService } from "../../services/TransactionsService";
+import { TablaService, type TablaDetalleResponse } from "../../services";
 import { EntitiesService } from "@/domains/maintainers/services/entitiesService";
 import {
   ProductService,
@@ -37,7 +38,6 @@ import type {
 import {
   tipoVentaOptions,
   tipoProductoVentaOptions,
-  tipoComprobanteOptions,
   monedaOptions,
   unidadMedidaOptions,
 } from "./types";
@@ -62,12 +62,13 @@ export const CreateSaleForm = () => {
   // Estados para el detalle de productos
   const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tiposComprobante, setTiposComprobante] = useState<TablaDetalleResponse[]>([]);
 
   // Obtener el correlativo al montar el componente
 
   const fetchCorrelativo = async () => {
     try {
-      const response = await TransactionsService.getCorrelative("venta");
+      const response = await TransactionsService.getCorrelative(1); // 1 = VENTA
       setFormState((prev) => ({
         ...prev,
         correlativo: response.correlativo,
@@ -79,6 +80,18 @@ export const CreateSaleForm = () => {
 
   useEffect(() => {
     fetchCorrelativo();
+    
+    // Cargar tipos de comprobante desde la API
+    const loadTiposComprobante = async () => {
+      try {
+        const tipos = await TablaService.getTiposComprobante();
+        setTiposComprobante(tipos);
+      } catch (error) {
+        console.error("Error al cargar tipos de comprobante:", error);
+      }
+    };
+    
+    loadTiposComprobante();
   }, []);
 
   const [productoSeleccionado, setProductoSeleccionado] = useState<
@@ -407,9 +420,10 @@ export const CreateSaleForm = () => {
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
       const ventaData: any = {
+        correlativo: formState.correlativo,
         idPersona: getSelectedClientId() || 1,
-        tipoOperacion: "venta",
-        tipoComprobante: formState.tipoComprobante || "FACTURA",
+        idTipoOperacion: 12, // 01-VENTA según tabla 12
+        idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
           : new Date().toISOString(),
@@ -461,8 +475,8 @@ export const CreateSaleForm = () => {
       const ventaData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
-        tipoOperacion: "venta", // Valor fijo
-        tipoComprobante: formState.tipoComprobante || "FACTURA", // Usar valor del form o fake
+        idTipoOperacion: 1, // 01-VENTA según tabla 12
+        idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
           : new Date().toISOString(),
@@ -840,7 +854,10 @@ export const CreateSaleForm = () => {
             </Text>
             <ComboBox
               size="xs"
-              options={tipoComprobanteOptions}
+              options={tiposComprobante.map(tipo => ({
+                value: tipo.idTablaDetalle.toString(),
+                label: `${tipo.codigo} - ${tipo.descripcion}`
+              }))}
               variant="createSale"
               name="tipoComprobante"
               value={formState.tipoComprobante}
@@ -862,7 +879,7 @@ export const CreateSaleForm = () => {
               value={formState.cliente}
               onChange={handleClientComboBoxChange}
               onFilterTextChange={setClientSearchText}
-              disabled={!isClienteEnabled()} // Habilitado solo para FACTURA o BOLETA
+              disabled={false}// Habilitado solo para FACTURA o BOLETA
             />
           </div>
           {shouldShowAddClientButton() && (
