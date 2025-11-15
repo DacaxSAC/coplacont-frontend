@@ -40,6 +40,7 @@ export const TRANSACTIONS_ROUTES = {
   MANUAL_JOURNAL_ENTRY: '/manual-journal-entry',
   PAYROLL: '/payroll',
   OPERATIONS: '/operations',
+  TRANSFERS: '/transfers',
 } as const;
 
 // Rutas del módulo de inventario

@@ -14,6 +14,13 @@ export const inventoryApi = {
      */
     getKardexMovements: (idInventario: number, fechaInicio: string, fechaFin: string) => 
         apiClient.get(`${INVENTORY_ENDPOINTS.GET_KARDEX_MOVEMENTS}?idInventario=${idInventario}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`),
+    /**
+     * Obtiene los productos comunes entre dos almacenes
+     * @param idAlmacen1 - ID del primer almacén
+     * @param idAlmacen2 - ID del segundo almacén
+     */
+    getCommonProducts: (idAlmacen1: number, idAlmacen2: number) => 
+        apiClient.get(`${INVENTORY_ENDPOINTS.GET_COMMON_PRODUCTS}?idAlmacen1=${idAlmacen1}&idAlmacen2=${idAlmacen2}`),
 } as const;
 
 export type InventoryApi = typeof inventoryApi;

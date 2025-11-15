@@ -1,7 +1,27 @@
 import { handleApiError } from "@/shared";
 import { transactionsApi } from "../api/transactionsApi";
-import type { RegisterSalePayload, RegisterPurchasePayload, RegisterOperationPayload } from "./types";
-import type{ Transaction } from "./types";
+import type {
+  RegisterSalePayload,
+  RegisterPurchasePayload,
+  RegisterOperationPayload,
+} from "./types";
+import type { Transaction } from "./types";
+
+type RegisterTransferPayload = {
+  idAlmacenOrigen: number;
+  idAlmacenDestino: number;
+  fechaEmision: string;
+  moneda: string;
+  tipoCambio?: number;
+  serie: string;
+  numero: string;
+  fechaVencimiento?: string;
+  detalles: {
+    idProducto: number;
+    cantidad: number;
+    descripcion: string;
+  }[];
+};
 
 /**
  * Servicio de transacciones
@@ -63,15 +83,18 @@ export class TransactionsService {
     }
   }
 
-
   /**
    * Obtiene el siguiente correlativo para un tipo de operación
    * @param idTipoOperacion - ID del tipo de operación (1 para venta, 2 para compra)
    * @returns Promise con el número de correlativo
    */
-  static async getCorrelative(idTipoOperacion: number): Promise<{ correlativo: string }> {
+  static async getCorrelative(
+    idTipoOperacion: number
+  ): Promise<{ correlativo: string }> {
     try {
-      const response = await transactionsApi.getSiguienteCorrelative(idTipoOperacion);
+      const response = await transactionsApi.getSiguienteCorrelative(
+        idTipoOperacion
+      );
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -97,10 +120,9 @@ export class TransactionsService {
    * @returns Promise con el tipo de cambio
    */
   static async getTypeExchange(date: string) {
-      const response = await transactionsApi.getTypeExchange(date);
-      return response.data;
+    const response = await transactionsApi.getTypeExchange(date);
+    return response.data;
   }
-
 
   /**
    * Obtiene todas las operaciones
@@ -109,7 +131,34 @@ export class TransactionsService {
   static async getOperations(): Promise<Transaction[]> {
     try {
       const response = await transactionsApi.getOperations();
-      console.log('response de operaciones', response.data);
+      console.log("response de operaciones", response.data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Obtiene todas las transferencias
+   * @returns Promise con la lista de transferencias
+   */
+  static async getTransfers(): Promise<Transaction[]> {
+    try {
+      const response = await transactionsApi.getTransfers();
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Crea una nueva transferencia
+   * @param payload - Datos de la transferencia a crear
+   * @returns Promise con la respuesta del servidor
+   */
+  static async createTransfer(payload: RegisterTransferPayload) {
+    try {
+      const response = await transactionsApi.createTransfer(payload);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

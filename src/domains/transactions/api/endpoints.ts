@@ -6,4 +6,5 @@ export const TRANSACTIONS_ENDPOINTS = {
     TIPO_CAMBIO_SUNAT: '/tipo-cambio/sunat',
     GET_SIGUIENTE_CORRELATIVO: '/comprobante/siguiente-correlativo',
     OBTENER_OPERACIONES: '/comprobante',
+    OBTENER_TRANSFERENCIAS: '/transferencias',
 } as const;

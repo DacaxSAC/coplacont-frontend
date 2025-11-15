@@ -69,6 +69,22 @@ export const transactionsApi = {
     getTypeExchange: (date: string)  => apiClient.get(TRANSACTIONS_ENDPOINTS.TIPO_CAMBIO_SUNAT, {params: {date}}),
     getSiguienteCorrelative: (idTipoOperacion: number) => apiClient.get(`${TRANSACTIONS_ENDPOINTS.GET_SIGUIENTE_CORRELATIVO}?idTipoOperacion=${idTipoOperacion}`),
     getOperations: () => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_OPERACIONES),
+    getTransfers: () => apiClient.get(TRANSACTIONS_ENDPOINTS.OBTENER_TRANSFERENCIAS),
+    createTransfer: (payload: {
+        idAlmacenOrigen: number;
+        idAlmacenDestino: number;
+        fechaEmision: string;
+        moneda: string;
+        tipoCambio?: number;
+        serie: string;
+        numero: string;
+        fechaVencimiento?: string;
+        detalles: {
+            idProducto: number;
+            cantidad: number;
+            descripcion: string;
+        }[];
+    }) => apiClient.post(TRANSACTIONS_ENDPOINTS.OBTENER_TRANSFERENCIAS, payload),
 } as const;
 
 export type TransactionsApi = typeof transactionsApi; 

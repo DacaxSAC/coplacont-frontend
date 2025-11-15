@@ -3,5 +3,6 @@ export const INVENTORY_ENDPOINTS={
     GET_INVENTORY_BY_WAREHOUSE_AND_PRODUCT: '/inventario/almacen/:idAlmacen/producto/:idProducto',
     GET_INVENTORY_BY_WAREHOUSE: '/inventario/almacen/:idAlmacen',
     CREATE_INVENTORY: '/inventario',
-    GET_KARDEX_MOVEMENTS: '/kardex'
+    GET_KARDEX_MOVEMENTS: '/kardex',
+    GET_COMMON_PRODUCTS:'/inventario/almacenes/comunes'
 }as const;

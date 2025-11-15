@@ -1,6 +1,7 @@
 import { handleApiError } from "@/shared";
 import { inventoryApi } from "../api/inventoryApi";
 import type { InventoryItem, KardexResponse } from "./types";
+import type { Product } from "@/domains/maintainers/types";
 
 /**
  * Servicio de transacciones
@@ -81,5 +82,18 @@ export class InventoryService {
     }
   }
 
-  
+  /**
+   * Obtiene los productos comunes entre dos almacenes
+   * @param idAlmacen1 - ID del primer almacén
+   * @param idAlmacen2 - ID del segundo almacén
+   * @returns Promise con la lista de productos comunes
+   */
+  static async getCommonProducts(idAlmacen1: number, idAlmacen2: number): Promise<Product[]> {
+    try {
+      const response = await inventoryApi.getCommonProducts(idAlmacen1, idAlmacen2);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
 }
