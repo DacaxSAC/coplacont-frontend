@@ -352,6 +352,11 @@ export const CreateSaleForm = () => {
     }
 
     const cantidad = parseFloat(cantidadIngresada);
+    const stockDisponible = Number(productoInventario.stockActual) || 0;
+    if (cantidad > stockDisponible) {
+      alert(`Stock insuficiente. Disponible: ${stockDisponible}`);
+      return;
+    }
 
     // Verificar si el producto ya existe en el detalle
     const productoExistente = detalleVenta.find(
@@ -440,7 +445,7 @@ export const CreateSaleForm = () => {
       const descSel = seleccionado?.descripcion?.toUpperCase() || '';
       const esNotaCredito = descSel.includes('NOTA DE CRÉDITO') || descSel.includes('NOTA DE CREDITO');
       const esNotaDebito = descSel.includes('NOTA DE DÉBITO') || descSel.includes('NOTA DE DEBITO');
-      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 1;
+      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 12;
 
       const ventaData: any = {
         correlativo: formState.correlativo,
@@ -499,7 +504,7 @@ export const CreateSaleForm = () => {
       const descSel2 = seleccionado2?.descripcion?.toUpperCase() || '';
       const esNotaCredito2 = descSel2.includes('NOTA DE CRÉDITO') || descSel2.includes('NOTA DE CREDITO');
       const esNotaDebito2 = descSel2.includes('NOTA DE DÉBITO') || descSel2.includes('NOTA DE DEBITO');
-      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 1;
+      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 12;
 
       const ventaData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake

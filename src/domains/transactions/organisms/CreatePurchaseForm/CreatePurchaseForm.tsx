@@ -811,7 +811,7 @@ export const CreatePurchaseForm = () => {
       const descSel = seleccionado?.descripcion?.toUpperCase() || '';
       const esNotaCredito = descSel.includes('NOTA DE CRÉDITO') || descSel.includes('NOTA DE CREDITO');
       const esNotaDebito = descSel.includes('NOTA DE DÉBITO') || descSel.includes('NOTA DE DEBITO');
-      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 2;
+      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 13;
 
       const compraData: any = {
         correlativo: formState.correlativo,
@@ -895,7 +895,7 @@ export const CreatePurchaseForm = () => {
       const descSel2 = seleccionado2?.descripcion?.toUpperCase() || '';
       const esNotaCredito2 = descSel2.includes('NOTA DE CRÉDITO') || descSel2.includes('NOTA DE CREDITO');
       const esNotaDebito2 = descSel2.includes('NOTA DE DÉBITO') || descSel2.includes('NOTA DE DEBITO');
-      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 2;
+      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 13;
 
       const compraData: any = {
         correlativo: formState.correlativo, // Usar valor del form o fake
