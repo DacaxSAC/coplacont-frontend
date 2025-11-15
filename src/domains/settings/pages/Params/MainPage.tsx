@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, FormField, Text } from '@/components';
+import { useNavigate } from 'react-router-dom';
+import { MAIN_ROUTES, SETTINGS_ROUTES } from '@/router';
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { formatMetodoValoracion, METODO_VALORACION_OPTIONS } from '../../types';
 import type { MetodoValoracion, ConfiguracionPeriodoResponse } from '../../types';
@@ -10,6 +12,7 @@ import styles from './MainPage.module.scss';
  * Permite visualizar y configurar el método de valoración de inventario
  */
 export const MainPage: React.FC = () => {
+  const navigate = useNavigate();
   const [configuration, setConfiguration] = useState<ConfiguracionPeriodoResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +59,8 @@ export const MainPage: React.FC = () => {
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al actualizar el método de valoración:', error);
-      setError('Error al actualizar el método de valoración');
+      const msg = (error as any)?.message || 'Error al actualizar el método de valoración';
+      setError(msg);
     } finally {
       setIsUpdating(false);
     }
@@ -160,6 +164,24 @@ export const MainPage: React.FC = () => {
               <Text size="sm" color="danger">
                 {error}
               </Text>
+              {error.includes('No se puede cambiar el método') && (
+                <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={() => navigate(`${MAIN_ROUTES.SETTINGS}${SETTINGS_ROUTES.ACCOUNTING_PERIODS}`)}
+                  >
+                    Gestionar Periodos
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => setError(null)}
+                  >
+                    Ocultar aviso
+                  </Button>
+                </div>
+              )}
             </div>
           )}
           
