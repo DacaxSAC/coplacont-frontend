@@ -65,6 +65,9 @@ export const MainPage: React.FC = () => {
   // Modal state for upload purchases
   const [isUploadOpen, setUploadOpen] = useState(false);
 
+  // Plantilla de columnas para la tabla de detalles (en fr)
+  const detailGridTemplate = "0.8fr 2fr 1.2fr 1.2fr 1fr 1fr 1.2fr";
+
   // Auto-apply filters when secondary filter values change
   useEffect(() => {
     applyAllFilters();
@@ -480,7 +483,7 @@ export const MainPage: React.FC = () => {
                       `S/ ${detalle.total || '0'}`
                     ]
                   } as TableRow)) || []}
-                  gridTemplate="80px 1fr 120px 120px 100px 100px 120px"
+                  gridTemplate={detailGridTemplate}
                 />
               </div>
             </div>

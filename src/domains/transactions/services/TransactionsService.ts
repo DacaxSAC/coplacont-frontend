@@ -1,6 +1,6 @@
 import { handleApiError } from "@/shared";
 import { transactionsApi } from "../api/transactionsApi";
-import type { RegisterSalePayload, RegisterPurchasePayload } from "./types";
+import type { RegisterSalePayload, RegisterPurchasePayload, RegisterOperationPayload } from "./types";
 import type{ Transaction } from "./types";
 
 /**
@@ -29,7 +29,21 @@ export class TransactionsService {
    */
   static async registerPurchase(payload: RegisterPurchasePayload) {
     try {
-      const response = await transactionsApi.registerSale(payload);
+      const response = await transactionsApi.registerPurchase(payload);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Crea una nueva operación general
+   * @param payload - Datos de la operación a crear
+   * @returns Promise con la respuesta del servidor
+   */
+  static async createOperation(payload: RegisterOperationPayload) {
+    try {
+      const response = await transactionsApi.createOperation(payload);
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -85,5 +99,20 @@ export class TransactionsService {
   static async getTypeExchange(date: string) {
       const response = await transactionsApi.getTypeExchange(date);
       return response.data;
+  }
+
+
+  /**
+   * Obtiene todas las operaciones
+   * @returns Promise con la lista de operaciones
+   */
+  static async getOperations(): Promise<Transaction[]> {
+    try {
+      const response = await transactionsApi.getOperations();
+      console.log('response de operaciones', response.data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 }

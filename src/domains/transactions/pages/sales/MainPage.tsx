@@ -64,6 +64,9 @@ export const MainPage: React.FC = () => {
   // Modal state for upload sales
   const [isUploadOpen, setUploadOpen] = useState(false);
 
+  // Plantilla de columnas para la tabla de detalles (en fr)
+  const detailGridTemplate = "0.8fr 2fr 1.2fr 1.2fr 1fr 1fr 1.2fr";
+
   // Auto-apply filters when secondary filter values change
   useEffect(() => {
     applyAllFilters();
@@ -470,7 +473,7 @@ export const MainPage: React.FC = () => {
                       `S/ ${detalle.total}`
                     ]
                   } as TableRow))}
-                  gridTemplate="80px 1fr 120px 120px 100px 100px 120px"
+                  gridTemplate={detailGridTemplate}
                 />
               </div>
             </div>
@@ -483,15 +486,15 @@ export const MainPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '12px' }}>
                 <div>
                   <Text size="sm" weight={500}>Total Gravada:</Text>
-                  <Text size="sm">S/ {selectedSale.totales.totalGravada}</Text>
+                  <Text size="sm">S/ {selectedSale.totales?.totalGravada ?? '0.00'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>IGV:</Text>
-                  <Text size="sm">S/ {selectedSale.totales.totalIgv}</Text>
+                  <Text size="sm">S/ {selectedSale.totales?.totalIgv ?? '0.00'}</Text>
                 </div>
                 <div>
                   <Text size="sm" weight={500}>Total General:</Text>
-                  <Text size="sm" weight={600}>S/ {selectedSale.totales.totalGeneral}</Text>
+                  <Text size="sm" weight={600}>S/ {selectedSale.totales?.totalGeneral ?? '0.00'}</Text>
                 </div>
               </div>
             </div>

@@ -39,6 +39,7 @@ export const TRANSACTIONS_ROUTES = {
   CASH: '/cash',
   MANUAL_JOURNAL_ENTRY: '/manual-journal-entry',
   PAYROLL: '/payroll',
+  OPERATIONS: '/operations',
 } as const;
 
 // Rutas del módulo de inventario

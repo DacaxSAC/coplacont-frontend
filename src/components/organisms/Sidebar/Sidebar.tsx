@@ -148,6 +148,20 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                   Ventas
                 </Link>
               </li>
+              <li>
+                <Link
+                  to={`${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.OPERATIONS}`}
+                  className={
+                    isActiveLink(
+                      `${MAIN_ROUTES.TRANSACTIONS}${TRANSACTIONS_ROUTES.OPERATIONS}`
+                    )
+                      ? styles.active
+                      : ""
+                  }
+                >
+                  Operaciones
+                </Link>
+              </li>
             </ul>
           </div>
         )}

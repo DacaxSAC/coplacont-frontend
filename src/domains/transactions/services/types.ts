@@ -40,6 +40,21 @@ export interface RegisterPurchasePayload {
   detalles: SaleDetail[];
 }
 
+export interface RegisterOperationPayload {
+  correlativo: string;
+  idPersona: number;
+  idTipoOperacion: number;
+  idTipoComprobante: number;
+  fechaEmision: string;
+  moneda: string;
+  tipoCambio: number;
+  serie: string;
+  numero: string;
+  fechaVencimiento?: string; // Opcional
+  total: number;
+  descripcion: string;
+}
+
 export interface TransactionTotals {
   idTotal: number;
   totalGravada: string;
@@ -53,15 +68,19 @@ export interface TransactionTotals {
 export interface Transaction {
   idComprobante: number;
   correlativo: string;
-  tipoOperacion: 'venta' | 'compra';
+  // Tipo de operación devuelto por el backend como objeto de tabla detalle
+  tipoOperacion: TablaDetalleResponse;
+  // Tipo de comprobante devuelto como objeto; puede ser string en endpoints antiguos
   tipoComprobante: string | TablaDetalleResponse;
   fechaEmision: string;
   moneda: string;
   tipoCambio: string;
   serie: string;
   numero: string;
-  fechaVencimiento: string;
-  totales: TransactionTotals;
+  // Puede ser null cuando no aplica
+  fechaVencimiento: string | null;
+  // Puede ser null si la operación no tiene totales
+  totales: TransactionTotals | null;
   detalles: Detail[];
   entidad: Entidad;
   persona: Persona;
