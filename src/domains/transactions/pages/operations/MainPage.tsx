@@ -339,14 +339,11 @@ const MainPage: React.FC = () => {
         {loading ? (
           <Loader />
         ) : (
-          <div className={styles.tableWrapper}>
-            {/* Grid template alineado con columnas: Fecha, Comprobante, Serie, Número, Entidad, Tipo Operación, Total, Acciones */}
             <Table
               headers={tableData.headers}
               rows={tableData.rows}
               gridTemplate={gridTemplate}
             />
-          </div>
         )}
 
         {/* Modal de detalle */}
