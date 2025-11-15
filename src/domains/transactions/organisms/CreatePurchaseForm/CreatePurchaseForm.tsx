@@ -653,19 +653,19 @@ export const CreatePurchaseForm = () => {
   };
 
   // Función para determinar si debe mostrarse el combo de comprobante afecto
-  //const shouldShowComprobanteAfecto = (): boolean => {
-  //  return (
-  //    formState.tipoComprobante === TipoComprobanteEnum.NOTA_ENTRADA
-  //  );
-  //};
+  const shouldShowComprobanteAfecto = (): boolean => {
+    const seleccionado = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+    const desc = seleccionado?.descripcion?.toUpperCase() || '';
+    return desc.includes('NOTA DE CRÉDITO') || desc.includes('NOTA DE CREDITO') || desc.includes('NOTA DE DÉBITO') || desc.includes('NOTA DE DEBITO');
+  };
 
   // Función para obtener las opciones de comprobantes afectos
-  //const getComprobantesAfectosOptions = () => {
-  //  return comprasRegistradas.map((compra) => ({
-  //    value: compra.idComprobante.toString(),
-  //    label: `${compra.serie}-${compra.numero} - ${compra.fechaEmision}`,
-  //  }));
-  //};
+  const getComprobantesAfectosOptions = () => {
+    return comprasRegistradas.map((compra) => ({
+      value: compra.idComprobante.toString(),
+      label: `${compra.serie}-${compra.numero} - ${compra.fechaEmision}`,
+    }));
+  };
 
   // Función para obtener las opciones de productos del inventario
   // Filtra los productos que ya están en el detalle de compra para el almacén seleccionado
@@ -807,10 +807,16 @@ export const CreatePurchaseForm = () => {
       const fechaVencimientoValida =
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
+      const seleccionado = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+      const descSel = seleccionado?.descripcion?.toUpperCase() || '';
+      const esNotaCredito = descSel.includes('NOTA DE CRÉDITO') || descSel.includes('NOTA DE CREDITO');
+      const esNotaDebito = descSel.includes('NOTA DE DÉBITO') || descSel.includes('NOTA DE DEBITO');
+      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 2;
+
       const compraData: any = {
         correlativo: formState.correlativo,
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
-        idTipoOperacion: 13, // 02-COMPRA según tabla 12
+        idTipoOperacion,
         idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
@@ -885,10 +891,16 @@ export const CreatePurchaseForm = () => {
       const fechaVencimientoValida =
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
+      const seleccionado2 = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+      const descSel2 = seleccionado2?.descripcion?.toUpperCase() || '';
+      const esNotaCredito2 = descSel2.includes('NOTA DE CRÉDITO') || descSel2.includes('NOTA DE CREDITO');
+      const esNotaDebito2 = descSel2.includes('NOTA DE DÉBITO') || descSel2.includes('NOTA DE DEBITO');
+      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 2;
+
       const compraData: any = {
         correlativo: formState.correlativo, // Usar valor del form o fake
         idPersona: getSelectedProviderId() || 1, // Usar ID del proveedor seleccionado o valor por defecto
-        idTipoOperacion: 2, // 02-COMPRA según tabla 12
+        idTipoOperacion: idTipoOperacion2,
         idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
@@ -1031,7 +1043,7 @@ export const CreatePurchaseForm = () => {
           </div>
 
           {/* Mostrar combo de Comprobante afecto solo para notas de crédito y débito */}
-          {/**shouldShowComprobanteAfecto() && (
+          {shouldShowComprobanteAfecto() && (
             <div
               className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--full"]}`}
             >
@@ -1044,10 +1056,10 @@ export const CreatePurchaseForm = () => {
                 variant="createSale"
                 name="idComprobanteAfecto"
                 value={formState.idComprobanteAfecto}
-                onChange={handleComprobanteAfectoChange}
+                onChange={(v) => setFormState(prev => ({...prev, idComprobanteAfecto: String(v)}))}
               />
             </div>
-          )*/}
+          )}
 
           <div
             className={`${styles.CreatePurchaseForm__FormField} ${styles["CreatePurchaseForm__FormField--proveedor"]}`}

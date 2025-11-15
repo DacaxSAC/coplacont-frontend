@@ -63,6 +63,7 @@ export const CreateSaleForm = () => {
   const [detalleVenta, setDetalleVenta] = useState<DetalleVentaItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [tiposComprobante, setTiposComprobante] = useState<TablaDetalleResponse[]>([]);
+  const [ventasRegistradas, setVentasRegistradas] = useState<any[]>([]);
 
   // Obtener el correlativo al montar el componente
 
@@ -92,6 +93,7 @@ export const CreateSaleForm = () => {
     };
     
     loadTiposComprobante();
+    TransactionsService.getSales().then((data) => setVentasRegistradas(data));
   }, []);
 
   const [productoSeleccionado, setProductoSeleccionado] = useState<
@@ -145,6 +147,7 @@ export const CreateSaleForm = () => {
       ...prev,
       tipoComprobante: tipoComprobanteValue,
       cliente: "",
+      fechaVencimiento: "",
     }));
   };
 
@@ -158,6 +161,19 @@ export const CreateSaleForm = () => {
       formState.tipoComprobante === TipoComprobanteEnum.BOLETA ||
       formState.tipoComprobante === TipoComprobanteEnum.NOTA_SALIDA
     );
+  };
+
+  const shouldShowComprobanteAfecto = (): boolean => {
+    const seleccionado = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+    const desc = seleccionado?.descripcion?.toUpperCase() || '';
+    return desc.includes('NOTA DE CRÉDITO') || desc.includes('NOTA DE CREDITO') || desc.includes('NOTA DE DÉBITO') || desc.includes('NOTA DE DEBITO');
+  };
+
+  const getComprobantesAfectosOptions = () => {
+    return ventasRegistradas.map((venta: any) => ({
+      value: venta.idComprobante.toString(),
+      label: `${venta.serie}-${venta.numero} - ${venta.fechaEmision}`,
+    }));
   };
 
   const isDetalleVentaEnabled = () => {
@@ -177,6 +193,7 @@ export const CreateSaleForm = () => {
       formState.tipoProductoVenta !== "" &&
       formState.serie !== "" &&
       formState.numero !== "" &&
+      (!shouldShowComprobanteAfecto() || formState.fechaVencimiento !== "") &&
       detalleVenta.length > 0
     );
   };
@@ -419,10 +436,16 @@ export const CreateSaleForm = () => {
       const fechaVencimientoValida =
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
+      const seleccionado = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+      const descSel = seleccionado?.descripcion?.toUpperCase() || '';
+      const esNotaCredito = descSel.includes('NOTA DE CRÉDITO') || descSel.includes('NOTA DE CREDITO');
+      const esNotaDebito = descSel.includes('NOTA DE DÉBITO') || descSel.includes('NOTA DE DEBITO');
+      const idTipoOperacion = esNotaCredito ? 8 : esNotaDebito ? 9 : 1;
+
       const ventaData: any = {
         correlativo: formState.correlativo,
         idPersona: getSelectedClientId() || 1,
-        idTipoOperacion: 12, // 01-VENTA según tabla 12
+        idTipoOperacion,
         idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
@@ -472,10 +495,16 @@ export const CreateSaleForm = () => {
       const fechaVencimientoValida =
         formState.fechaVencimiento && formState.fechaVencimiento.trim() !== "";
 
+      const seleccionado2 = tiposComprobante.find(t => t.idTablaDetalle.toString() === formState.tipoComprobante);
+      const descSel2 = seleccionado2?.descripcion?.toUpperCase() || '';
+      const esNotaCredito2 = descSel2.includes('NOTA DE CRÉDITO') || descSel2.includes('NOTA DE CREDITO');
+      const esNotaDebito2 = descSel2.includes('NOTA DE DÉBITO') || descSel2.includes('NOTA DE DEBITO');
+      const idTipoOperacion2 = esNotaCredito2 ? 8 : esNotaDebito2 ? 9 : 1;
+
       const ventaData: any = {
         correlativo: formState.correlativo || "CORR-12345", // Usar valor del form o fake
         idPersona: getSelectedClientId() || 1, // Usar ID del cliente seleccionado o valor por defecto
-        idTipoOperacion: 1, // 01-VENTA según tabla 12
+        idTipoOperacion: idTipoOperacion2,
         idTipoComprobante: parseInt(formState.tipoComprobante) || 1, // Usar ID del tipo de comprobante seleccionado
         fechaEmision: fechaEmisionValida
           ? new Date(formState.fechaEmision).toISOString()
@@ -959,6 +988,21 @@ export const CreateSaleForm = () => {
               onChange={handleComboBoxChange("tipoVenta")}
             />
           </div>
+          {shouldShowComprobanteAfecto() && (
+            <div
+              className={`${styles.CreateSaleForm__FormField} ${styles["CreateSaleForm__FormField--cliente"]}`}
+            >
+              <Text size="xs" color="neutral-primary">Comprobante afecto</Text>
+              <ComboBox
+                size="xs"
+                options={getComprobantesAfectosOptions()}
+                variant="createSale"
+                name="idComprobanteAfecto"
+                value={(formState as any).idComprobanteAfecto || ''}
+                onChange={(v) => (setFormState((prev: any) => ({...prev, idComprobanteAfecto: String(v)})))}
+              />
+            </div>
+          )}
         </div>
 
         {/** Fila 3: Serie, Número y Fecha de vencimiento */}
